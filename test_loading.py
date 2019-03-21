@@ -29,5 +29,5 @@ for i in range(len(images)):
         yticks([])
         cpt+=1
 
-show()
+savefig('test_loading.png')
 
