@@ -1,11 +1,15 @@
 import urllib.request
 import numpy as np
 import tarfile
+import os
+import pickle
+import time
 
+def load(data_format='NCHW',fine_labels=True):
+    
+    t = time.time()
 
-
-
-def load(data_format='NCHW'):
+    label = 'fine_labels' if fine_labels else 'coarse_labels'
 
     PATH = os.environ['DATASET_PATH']
 
@@ -13,30 +17,27 @@ def load(data_format='NCHW'):
         os.mkdir(PATH+'cifar100')
         print('Creating Directory')
     if not os.path.exists(PATH+'cifar100/cifar100.tar.gz'):
-        print('Downloading Files')
+        print('Downloading CIFAR100 Files')
         url = 'https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz'
         urllib.request.urlretrieve(url,PATH+'cifar100/cifar100.tar.gz')
     # Loading the file
+    print('Loading CIFAR100')
     tar = tarfile.open(PATH+'cifar100/cifar100.tar.gz', 'r:gz')
-    train_names = ['cifar-100-batches-py/train']
-    test_name   = ['cifar-100-batches-py/test']
+    train_names = ['cifar-100-python/train']
+    test_name   = ['cifar-100-python/test']
     for member in tar.getmembers():
         if member.name in train_names:
             f       = tar.extractfile(member)
             content = f.read()
-            lines   = tar.extractfile(UU[-1]).read()
-            data_dic= pickle.loads(FF)
+            data_dic= pickle.loads(content,encoding='latin1')
             train_set=[data_dic['data'].reshape((-1,3,32,32)),
-                        data_dic['labels'])]
+                        np.array(data_dic[label])]
         elif member.name in test_name:
             f       = tar.extractfile(member)
             content = f.read()
-            lines   = tar.extractfile(content).read()
-            data_dic= pickle.loads(FF)
+            data_dic= pickle.loads(content,encoding='latin1')
             test_set= [data_dic['data'].reshape((-1,3,32,32)),
-                        data_dic['labels'])]
-    train_set[0] = np.concatenate(train_set[0],axis=0)
-    train_set[1] = np.concatenate(train_set[1],axis=0)
+                        np.array(data_dic[label])]
     # Compute a Valid Set
     random_indices = np.random.permutation(train_set[0].shape[0])
     train_indices  = random_indices[:int(train_set[0].shape[0]*0.9)]
@@ -48,6 +49,7 @@ def load(data_format='NCHW'):
         train_set[0] = np.transpose(train_set[0],[0,2,3,1])
         test_set[0] = np.transpose(test_set[0],[0,2,3,1])
         valid_set[0] = np.transpose(valid_set[0],[0,2,3,1])
+    print('Dataset CIFAR100 loaded in','{0:.2f}'.format(time.time()-t),'s.')
     return train_set,valid_set,test_set
 
 

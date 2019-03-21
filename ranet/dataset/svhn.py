@@ -3,8 +3,12 @@ import os
 import pickle,gzip
 import urllib.request
 import numpy as np
+import time
+
 
 def load(data_format='NCHW'):
+
+    t = time.time()
 
     PATH = os.environ['DATASET_PATH']
 
@@ -41,6 +45,9 @@ def load(data_format='NCHW'):
         train_set[0] = np.transpose(train_set[0],[0,2,3,1])
         test_set[0]  = np.transpose(test_set[0],[0,2,3,1])
         valid_set[0] = np.transpose(valid_set[0],[0,2,3,1])
+
+    print('Dataset SVHN loaded in','{0:.2f}'.format(time.time()-t),'s.')
+
     return train_set, valid_set, test_set
 
 

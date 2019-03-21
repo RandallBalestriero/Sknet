@@ -2,41 +2,52 @@ import os
 import gzip
 import urllib.request
 import numpy as np
+import time
+
+
 
 def load(data_format='NCHW'):
+
+    t = time.time()
 
     PATH = os.environ['DATASET_PATH']
 
     if not os.path.isdir(PATH+'fashionmnist'):
+        print('Creating Directory')
         os.mkdir(PATH+'fashionmnist')
 
     if not os.path.exists(PATH+'fashionmnist/train-images-idx3-ubyte.gz'):
+        print('Downloading FASHION-MNIST Train Images')
         urllib.request.urlretrieve('http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz',PATH+'fashionmnist/train-images-idx3-ubyte.gz')
 
     if not os.path.exists(PATH+'fashionmnist/train-labels-idx1-ubyte.gz'):
+        print('Downloading FASHION-MNIST Train Labels')
         urllib.request.urlretrieve('http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-labels-idx1-ubyte.gz',PATH+'fashionmnist/train-labels-idx1-ubyte.gz')
 
     if not os.path.exists(PATH+'fashionmnist/t10k-images-idx3-ubyte.gz'):
+        print('Downloading FASHION-MNIST Test Images')
         urllib.request.urlretrieve('http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-images-idx3-ubyte.gz',PATH+'fashionmnist/t10k-images-idx3-ubyte.gz')
 
     if not os.path.exists(PATH+'fashionmnist/t10k-labels-idx1-ubyte.gz'):
+        print('Downloading FASHION-MNIST Test Labels')
         urllib.request.urlretrieve('http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-labels-idx1-ubyte.gz',PATH+'fashionmnist/t10k-labels-idx1-ubyte.gz')
 
     # Loading the file
+    print('Loading FASHION-MNIST')
     train_set = [[],[]]
     test_set  = [[],[]]
 
-    with gzip.open(PATH+'fashionmnist/train-labels-idx3-ubyte.gz', 'rb') as lbpath:
+    with gzip.open(PATH+'fashionmnist/train-labels-idx1-ubyte.gz', 'rb') as lbpath:
         train_set[1] = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
 
     with gzip.open(PATH+'fashionmnist/train-images-idx3-ubyte.gz', 'rb') as lbpath:
-        train_set[0] = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=16).reshape(len(train_set[1]), (1,28,28))
+        train_set[0] = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=16).reshape((len(train_set[1]),1,28,28))
 
-    with gzip.open(PATH+'fashionmnist/t10k-labels-idx3-ubyte.gz', 'rb') as lbpath:
+    with gzip.open(PATH+'fashionmnist/t10k-labels-idx1-ubyte.gz', 'rb') as lbpath:
         test_set[1] = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
 
     with gzip.open(PATH+'fashionmnist/t10k-images-idx3-ubyte.gz', 'rb') as lbpath:
-        test_set[0] = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=16).reshape(len(train_set[1]), (1,28,28))
+        test_set[0] = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=16).reshape((len(test_set[1]),1,28,28))
 
     # Compute a Valid Set
     random_indices = np.random.permutation(train_set[0].shape[0])
@@ -50,6 +61,9 @@ def load(data_format='NCHW'):
         train_set[0] = np.transpose(train_set[0],[0,2,3,1])
         test_set[0]  = np.transpose(test_set[0],[0,2,3,1])
         valid_set[0] = np.transpose(valid_set[0],[0,2,3,1])
+
+    print('Dataset FASHION-MNIST loaded in','{0:.2f}'.format(time.time()-t),'s.')
+
     return train_set, valid_set, test_set
 
 
