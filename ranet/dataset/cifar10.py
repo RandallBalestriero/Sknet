@@ -16,6 +16,8 @@ def load(data_format='NCHW'):
         print('Downloading Files')
         url = 'https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz'
         urllib.request.urlretrieve(url,PATH+'cifar10/cifar10.tar.gz')
+
+    print('Loading CIFAR10')
     # Loading the file
     tar = tarfile.open(PATH+'cifar10/cifar10.tar.gz', 'r:gz')
     # Loop over ['data_batch_1','data_batch_2','data_batch_3','data_batch_4','data_batch_5',]
@@ -31,17 +33,15 @@ def load(data_format='NCHW'):
         if member.name in train_names:
             f       = tar.extractfile(member)
             content = f.read()
-            lines   = tar.extractfile(UU[-1]).read()
-            data_dic= pickle.loads(FF)
+            data_dic= pickle.loads(content,encoding='latin1')
             train_set[0].append(data_dic['data'].reshape((-1,3,32,32)))
             train_set[1].append(data_dic['labels'])
         elif member.name in test_name:
             f       = tar.extractfile(member)
             content = f.read()
-            lines   = tar.extractfile(content).read()
-            data_dic= pickle.loads(FF)
+            data_dic= pickle.loads(content,encoding='latin1')
             test_set= [data_dic['data'].reshape((-1,3,32,32)),
-                        data_dic['labels'])]
+                        data_dic['labels']]
     train_set[0] = np.concatenate(train_set[0],axis=0)
     train_set[1] = np.concatenate(train_set[1],axis=0)
     # Compute a Valid Set

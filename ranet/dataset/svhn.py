@@ -22,13 +22,13 @@ def load(data_format='NCHW'):
         url = 'http://ufldl.stanford.edu/housenumbers/test_32x32.mat'
         urllib.request.urlretrieve(url,PATH+'svhn/test_32x32.mat')
 
-
+    print('Loading SVHN')
     train_set = sio.loadmat(PATH+'svhn/train_32x32.mat')
     train_set = [train_set['X'].transpose([3,2,0,1]).astype('float32'),
-                concatenate(train_data['y']).astype('int32')-1]
+                train_set['y'].astype('int32')-1]
     test_set  = sio.loadmat(PATH+'svhn/test_32x32.mat')
-    test_set  = [test_data['X'].transpose([3,2,0,1]).astype('float32'),
-                concatenate(test_data['y']).astype('int32')-1]
+    test_set  = [test_set['X'].transpose([3,2,0,1]).astype('float32'),
+                test_set['y'].astype('int32')-1]
 
     # Compute a Valid Set
     random_indices = np.random.permutation(train_set[0].shape[0])
