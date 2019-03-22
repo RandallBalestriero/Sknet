@@ -1,33 +1,30 @@
 from ranet.dataset import mnist,svhn,cifar10,fashionmnist,cifar100
-from pylab import *
+from ranet.utils import plotting
+import pylab as pl
 
-images = list()
+# Put the dataset functions into a list s.t. dataset_list[0].load() 
+# loads the dataset 0
+dataset_list = [mnist,fashionmnist,svhn,cifar10,cifar100]
 
-train_set,valid_set,test_set = mnist.load()
-images.append(train_set[0][:10])
+# Save number of dataset
+n_dataset    = len(dataset_list)
 
-train_set,valid_set,test_set = fashionmnist.load()
-images.append(train_set[0][:10])
+# Initialize the counter for subplot
+cpt          = 1
 
-train_set,valid_set,test_set = svhn.load()
-images.append(train_set[0][:10])
-
-train_set,valid_set,test_set = cifar10.load()
-images.append(train_set[0][:10])
-
-train_set,valid_set,test_set = cifar100.load()
-images.append(train_set[0][:10])
-
-
-
-cpt=1
-for i in range(len(images)):
-    for im in images[i]:
-        subplot(len(images),10,cpt)
-        imshow(squeeze(im.transpose([1,2,0]))/im.max(),aspect='auto')
-        xticks([])
-        yticks([])
+# Loop over the dataset_list to load them (download them if necessary)
+# and display the first 10 images
+pl.figure(figsize=(20,n_dataset*2))
+for dataset in dataset_list:
+    train_set,valid_set,test_set = dataset.load(seed=10)
+    for im,label in zip(train_set[0][:10],train_set[1][:10]):
+        pl.subplot(n_dataset,10,cpt)
+        pl.title(label)
+        plotting.imshow(im)
         cpt+=1
 
-savefig('test_loading.png')
+# Reduce side margins
+pl.tight_layout()
+
+pl.savefig('test_loading.png')
 

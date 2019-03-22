@@ -6,7 +6,7 @@ import tarfile
 import time
 
 
-def load(data_format='NCHW'):
+def load(data_format='NCHW', seed=None):
 
     t = time.time()
 
@@ -49,7 +49,7 @@ def load(data_format='NCHW'):
     train_set[0] = np.concatenate(train_set[0],axis=0)
     train_set[1] = np.concatenate(train_set[1],axis=0)
     # Compute a Valid Set
-    random_indices = np.random.permutation(train_set[0].shape[0])
+    random_indices = np.random.RandomState(seed=seed).permutation(train_set[0].shape[0])
     train_indices  = random_indices[:int(train_set[0].shape[0]*0.9)]
     valid_indices  = random_indices[int(train_set[0].shape[0]*0.9):]
     valid_set      = [train_set[0][valid_indices],train_set[1][valid_indices]]

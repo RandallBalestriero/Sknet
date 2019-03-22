@@ -2,8 +2,6 @@
 # -*- coding: utf-8 -*-
 
 import tensorflow as tf
-from utils import *
-
 
 
 class PoolLayer:
@@ -11,7 +9,7 @@ class PoolLayer:
         self.output = tf.nn.pool(incoming.output, windows, pool_type, padding=padding, 
                                     strides=strides, data_format=data_format)
         self.VQ     = None #TO CHANGE !
-        self.output_shape=self.output.get_shape().as_list())
+        self.output_shape=self.output.get_shape().as_list()
 
 
 class GlobalPoolLayer:

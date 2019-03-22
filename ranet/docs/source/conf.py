@@ -24,9 +24,9 @@ copyright = '2019, Randall Balestriero'
 author = 'Randall Balestriero'
 
 # The short X.Y version
-version = ''
+version = 'a.1'
 # The full version, including alpha/beta/rc tags
-release = '03/19/2019'
+release = 'alpha.1'
 
 
 # -- General configuration ---------------------------------------------------

@@ -5,7 +5,7 @@ import numpy as np
 import time
 
 
-def load(data_format='NCHW'):
+def load(data_format='NCHW',seed=None):
 
     t = time.time()
 

@@ -1,13 +1,14 @@
-from utils_plot import *
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
 
+import tensorflow as tf
 
-import random
 
 
 
 class Trainer(object):
-    def __init__(self, model, lr=0.0001,
-                optimizer = tf.train.AdamOptimizer, regression=False):
+    def __init__(self, model, lr_schedule, optimizer = tf.train.AdamOptimizer, regression=False, 
+            bn_training=True):
         # Tensorflow Config
         tf.reset_default_graph()
         config                          = tf.ConfigProto()
@@ -17,96 +18,105 @@ class Trainer(object):
         # Attributes
         self.n_classes  = model.n_classes
         self.batch_size = model.input_shape[0]
-        self.lr         = lr
-#        self.update_batch_norm = update_batch_norm
         self.regression = regression
+        self.bn_training= bn_training
+        self.lr_schedule= lr_schedule
         with tf.device('/device:GPU:0'):
             self.learning_rate = tf.placeholder(tf.float32,name='learning_rate')
-            optimizer          = optimizer(self.learning_rate)
             self.x             = tf.placeholder(tf.float32, shape=model.input_shape,name='x')
             self.training      = tf.placeholder(tf.bool,name='phase')
             self.prediction,self.layers = model_class.get_layers(self.x,training=self.training)
             self.number_of_params = count_number_of_params()
             if(regression):
-                self.y_       = tf.placeholder(tf.float32, shape=[input_shape[0]],name='y')
-                self.loss     = tf.reduce_sum(tf.nn.l2_loss(self.prediction-self.y_)*2)/input_shape[0]
+                self.y        = tf.placeholder(tf.float32, shape=[input_shape[0]],name='y')
+                self.loss     = tf.reduce_sum(tf.nn.l2_loss(self.prediction-self.y)*2)/input_shape[0]
                 self.accuracy = self.loss
             else:
-                self.y_       = tf.placeholder(tf.int32, shape=[input_shape[0]],name='y')
-                self.loss     = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.prediction,labels=self.y_))/input_shape[0]
-                self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.cast(tf.argmax(self.prediction,1),tf.int32), self.y_),tf.float32))
+                self.y        = tf.placeholder(tf.int32, shape=[input_shape[0]],name='y')
+                self.loss     = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.prediction,labels=self.y))/input_shape[0]
+                self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.cast(tf.argmax(self.prediction,1),tf.int32), self.y),tf.float32))
 #            self.VQ        = [l.VQ for l in self.layers[1:]]
 #            self.distances = tf.stack([get_distance(self.layers[:2+l]) for l in range(len(self.layers)-1)],1)
 #            self.positive_radius = tf.stack([l.positive_radius for l in self.layers[1:]],1)
 #            self.negative_radius = tf.stack([l.negative_radius for l in self.layers[1:]],1)
+            optimizer        = optimizer(self.learning_rate)
             self.update_ops  = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
             with tf.control_dependencies(self.update_ops):
                 self.apply_updates = optimizer.minimize(self.loss)
             self.session.run(tf.global_variables_initializer())
     def _fit_batch_norm(self,X):
         perm = permutation(X.shape[0])
-        n_train    = X.shape[0]//self.batch_size
         for i in range(n_train):
             here = perm[i*self.batch_size:(i+1)*self.batch_size]
             self.session.run(self.update_ops,feed_dict={self.x:X[here],self.training:True})
-    def _fit(self,X,y,indices,update_time=50):
-        self.e+=1
-        n_train    = X.shape[0]//self.batch_size
-        train_loss = []
-        for i in range(n_train):
-            if(self.batch_size<self.n_classes):
-                here = [random.sample(k,1) for k in indices]
-                here = [here[i] for i in permutation(self.n_classes)[:self.batch_size]]
-            else:
-                here = [random.sample(k,self.batch_size//self.n_classes) for k in indices]
-                here = concatenate(here)
-            self.session.run(self.apply_updates,feed_dict={self.x:X[here],self.y_:y[here],self.training:self.update_batch_norm,self.learning_rate:float32(self.lr)})
-            if(i%update_time==0):
-                train_loss.append(self.session.run(self.loss,feed_dict={self.x:X[here],self.y_:y[here],self.training:False}))
-            if(i%100 ==0):
-                print(i,n_train,train_loss[-1])
-        return train_loss
-    def _fit_regression(self,X,y,update_time=50):
-        self.e    += 1
-        n_train    = X.shape[0]//self.batch_size
-        train_loss = []
-        perm       = permutation(X.shape[0])
-        for i in range(n_train):
+    def _fit(self,data,update_time=50):
+        loss = []
+        perm = permutation(X.shape[0])
+        for i in range(self.n_train):
             here = perm[i*self.batch_size:(i+1)*self.batch_size]
-            self.session.run(self.apply_updates,feed_dict={self.x:X[here],self.y_:y[here],self.training:self.update_batch_norm,self.learning_rate:float32(self.lr)})
+            self.session.run(self.apply_updates,feed_dict={self.x:data[0][here],self.y:data[1][here],
+                self.training:self.bn_training,self.learning_rate:float32(self.lr_schedule.lr)})
             if(i%update_time==0):
-                train_loss.append(self.session.run(self.loss,feed_dict={self.x:X[here],self.y_:y[here],self.training:False}))
-            if(i%100 ==0):
-                print(i,n_train,train_loss[-1])
-        return train_loss
-    def fit(self,X,y,X_test,y_test,n_epochs=5,batch_norm_epochs=0):
+                loss.append(self.session.run(self.loss,
+                    feed_dict={self.x:data[0][here],self.y:data[1][here],self.training:False}))
+                print(i,self.n_train,loss[-1])
+        return loss
+    def _fit_regression(self,data,update_time=50):
+        loss = []
+        perm = permutation(data[0].shape[0])
+        for i in range(self.n_train):
+            here = perm[i*self.batch_size:(i+1)*self.batch_size]
+            self.session.run(self.apply_updates,feed_dict={self.x:data[0][here],self.y_:data[1][here],
+                self.training:self.bn_training,self.learning_rate:float32(self.lr_schedule.lr)})
+            if(i%update_time==0):
+                loss.append(self.session.run(self.loss,
+                    feed_dict={self.x:data[0][here],self.y:data[1][here],self.training:False}))
+                print(i,self.n_train,loss[-1])
+        return loss
+    def _test(self,data,n):
+        acc = 0.0
+        for j in range(n):
+            acc+=self.session.run(self.accuracy,feed_dict={
+                self.x:data[0][self.batch_size*j:self.batch_size*(j+1)],
+                self.y:data[1][self.batch_size*j:self.batch_size*(j+1)],self.training:False})
+        return acc/n
+    def fit(self, train_set, valid_set, test_set, update_time = 50,
+            n_epochs=5, batch_norm_epochs=0):
+        # Set up the number of batches for each set
+        self.n_train = train_set[0].shape[0]//self.batch_size
+        self.n_test  = test_set[0].shape[0]//self.batch_size
+        self.n_valid = valid_set[0].shape[0]//self.batch_size
+        # Init list
         train_loss = []
+        valid_accu = []
         test_accu  = []
-        self.e     = 0
-        n_test     = X_test.shape[0]//self.batch_size
-        if(self.regression==False): indices    = [list(find(y==k)) for k in range(self.n_classes)]
+        lr         = []
+        # Perform training of batch-norm (optional, should be 0 in general)
         for i in range(batch_norm_epochs):
-            self._fit_batch_norm(X)
+            self._fit_batch_norm(train_set[0])
         if(n_epochs==0): return 0,0
-        for i in range(n_epochs):
-            if i==(3*n_epochs//4): self.lr/=3
-            elif i==(5*n_epochs//6): self.lr/=3
+        for epoch in range(n_epochs):
             print("epoch",i)
-            if(self.regression==False): train_loss.append(self._fit(X,y,indices))
-            else:                  train_loss.append(self._fit_regression(X,y))
+            if self.regression:
+                train_loss.append(self._fit_regression(train_set, update_time=update_time))
+            else:
+                train_loss.append(self._fit(train_set, update_time=update_time))
+            # NOW COMPUTE VALID SET ACCURACY
+            valid_accu.append(self._test(valid_set,self.n_valid))
             # NOW COMPUTE TEST SET ACCURACY
-            acc1 = 0.0
-            for j in range(n_test):
-                acc1+=self.session.run(self.accuracy,feed_dict={self.x:X_test[self.batch_size*j:self.batch_size*(j+1)],
-    				self.y_:y_test[self.batch_size*j:self.batch_size*(j+1)],self.training:False})
-            test_accu.append(acc1/n_test)
-            print('Test:',test_accu[-1])
-        return concatenate(train_loss),test_accu
+            test_accu.append(self._test(test_set,self.n_test))
+            self.lr_schedule.update(epoch=epoch,valid_accu=valid_accu)
+            print('Valid:',valid_accu[-1])
+        return train_loss,valid_accu,test_accu,self.lr_schedule.lrs
     def predict(self,X):
+        """
+        Given an array return the prediction
+        """
         n = X.shape[0]//self.batch_size
         preds = []
         for j in range(n):
-            preds.append(self.session.run(self.prediction,feed_dict={self.x:X[self.batch_size*j:self.batch_size*(j+1)],self.training:False}))
+            preds.append(self.session.run(self.prediction,
+                feed_dict={self.x:X[self.batch_size*j:self.batch_size*(j+1)],self.training:False}))
         return concatenate(preds,axis=0)
     def get_continuous_VQ(self,X):
         """
