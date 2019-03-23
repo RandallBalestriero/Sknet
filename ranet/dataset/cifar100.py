@@ -5,8 +5,20 @@ import os
 import pickle
 import time
 
+
+
+
+name          = 'cifar100'
+image_shape = (3,32,32)
+data_format   = 'NCHW'
+classes       = 100
+
+
 def load(data_format='NCHW',fine_labels=True, seed=None):
     
+    if not fine_labels:
+        classes=10
+
     t = time.time()
 
     label = 'fine_labels' if fine_labels else 'coarse_labels'

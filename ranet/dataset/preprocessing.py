@@ -4,9 +4,21 @@
 import numpy as np
 import time
 
+
+class identity:
+    def __init__(self,eps=0.0001):
+        self.name = '-preprocessing(identity)'
+    def fit(self,x,axis=[0],**kwargs):
+        pass
+    def fit_transform(self,x,**kwargs):
+        return x
+    def transform(self,x,**kwargs):
+        return x
+
+
 class standardize:
     def __init__(self,eps=0.0001):
-        self.name = 'standardize, eps:'+str(eps)
+        self.name = '-preprocessing(standardize,eps='+str(eps)+')'
         self.eps = eps
     def fit(self,x,axis=[0],**kwargs):
         print("Fitting standardize preprocessing")
@@ -27,7 +39,7 @@ class standardize:
 
 class zca_whitening:
     def __init__(self,eps = 0.0001):
-        self.name = 'zca_whitening, eps:'+str(eps)
+        self.name = '-preprocessing(zcawhitening,eps='+str(eps)+')'
         self.eps = eps
     def fit(self,x):
         print("Fitting zca_whitening preprocessing")

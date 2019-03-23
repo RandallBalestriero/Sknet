@@ -5,6 +5,11 @@ import numpy as np
 import time
 
 
+name          = 'mnist'
+image_shape = (1,28,28)
+data_format   = 'NCHW'
+classes       = 10
+
 def load(data_format='NCHW',seed=None):
 
     t = time.time()

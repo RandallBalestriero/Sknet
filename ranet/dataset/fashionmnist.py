@@ -6,6 +6,13 @@ import time
 
 
 
+
+name          = 'fashionmnist'
+image_shape = (1,28,28)
+data_format   = 'NCHW'
+classes       = 10
+
+
 def load(data_format='NCHW',seed=None):
 
     t = time.time()

@@ -6,6 +6,12 @@ import tarfile
 import time
 
 
+name          = 'cifar10'
+image_shape   = (3,32,32)
+data_format   = 'NCHW'
+classes       = 10
+
+
 def load(data_format='NCHW', seed=None):
 
     t = time.time()

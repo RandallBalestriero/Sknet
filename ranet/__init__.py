@@ -4,9 +4,9 @@
 
 __all__ = [
         "dataset",
-        "layers",
+        "layer",
         "utils",
-        "models",
+        "model",
         "samples"]
 
 from . import *
