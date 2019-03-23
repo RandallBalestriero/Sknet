@@ -7,7 +7,7 @@ import tensorflow as tf
 # ToDo: PoolLayer: optimize s.t. if it is just channel pooling you dont reshape
 
 
-class PoolLayer:
+class Pool:
     def __init__(self, incoming, windows, strides=None, pool_type='MAX', padding='VALID'):
         """
 
@@ -72,7 +72,7 @@ class PoolLayer:
         self.output_shape=self.output.get_shape().as_list()
 
 
-class GlobalSpatialPoolLayer:
+class GlobalSpatialPool:
     def __init__(self,incoming, pool_type='AVG'):
         """
 

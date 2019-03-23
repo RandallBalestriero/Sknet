@@ -11,17 +11,17 @@ class base(Model):
         self.name = '-model(cnn.base)'
         self.data_format = data_format
     def get_layers(self,input_variable,training):
-        dnn = [layer.InputLayer(self.input_shape,input_variable, data_format=self.data_format)]
+        dnn = [layer.Input(self.input_shape,input_variable, data_format=self.data_format)]
         #
-        dnn.append(layer.transform.Conv2DLayer(dnn[-1],filters=(32,5,5),
+        dnn.append(layer.transform.Conv2D(dnn[-1],filters=(32,5,5),
             nonlinearity = tf.nn.relu, training=training, batch_norm=True))
-        dnn.append(layer.pool.PoolLayer(dnn[-1],windows=(1,2,2),strides=(1,2,2),pool_type='MAX'))
+        dnn.append(layer.pool.Pool(dnn[-1],windows=(1,2,2),strides=(1,2,2),pool_type='MAX'))
         #
-        dnn.append(layer.transform.Conv2DLayer(dnn[-1],filters=(64,3,3),
+        dnn.append(layer.transform.Conv2D(dnn[-1],filters=(64,3,3),
             nonlinearity = tf.nn.relu, training=training, batch_norm=True))
-        dnn.append(layer.pool.PoolLayer(dnn[-1],windows=(1,2,2),strides=(1,2,2),pool_type='MAX'))
-        dnn.append(layer.transform.DenseLayer(dnn[-1], units=128, training=training, batch_norm=True))
-        dnn.append(layer.OutputLayer(dnn[-1],classes=self.classes))
+        dnn.append(layer.pool.Pool(dnn[-1],windows=(1,2,2),strides=(1,2,2),pool_type='MAX'))
+        dnn.append(layer.transform.Dense(dnn[-1], units=128, training=training, batch_norm=True))
+        dnn.append(layer.Output(dnn[-1],classes=self.classes))
         return dnn
 
 

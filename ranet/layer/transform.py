@@ -3,7 +3,7 @@ from .normalization import batch_normalization as _bn
 import numpy as np
 
 
-class DenseLayer:
+class Dense:
     def __init__(self, incoming, units, nonlinearity = tf.nn.relu,
                 training=None, batch_norm = False,
                 init_W = tf.contrib.layers.xavier_initializer(uniform=True), name=''):
@@ -76,7 +76,7 @@ class ConstraintDenseLayer:
 
 
 
-class Conv2DLayer:
+class Conv2D:
     def __init__(self,incoming,filters,nonlinearity = tf.nn.relu,
                     training=None, batch_norm = True,
                     init_W = tf.contrib.layers.xavier_initializer(uniform=True),
