@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 __all__ = [
+        "preprocess",
         "mnist",
         "fashionmnist",
         "svhn",

@@ -1,6 +1,6 @@
-from ranet.dataset import mnist,svhn,cifar10,fashionmnist,cifar100
-from ranet.dataset import preprocessing
-from ranet.utils import plotting
+from sknet.dataset import mnist,svhn,cifar10,fashionmnist,cifar100
+from sknet.dataset import preprocess
+from sknet.utils import plotting
 
 import pylab as pl
 

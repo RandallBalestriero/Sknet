@@ -1,7 +1,7 @@
-from ranet import dataset
-from ranet.dataset import preprocessing
-from ranet.utils import schedules,trainer
-from ranet import model,utils
+from sknet import dataset
+from sknet.dataset import preprocessing
+from sknet.utils import schedules,trainer
+from sknet import model,utils
 import matplotlib
 matplotlib.use('Agg')
 import os

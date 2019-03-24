@@ -3,7 +3,7 @@
 
 __all__ = [
         "special",
-        "normalization",
+        "normalize",
         "pool",
         "augment",
         "transform",
