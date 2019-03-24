@@ -1,0 +1,14 @@
+Metadata-Version: 2.1
+Name: sknet
+Version: 0.0.1
+Summary: sknet package
+Home-page: https://github.com/RandallBalestriero/sknet
+Author: Randall Balestriero
+Author-email: randallbalestriero@gmail.com
+License: UNKNOWN
+Description: # Highperplane
+Platform: UNKNOWN
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Classifier: Operating System :: Linux
+Description-Content-Type: text/markdown

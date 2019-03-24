@@ -1,0 +1,294 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Data Loading &mdash; sk-net alpha.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'alpha.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Pre-processing" href="preprocess.html" />
+    <link rel="prev" title="Installation" href="installation.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> sk-net
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                a.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Data Loading</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#adding-a-dataset">Adding a dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#code-example">Code Example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="preprocess.html">Pre-processing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="layer.html">Layers</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">sk-net</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li>Data Loading</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/user/dataset.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="data-loading">
+<h1>Data Loading<a class="headerlink" href="#data-loading" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dataset">
+<h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
+<p>Sknet provides comon dataset out-of-the-box in the _sknet.dataset module as</p>
+<ul class="simple">
+<li>sknet.dataset.mnist</li>
+<li>sknet.dataset.fashionmnist</li>
+<li>sknet.dataset.svhn</li>
+<li>sknet.dataset.cifar10</li>
+<li>sknet.dataset.cifar100</li>
+</ul>
+<p>In order to load the train/valid/test set one simply
+calls the load function as in:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_set</span><span class="p">,</span><span class="n">valid_set</span><span class="p">,</span><span class="n">test_set</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mnist</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>where each set contains first the inputs and then the labels as in:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_x</span><span class="p">,</span><span class="n">train_y</span> <span class="o">=</span> <span class="n">train_set</span>
+<span class="n">valid_x</span><span class="p">,</span><span class="n">valid_y</span> <span class="o">=</span> <span class="n">valid_set</span>
+<span class="n">test_x</span><span class="p">,</span><span class="n">test_y</span>   <span class="o">=</span> <span class="n">test_set</span>
+</pre></div>
+</div>
+<p>To access the image shape, the data format or additional dataset
+specific attributes simply do:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">mnist_image_shape</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mnist</span><span class="o">.</span><span class="n">image_shape</span> <span class="c1">#(1,28,28)</span>
+<span class="n">mnist_data_format</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">mnist</span><span class="o">.</span><span class="n">data_format</span> <span class="c1"># &#39;NCHW&#39;</span>
+</pre></div>
+</div>
+<p>The standard format is ‘NCHW’. But the
+library supports transparently the ‘NHWC’.</p>
+<p>All the pre-coded dataset will be loaded from the path given by the
+environment variable DATASET_PATH. If needs be, the dataset will first
+be downloaded into this path prior loading (at first utilisation of
+sknet for example). The saved dataset are in compressed format.</p>
+</div>
+<div class="section" id="adding-a-dataset">
+<h2>Adding a dataset<a class="headerlink" href="#adding-a-dataset" title="Permalink to this headline">¶</a></h2>
+<p>Each dataset has its correpsonding file in sknet/dataset/dataset_name.py
+in which all the attributes and the load function are defined.
+To add a dataset, one needs to create a .py file with name being the one
+of the dataset. In this file one needs</p>
+<ul class="simple">
+<li>load function</li>
+<li>image_shape, data_format attributes</li>
+</ul>
+</div>
+<div class="section" id="code-example">
+<h2>Code Example<a class="headerlink" href="#code-example" title="Permalink to this headline">¶</a></h2>
+<p>Running the code _quickstart_data_loading.py</p>
+<div class="figure" id="id1">
+<a class="reference internal image-reference" href="../_images/test_loading.png"><img alt="dataset figure" src="../_images/test_loading.png" style="width: 1000.0px; height: 500.0px;" /></a>
+<p class="caption"><span class="caption-text">Preloaded dataset from sknet.</span></p>
+</div>
+<p>running for the first time will produce:</p>
+<p>Loading MNIST
+Dataset MNIST loaded in 0.71 s.
+Loading FASHION-MNIST
+Dataset FASHION-MNIST loaded in 0.33 s.
+Loading SVHN
+Dataset SVHN loaded in 2.74 s.
+Loading CIFAR10
+Dataset CIFAR10 loaded in 2.37 s.
+Loading CIFAR100
+Dataset CIFAR100 loaded in 2.39 s.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="preprocess.html" class="btn btn-neutral float-right" title="Pre-processing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="installation.html" class="btn btn-neutral float-left" title="Installation" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sk-net contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

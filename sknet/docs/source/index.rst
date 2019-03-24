@@ -1,17 +1,55 @@
-Welcome to sk-net
-==================
+Welcome to sk-net (in construction)
+===================================
 
-Lasagne is a lightweight library to build and train neural networks in Theano.
+Sknet is a lightweight library to build and train neural networks in Tensorflow.
+This library aims ot fulfill two major goals:
 
-Lasagne is a work in progress, input is welcome. The available documentation is
-limited for now. The project is on `GitHub`_.
+    - provide an out-of-the-box solution for practicioner to reproduce results
+    and build upon previous work with a comon working environment
+    - provide tools and simple methods following the research direction of
+    the development team around max-affine splines to interpret deep neural
+    networks
+    
+This toolbox is oriented for research and education, for any scale projects
+do not requiring multi-GPU computing.
+We briefly describe here the fundamentals of the toolbox. The project is on _GitHub.
+
+
+Sknet way ot working
+--------------------
+
+The library is built with the deep learning pipeline in mind. That is, it provides
+multiple blocks being combined to solve a task. Those blocks are:
+
+    - dataset : any collection of inputs or (input-output) pairs
+    
+    - pre-processing (optional): pre-processing that can be applied onto any
+    dataset for increased performances s.a. zca whitening
+    
+    - models : a fully describe DNN form input to output, in term of 
+    layers s.a. LeNet5
+    
+    - layers : low-level building blocks of any DNN s.a. dense or conv2D
+    
+    - optimizer : any updating policy applied onto the learnable weights 
+    of a model s.a. adam or sgd
+    
+    - learning rate schedules: combined with a loss function, a model and 
+    a dataset, the learning rate scheduler plays a crucial role to 
+    guarantee best performances s.a. stepwise or adaptive
+    
+    - trainer : a higher-level method assembling those independent blocks 
+    into a trainable pipeline, also containing the tensorflow session
+
+
+In each block, any user can augment the library with their own creation.
 
   
 User Guide
 ----------
 
-The Lasagne user guide explains how to install Lasagne, how to build and train
-neural networks using Lasagne, and how to contribute to the library as a
+The Sknet user guide explains how to install Sknet, how to build and train
+neural networks, and how to contribute to the library as a
 developer.
 
 .. toctree::
@@ -26,8 +64,7 @@ developer.
 API Reference
 -------------
 
-If you are looking for information on a specific function, class or
-method, this part of the documentation is for you.
+If you are looking for information on a specific function:
 
 .. toctree::
   :maxdepth: 2
@@ -35,7 +72,6 @@ method, this part of the documentation is for you.
   modules/dataset
   modules/layer
   modules/model
-  modules/preprocessing
   
 
 Quickstart

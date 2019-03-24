@@ -40,7 +40,7 @@ project = u'sk-net'
 copyright = u'2019, Sk-net contributors'
 author = 'Randall Balestriero'
 
-#import sknet
+from ../../.. import sknet
 #version = '.'.join(tensorflow.__version__.split('.', 2)[:2])
 #release = sknet.__version__
 version = 'a.1'
