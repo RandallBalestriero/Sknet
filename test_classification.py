@@ -2,7 +2,8 @@ from ranet import dataset
 from ranet.dataset import preprocessing
 from ranet.utils import schedules,trainer
 from ranet import model,utils
-
+import matplotlib
+matplotlib.use('Agg')
 import os
 # Make Tensorflow quiet.
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
@@ -73,7 +74,7 @@ for dataset_ in datasets:
                 pl.subplot(133)
                 pl.plot(lrs)
                 pl.title('Learning Rates')
-                pl.suptitle(name+' {0.:1f}%, in {}min.'.format(best_accu*100,np.int32((time.time()-t_)/60)))
+                pl.suptitle(name+' {:1f}, in {}min.'.format(best_accu*100,np.int32((time.time()-t_)/60)))
                 pl.savefig(name+'.png')
 #np.savez_compressed(name,
 #                        train_loss=train_loss,

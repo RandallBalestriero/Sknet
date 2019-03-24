@@ -1,0 +1,73 @@
+Welcome to sk-net
+==================
+
+Lasagne is a lightweight library to build and train neural networks in Theano.
+
+Lasagne is a work in progress, input is welcome. The available documentation is
+limited for now. The project is on `GitHub`_.
+
+  
+User Guide
+----------
+
+The Lasagne user guide explains how to install Lasagne, how to build and train
+neural networks using Lasagne, and how to contribute to the library as a
+developer.
+
+.. toctree::
+  :maxdepth: 2
+
+  user/installation
+
+API Reference
+-------------
+
+If you are looking for information on a specific function, class or
+method, this part of the documentation is for you.
+
+.. toctree::
+  :maxdepth: 2
+
+  modules/dataset
+  modules/layer
+  modules/model
+  modules/preprocessing
+  
+
+Quickstart
+==========
+
+
+CIFAR100 with LeNet5
+--------------------
+
+
+SVHN with Custom Model
+----------------------
+
+
+
+
+
+About this documentation
+========================
+
+Lots of documentation can be found online [#f1]_
+
+
+.. rubric:: Footnotes
+
+.. [#f1] '<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html#simple-tables>'_
+
+
+Indices and tables
+------------------
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+.. _GitHub: https://github.com/RandallBalestriero/sknet.git
+.. _Python: https://www.python.org/download/releases/3.0/
+.. _Tensorflow: https://www.tensorflow.org/
+.. _Anaconda: https://www.anaconda.com/
