@@ -4,3 +4,4 @@ wheel
 numpy
 tensorflow
 matplotlib
+scipy
