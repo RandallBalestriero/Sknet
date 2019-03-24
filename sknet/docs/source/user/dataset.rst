@@ -69,7 +69,7 @@ Running the code _quickstart_data_loading.py
 
 will generate the following figure
 
-.. figure:: ./test_loading.png
+.. figure:: ../_static/test_loading.png
    :scale: 50 %
    :alt: dataset figure
 
