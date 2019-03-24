@@ -10,23 +10,23 @@ This library aims ot fulfill two major goals:
       the development team around max-affine splines to interpret deep neural
       networks
     
-This toolbox is oriented for research and education, for any scale projects
+This toolbox is oriented for research and education, and any projects
 do not requiring multi-GPU computing.
 We briefly describe here the fundamentals of the toolbox. The project is on _GitHub.
 
 
-Sknet way ot working
+Sknet way of working
 --------------------
 
 The library is built with the deep learning pipeline in mind. That is, it provides
 multiple blocks being combined to solve a task. Those blocks are:
 
-    - dataset :ref:`dataloading-label`: any collection of inputs or (input-output) pairs
-    - pre-processing (optional): pre-processing that can be applied onto any
+    - :ref:`dataloading-label`: any collection of inputs or (input-output) pairs
+    - :ref:`preprocess-label` (optional): pre-processing that can be applied onto any
       dataset for increased performances s.a. zca whitening
-    - models : a fully describe DNN form input to output, in term of 
+    - :ref:`model-label`: a fully describe DNN form input to output, in term of 
       layers s.a. LeNet5
-    - layers : low-level building blocks of any DNN s.a. dense or conv2D
+    - :ref:`layer-label`: low-level building blocks of any DNN s.a. dense or conv2D
     - optimizer : any updating policy applied onto the learnable weights 
       of a model s.a. adam or sgd
     - learning rate schedules: combined with a loss function, a model and 
@@ -34,9 +34,6 @@ multiple blocks being combined to solve a task. Those blocks are:
       guarantee best performances s.a. stepwise or adaptive
     - trainer : a higher-level method assembling those independent blocks 
       into a trainable pipeline, also containing the tensorflow session
-
-
-In each block, any user can augment the library with their own creation.
 
   
 User Guide

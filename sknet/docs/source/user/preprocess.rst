@@ -1,4 +1,6 @@
-Pre-processing
+.. _preprocess-label:
+
+Preprocess
 ==============
 
 Methods

@@ -1,12 +1,7 @@
 .. _dataloading-label:
 
-Data Loading
-============
-
-Dataset format
---------------
-All dataset are classes in the :mod:`sknet.dataset` module. Here is 
-a minimal class
+Dataset
+=======
 
 
 Pre-loaded Datasets

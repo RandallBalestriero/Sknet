@@ -1,5 +1,7 @@
-Layers
-======
+.. _layer-label:
+
+Layer
+=====
 
 Special
 -------

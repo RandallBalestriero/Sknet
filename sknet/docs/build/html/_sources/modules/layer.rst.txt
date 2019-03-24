@@ -6,14 +6,6 @@
 .. toctree::
     :hidden:
 
-    layer/special
-   
-
-.. rubric:: :doc:`layer/special`
-
-.. autosummary::
-    :nosignatures:
-
-    input
-    output
+-- automodule:: sknet.layer.special
+    :members:
 
