@@ -1,3 +1,5 @@
+.. _dataloading-label:
+
 Data Loading
 ============
 

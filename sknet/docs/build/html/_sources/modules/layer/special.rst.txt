@@ -5,10 +5,10 @@ Special Layers
 
 .. currentmodule:: sknet.layer.special
 
-.. autoclass:: input
+.. autoclass:: sknet.layer.special.input
     :members:
 
-.. autoclass:: output
+.. autoclass:: sknet.layer.special.output
     :members:
 
 

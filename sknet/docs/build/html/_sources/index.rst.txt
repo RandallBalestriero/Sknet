@@ -1,4 +1,4 @@
-Welcome to sk-net (in construction)
+Welcome to Sknet (in construction)
 ===================================
 
 Sknet is a lightweight library to build and train neural networks in Tensorflow.
@@ -21,7 +21,7 @@ Sknet way ot working
 The library is built with the deep learning pipeline in mind. That is, it provides
 multiple blocks being combined to solve a task. Those blocks are:
 
-    - dataset : any collection of inputs or (input-output) pairs
+    - dataset :ref:`dataloading-label`: any collection of inputs or (input-output) pairs
     - pre-processing (optional): pre-processing that can be applied onto any
       dataset for increased performances s.a. zca whitening
     - models : a fully describe DNN form input to output, in term of 
