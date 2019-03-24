@@ -3,4 +3,4 @@ setuptools
 wheel
 numpy
 tensorflow
-pylab
+matplotlib
