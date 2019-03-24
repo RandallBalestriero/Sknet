@@ -9,7 +9,7 @@
     model/cnn
    
 
-.. rubric:: :doc:`model/cnn`
+.. rubric:: :doc:'model/cnn'
 
 .. autosummary::
     :nosignatures:

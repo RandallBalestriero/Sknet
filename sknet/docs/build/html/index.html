@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Welcome to sk-net &mdash; sk-net alpha.1 documentation</title>
+  <title>Welcome to sk-net (in construction) &mdash; Sknet alpha.1 documentation</title>
   
 
   
@@ -59,7 +59,7 @@
           
 
           
-            <a href="#" class="icon icon-home"> sk-net
+            <a href="#" class="icon icon-home"> Sknet
           
 
           
@@ -69,7 +69,7 @@
             
             
               <div class="version">
-                a.1
+                1.8.0
               </div>
             
           
@@ -118,7 +118,7 @@
       <nav class="wy-nav-top" aria-label="top navigation">
         
           <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
-          <a href="#">sk-net</a>
+          <a href="#">Sknet</a>
         
       </nav>
 
@@ -149,7 +149,7 @@
     
       <li><a href="#">Docs</a> &raquo;</li>
         
-      <li>Welcome to sk-net</li>
+      <li>Welcome to sk-net (in construction)</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -168,15 +168,57 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="welcome-to-sk-net">
-<h1>Welcome to sk-net<a class="headerlink" href="#welcome-to-sk-net" title="Permalink to this headline">¶</a></h1>
-<p>Lasagne is a lightweight library to build and train neural networks in Theano.</p>
-<p>Lasagne is a work in progress, input is welcome. The available documentation is
-limited for now. The project is on <a class="reference external" href="https://github.com/RandallBalestriero/sknet.git">GitHub</a>.</p>
+  <div class="section" id="welcome-to-sk-net-in-construction">
+<h1>Welcome to sk-net (in construction)<a class="headerlink" href="#welcome-to-sk-net-in-construction" title="Permalink to this headline">¶</a></h1>
+<p>Sknet is a lightweight library to build and train neural networks in Tensorflow.
+This library aims ot fulfill two major goals:</p>
+<blockquote>
+<div><ul class="simple">
+<li>provide an out-of-the-box solution for practicioner to reproduce results</li>
+</ul>
+<p>and build upon previous work with a comon working environment
+- provide tools and simple methods following the research direction of
+the development team around max-affine splines to interpret deep neural
+networks</p>
+</div></blockquote>
+<p>This toolbox is oriented for research and education, for any scale projects
+do not requiring multi-GPU computing.
+We briefly describe here the fundamentals of the toolbox. The project is on _GitHub.</p>
+<div class="section" id="sknet-way-ot-working">
+<h2>Sknet way ot working<a class="headerlink" href="#sknet-way-ot-working" title="Permalink to this headline">¶</a></h2>
+<p>The library is built with the deep learning pipeline in mind. That is, it provides
+multiple blocks being combined to solve a task. Those blocks are:</p>
+<blockquote>
+<div><ul class="simple">
+<li>dataset : any collection of inputs or (input-output) pairs</li>
+<li>pre-processing (optional): pre-processing that can be applied onto any</li>
+</ul>
+<p>dataset for increased performances s.a. zca whitening</p>
+<ul class="simple">
+<li>models : a fully describe DNN form input to output, in term of</li>
+</ul>
+<p>layers s.a. LeNet5</p>
+<ul class="simple">
+<li>layers : low-level building blocks of any DNN s.a. dense or conv2D</li>
+<li>optimizer : any updating policy applied onto the learnable weights</li>
+</ul>
+<p>of a model s.a. adam or sgd</p>
+<ul class="simple">
+<li>learning rate schedules: combined with a loss function, a model and</li>
+</ul>
+<p>a dataset, the learning rate scheduler plays a crucial role to
+guarantee best performances s.a. stepwise or adaptive</p>
+<ul class="simple">
+<li>trainer : a higher-level method assembling those independent blocks</li>
+</ul>
+<p>into a trainable pipeline, also containing the tensorflow session</p>
+</div></blockquote>
+<p>In each block, any user can augment the library with their own creation.</p>
+</div>
 <div class="section" id="user-guide">
 <h2>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h2>
-<p>The Lasagne user guide explains how to install Lasagne, how to build and train
-neural networks using Lasagne, and how to contribute to the library as a
+<p>The Sknet user guide explains how to install Sknet, how to build and train
+neural networks, and how to contribute to the library as a
 developer.</p>
 <div class="toctree-wrapper compound">
 <ul>
@@ -205,8 +247,7 @@ developer.</p>
 </div>
 <div class="section" id="api-reference">
 <h2>API Reference<a class="headerlink" href="#api-reference" title="Permalink to this headline">¶</a></h2>
-<p>If you are looking for information on a specific function, class or
-method, this part of the documentation is for you.</p>
+<p>If you are looking for information on a specific function:</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
@@ -263,7 +304,7 @@ method, this part of the documentation is for you.</p>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, Sk-net contributors
+        &copy; Copyright 2019, Sknet contributors
 
     </p>
   </div>

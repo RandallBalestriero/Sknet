@@ -1,5 +1,5 @@
 Convolutional Neural Networks
---------------------
+-----------------------------
 
 .. automodule:: sknet.model.cnn
 

@@ -1,9 +1,9 @@
-Convolutional layers
---------------------
+Special Layers
+--------------
 
 .. automodule:: sknet.layer.special
 
-.. currentmodule:: sknet.layer
+.. currentmodule:: sknet.layer.special
 
 .. autoclass:: input
     :members:

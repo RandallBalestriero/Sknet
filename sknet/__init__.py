@@ -9,4 +9,6 @@ __all__ = [
         "model",
         "samples"]
 
+__version__ = 'alpha.1'
+
 from . import *

@@ -9,7 +9,7 @@
     layer/special
    
 
-.. rubric:: :doc:`layers/special`
+.. rubric:: :doc:`layer/special`
 
 .. autosummary::
     :nosignatures:

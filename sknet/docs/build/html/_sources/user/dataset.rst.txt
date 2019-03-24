@@ -58,12 +58,13 @@ Code Example
 
 Running the code _quickstart_data_loading.py
 
-.. literalinclude:: quickstart_data_loading.py
-
+.. literalinclude:: /quickstart_data_loading.py
+    :encoding: latin-1
+    :language: python
 
  will generate the following figure
 
-.. figure:: test_loading.png
+.. figure:: ./test_loading.png
    :scale: 50 %
    :alt: dataset figure
 

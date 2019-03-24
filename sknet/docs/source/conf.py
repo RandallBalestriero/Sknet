@@ -5,7 +5,7 @@
 
 import os
 import sys
-sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(0, os.path.abspath('../../../'))
 
 extensions = [
     'sphinx.ext.autodoc',
@@ -36,17 +36,15 @@ source_suffix = '.rst'
 master_doc = 'index'
 
 # General information about the project.
-project = u'sk-net'
-copyright = u'2019, Sk-net contributors'
+project = u'Sknet'
+copyright = u'2019, Sknet contributors'
 author = 'Randall Balestriero'
 
-from ../../.. import sknet
-#version = '.'.join(tensorflow.__version__.split('.', 2)[:2])
-#release = sknet.__version__
-version = 'a.1'
-release = 'alpha.1'
 
-
+import sknet
+import tensorflow
+version = tensorflow.__version__
+release = sknet.__version__
 
 
 exclude_patterns = ['build']
@@ -73,7 +71,7 @@ def linkcode_resolve(domain, info):
     except Exception:
         filename = info['module'].replace('.', '/') + '.py'
     tag = 'master' if 'dev' in release else ('v' + release)
-    return "https://github.com/RandallBalestriero/sknet/blob/%s/%s" % (tag, filename)
+    return "https://github.com/RandallBalestriero/Sknet/blob/%s/%s" % (tag, filename)
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -100,7 +98,7 @@ pygments_style = 'sphinx'
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'RANETdoc'
+htmlhelp_basename = 'Sknetdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -127,7 +125,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'RANET.tex', 'RANET Documentation',
+    (master_doc, 'Sknet.tex', 'Sknet Documentation',
      'Randall Balestriero', 'manual'),
 ]
 
@@ -137,7 +135,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'ranet', 'RANET Documentation',
+    (master_doc, 'Sknet', 'Sknet Documentation',
      [author], 1)
 ]
 
@@ -148,8 +146,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'RANET', 'RANET Documentation',
-     author, 'RANET', 'One line description of project.',
+    (master_doc, 'Sknet', 'Sknet Documentation',
+     author, 'Sknet', 'One line description of project.',
      'Miscellaneous'),
 ]
 
