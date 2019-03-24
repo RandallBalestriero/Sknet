@@ -1,14 +1,26 @@
 :mod:`sknet.dataset`
 =====================
 
-.. automodule:: sknet.dataset.preprocess
+.. contents:: Table of Contents
 
-.. toctree::
-    :hidden:
+.. automodule:: sknet.dataset
+    :members:
+    :private-members:
+    :special-members:
 
-    dataset/preprocess
-   
+Generated Index
+===============
 
+Part of the sphinx build process in generate and index file: :ref:`genindex`.
+
+
+
+Data
+====
+
+.. data:: Data_item_1
+          Data_item_2
+          Data_item_3
 
 
      

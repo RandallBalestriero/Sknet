@@ -1,14 +1,28 @@
 :mod:`sknet.dataset`
 =====================
 
-.. automodule:: sknet.dataset.preprocess
+.. contents:: Table of Contents
 
-.. toctree::
-    :hidden:
+.. automodule:: sknet.dataset
+    :members:
+    :private-members:
+    :special-members:
 
-    dataset/preprocess
-   
+Generated Index
+===============
 
+Part of the sphinx build process in generate and index file: :ref:`genindex`.
+
+
+
+Data
+====
+
+.. data:: mnist
+          fashionmnist
+          svhn
+          cifar10
+          cifar100
 
 
      
