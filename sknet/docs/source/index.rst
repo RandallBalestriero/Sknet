@@ -64,7 +64,6 @@ If you are looking for information on a specific function:
   modules/layer
   modules/model
   
-
 Quickstart
 ==========
 
@@ -86,17 +85,26 @@ About this documentation
 Lots of documentation can be found online [#f1]_
 
 
-.. rubric:: Footnotes
 
-.. [#f1] '<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html#simple-tables>'_
+.. toctree::
+  :maxdepth: 2
 
-
-Indices and tables
+Indices, tables, Index
 ------------------
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+
+
+
+.. rubric:: Footnotes
+
+.. [#f1] '<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html#simple-tables>'_
+
+
+
 
 .. _GitHub: https://github.com/RandallBalestriero/sknet.git
 .. _Python: https://www.python.org/download/releases/3.0/

@@ -7,9 +7,25 @@ from .. import layer
 
 class base(Model):
     def __init__(self,input_shape,classes,data_format,**kwargs):
+        """Start the Foo.
+
+        :param qux: The first argument to initialize class.
+        :type qux: string
+        :param spam: Spam me yes or no...
+        :type spam: bool
+
+        """
         super().__init__(input_shape,classes,data_format,**kwargs)
         self.name = '-model(cnn.base)'
     def get_layers(self,input_variable,training):
+        """get layers.
+
+        :param qux: The first argument to initialize class.
+        :type qux: string
+        :param spam: Spam me yes or no...
+        :type spam: bool
+
+        """
         dnn = [layer.special.input(self.input_shape,input_variable, data_format=self.data_format)]
         #
         dnn.append(layer.transform.Conv2D(dnn[-1],filters=(32,5,5),

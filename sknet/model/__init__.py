@@ -14,10 +14,26 @@ __all__=[
 
 class Model:
     def __init__(self,input_shape, classes=10, data_format='NCHW', **kwargs):
+        """Start the Foo.
+
+        :param qux: The first argument to initialize class.
+        :type qux: string
+        :param spam: Spam me yes or no...
+        :type spam: bool
+
+        """
         self.classes      = classes
         self.input_shape  = input_shape
         self.data_format  = data_format
     def get_layers(self, input_variable, training):
+        """get the layers.
+
+        :param qux: The first argument to initialize class.
+        :type qux: string
+        :param spam: Spam me yes or no...
+        :type spam: bool
+
+        """
         pass
 
 

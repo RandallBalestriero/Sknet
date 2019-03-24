@@ -1,19 +1,16 @@
 :mod:`sknet.model`
 =====================
 
+.. contents:: Table of Contents
+
 .. automodule:: sknet.model
+    :members:
+    :private-members:
+    :special-members:
 
-.. toctree::
-    :hidden:
-
-    model/cnn
-   
-
-.. rubric:: :doc:'model/cnn'
-
-.. autosummary::
-    :nosignatures:
-
-    base
     
+
+.. cnn:: cnn.base
+
+.. minimal:: minimal.augment
 

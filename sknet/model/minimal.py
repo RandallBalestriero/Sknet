@@ -9,6 +9,14 @@ from .. import layer
 class augmentation(Model):
     def __init__(self,input_shape,crop,crop_size,left_right,
             up_down,rot90,data_format,**kwargs):
+        """Start the minimal.
+
+        :param qux: The first argument to initialize class.
+        :type qux: string
+        :param spam: Spam me yes or no...
+        :type spam: bool
+
+        """
         super().__init__(input_shape,1,**kwargs)
         self.name      = '-model(augmentation)'
         self.crop      = crop
@@ -18,6 +26,14 @@ class augmentation(Model):
         self.up_down   = up_down
         self.rot90     = rot90
     def get_layers(self,input_variable,training):
+        """Start the Foo.
+
+        :param qux: The first argument to initialize class.
+        :type qux: string
+        :param spam: Spam me yes or no...
+        :type spam: bool
+
+        """
         dnn = [layer.Input(self.input_shape,input_variable, data_format=self.data_format)]
         if self.crop:
             dnn.append(layer.augment.RandomCrop(dnn[-1],training=training,crop_size=self.crop_size))
