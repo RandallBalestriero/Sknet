@@ -8,6 +8,9 @@ from . import Layer
 
 
 class Pool(Layer):
+    """Pooling layer over spatial and/or channel dimensions.
+    Finish
+    """
     def __init__(self, incoming, windows, strides=None, pool_type='MAX', 
             padding='VALID'):
         """

@@ -53,14 +53,15 @@ in which all the attributes and the load function are defined.
 To add a dataset, one needs to create a .py file with name being the one
 of the dataset. In this file one needs
 
-- load function
-- image_shape, data_format attributes
+    - load function
+    - image_shape, data_format attributes
 
 
 Code Example
 ------------
 
 Running the code _quickstart_data_loading.py
+
 
 .. literalinclude:: ../../../../quickstart_data_loading.py
     :encoding: latin-1

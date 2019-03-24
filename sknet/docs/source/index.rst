@@ -60,9 +60,8 @@ If you are looking for information on a specific function:
 .. toctree::
   :maxdepth: 2
 
-  modules/dataset
-  modules/layer
   modules/model
+  modules/layer
   
 Quickstart
 ==========
@@ -86,11 +85,10 @@ Lots of documentation can be found online [#f1]_
 
 
 
-.. toctree::
-  :maxdepth: 2
+
 
 Indices, tables, Index
-------------------
+----------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

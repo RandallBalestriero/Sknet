@@ -3,14 +3,26 @@
 
 .. contents:: Table of Contents
 
-.. automodule:: sknet.model
+
+.. autoclass:: sknet.model.Model
     :members:
     :private-members:
     :special-members:
 
     
+:mod:`sknet.model.cnn`
+----------------------
 
-.. cnn:: cnn.base
+.. autoclass:: sknet.model.cnn.base
+    :members:
+    :private-members:
+    :special-members:
+    
+:mod:`sknet.model.minimal`
+--------------------------
 
-.. minimal:: minimal.augment
+.. autoclass:: sknet.model.minimal.augmentation
+    :members:
+    :private-members:
+    :special-members:
 

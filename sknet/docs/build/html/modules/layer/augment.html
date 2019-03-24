@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Convolutional Neural Networks &mdash; Sknet alpha.1 documentation</title>
+  <title>Augment Layer &mdash; Sknet alpha.1 documentation</title>
   
 
   
@@ -45,7 +45,8 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="prev" title="sknet.model" href="../model.html" /> 
+    <link rel="next" title="Pool Layer" href="pool.html" />
+    <link rel="prev" title="Transform Layer" href="transform.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -101,12 +102,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dataset.html#generated-index">Generated Index</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../dataset.html#data">Data</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Convolutional Neural Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="transform.html">Transform Layer</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Augment Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
 </ul>
 </li>
 </ul>
@@ -154,15 +154,15 @@
     
       <li><a href="../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a> &raquo;</li>
+          <li><a href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> &raquo;</li>
         
-      <li>Convolutional Neural Networks</li>
+      <li>Augment Layer</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/modules/model/cnn.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/modules/layer/augment.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -175,8 +175,30 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.model.cnn">
-<span id="convolutional-neural-networks"></span><h1>Convolutional Neural Networks<a class="headerlink" href="#module-sknet.model.cnn" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-sknet.layer.augment">
+<span id="augment-layer"></span><h1>Augment Layer<a class="headerlink" href="#module-sknet.layer.augment" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sknet.layer.RandomCrop">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomCrop</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_size</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="sknet.layer.RandomCrop.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_size</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.layer.RandomRot90">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomRot90</code><span class="sig-paren">(</span><em>incoming</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="sknet.layer.RandomRot90.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -187,8 +209,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="pool.html" class="btn btn-neutral float-right" title="Pool Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="../model.html" class="btn btn-neutral float-left" title="sknet.model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="transform.html" class="btn btn-neutral float-left" title="Transform Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

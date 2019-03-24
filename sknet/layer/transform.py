@@ -13,40 +13,7 @@ class Dense(Layer):
         2D pooling layer
         Performs 2D mean- or max-pooling over the two trailing axes of a 4D input
         tensor. This is an alternative implementation which uses
-        ``theano.sandbox.cuda.dnn.dnn_pool`` directly.
-        Parameters
-        ----------
-        incoming : a :class:`Layer` instance or tuple
-            The layer feeding into this layer, or the expected input shape.
-        pool_size : integer or iterable
-            The length of the pooling region in each dimension. If an integer, it
-            is promoted to a square pooling region. If an iterable, it should have
-            two elements.
-        stride : integer, iterable or ``None``
-            The strides between sucessive pooling regions in each dimension.
-            If ``None`` then ``stride = pool_size``.
-        pad : integer or iterable
-            Number of elements to be added on each side of the input
-            in each dimension. Each value must be less than
-            the corresponding stride.
-        ignore_border : bool (default: True)
-            This implementation never includes partial pooling regions, so this
-            argument must always be set to True. It exists only to make sure the
-            interface is compatible with :class:`lasagne.layers.MaxPool2DLayer`.
-        mode : string
-            Pooling mode, one of 'max', 'average_inc_pad' or 'average_exc_pad'.
-            Defaults to 'max'.
-        **kwargs
-            Any additional keyword arguments are passed to the :class:`Layer`
-            superclass.
-        Notes
-        -----
-        The value used to pad the input is chosen to be less than
-        the minimum of the input, so that the output of each pooling region
-        always corresponds to some element in the unpadded input region.
-        This is a drop-in replacement for :class:`lasagne.layers.MaxPool2DLayer`.
-        Its interface is the same, except it does not support the ``ignore_border``
-        argument."""
+        """
         super().__init__(incoming)
         # Set up the input, flatten if needed
         if len(self.in_shape)>2:

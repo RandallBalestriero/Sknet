@@ -60,11 +60,9 @@ If you are looking for information on a specific function:
 .. toctree::
   :maxdepth: 2
 
-  modules/dataset
-  modules/layer
   modules/model
+  modules/layer
   
-
 Quickstart
 ==========
 
@@ -86,17 +84,25 @@ About this documentation
 Lots of documentation can be found online [#f1]_
 
 
+
+
+
+Indices, tables, Index
+----------------------
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
+
+
+
+
 .. rubric:: Footnotes
 
 .. [#f1] '<https://thomas-cokelaer.info/tutorials/sphinx/rest_syntax.html#simple-tables>'_
 
 
-Indices and tables
-------------------
 
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
 
 .. _GitHub: https://github.com/RandallBalestriero/sknet.git
 .. _Python: https://www.python.org/download/releases/3.0/
