@@ -18,6 +18,10 @@ developer.
   :maxdepth: 2
 
   user/installation
+  user/dataset
+  user/preprocess
+  user/model
+  user/layer
 
 API Reference
 -------------
