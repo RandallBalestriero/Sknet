@@ -97,7 +97,8 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Data Loading</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataset-format">Dataset format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pre-loaded-datasets">Pre-loaded Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#adding-a-dataset">Adding a dataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-example">Code Example</a></li>
 </ul>
@@ -176,8 +177,13 @@
             
   <div class="section" id="data-loading">
 <h1>Data Loading<a class="headerlink" href="#data-loading" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="dataset">
-<h2>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="dataset-format">
+<h2>Dataset format<a class="headerlink" href="#dataset-format" title="Permalink to this headline">¶</a></h2>
+<p>All dataset are classes in the <code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.dataset</span></code> module. Here is
+a minimal class</p>
+</div>
+<div class="section" id="pre-loaded-datasets">
+<h2>Pre-loaded Datasets<a class="headerlink" href="#pre-loaded-datasets" title="Permalink to this headline">¶</a></h2>
 <p>Sknet provides comon dataset out-of-the-box in the _sknet.dataset module as</p>
 <ul class="simple">
 <li>sknet.dataset.mnist</li>
@@ -224,6 +230,39 @@ of the dataset. In this file one needs</p>
 <div class="section" id="code-example">
 <h2>Code Example<a class="headerlink" href="#code-example" title="Permalink to this headline">¶</a></h2>
 <p>Running the code _quickstart_data_loading.py</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sknet.dataset</span> <span class="kn">import</span> <span class="n">mnist</span><span class="p">,</span><span class="n">svhn</span><span class="p">,</span><span class="n">cifar10</span><span class="p">,</span><span class="n">fashionmnist</span><span class="p">,</span><span class="n">cifar100</span>
+<span class="kn">from</span> <span class="nn">sknet.utils</span> <span class="kn">import</span> <span class="n">plotting</span>
+<span class="kn">import</span> <span class="nn">pylab</span> <span class="kn">as</span> <span class="nn">pl</span>
+
+<span class="c1"># Put the dataset functions into a list s.t. dataset_list[0].load() </span>
+<span class="c1"># loads the dataset 0</span>
+<span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">mnist</span><span class="p">,</span><span class="n">fashionmnist</span><span class="p">,</span><span class="n">svhn</span><span class="p">,</span><span class="n">cifar10</span><span class="p">,</span><span class="n">cifar100</span><span class="p">]</span>
+
+<span class="c1"># Save number of dataset</span>
+<span class="n">n_dataset</span>    <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">)</span>
+
+<span class="c1"># Initialize the counter for subplot</span>
+<span class="n">cpt</span>          <span class="o">=</span> <span class="mi">1</span>
+
+<span class="c1"># Loop over the dataset_list to load them (download them if necessary)</span>
+<span class="c1"># and display the first 10 images</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="n">n_dataset</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span>
+<span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">dataset_list</span><span class="p">:</span>
+    <span class="n">train_set</span><span class="p">,</span><span class="n">valid_set</span><span class="p">,</span><span class="n">test_set</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">im</span><span class="p">,</span><span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">train_set</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">10</span><span class="p">],</span><span class="n">train_set</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="mi">10</span><span class="p">]):</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">n_dataset</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">cpt</span><span class="p">)</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+        <span class="n">cpt</span><span class="o">+=</span><span class="mi">1</span>
+
+<span class="c1"># Reduce side margins</span>
+<span class="n">pl</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;./sknet/docs/source/user/test_loading.png&#39;</span><span class="p">)</span>
+
+</pre></div>
+</div>
+<p>will generate the following figure</p>
 <div class="figure" id="id1">
 <a class="reference internal image-reference" href="../_images/test_loading.png"><img alt="dataset figure" src="../_images/test_loading.png" style="width: 1000.0px; height: 500.0px;" /></a>
 <p class="caption"><span class="caption-text">Preloaded dataset from sknet.</span></p>

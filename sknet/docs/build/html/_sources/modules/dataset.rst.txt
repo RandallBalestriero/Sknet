@@ -1,7 +1,7 @@
 :mod:`sknet.dataset`
 =====================
 
-.. automodule:: sknet.dataset
+.. automodule:: sknet.dataset.preprocess
 
 .. toctree::
     :hidden:
@@ -9,14 +9,9 @@
     dataset/preprocess
    
 
-.. rubric:: :doc:`dataset/preprocess`
 
-.. autosummary::
-    :nosignatures:
 
-    standardize
-    zca_whitening
-    
+     
 
 
 

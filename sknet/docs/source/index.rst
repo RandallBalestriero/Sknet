@@ -5,10 +5,10 @@ Sknet is a lightweight library to build and train neural networks in Tensorflow.
 This library aims ot fulfill two major goals:
 
     - provide an out-of-the-box solution for practicioner to reproduce results
-    and build upon previous work with a comon working environment
+      and build upon previous work with a comon working environment
     - provide tools and simple methods following the research direction of
-    the development team around max-affine splines to interpret deep neural
-    networks
+      the development team around max-affine splines to interpret deep neural
+      networks
     
 This toolbox is oriented for research and education, for any scale projects
 do not requiring multi-GPU computing.
@@ -22,24 +22,18 @@ The library is built with the deep learning pipeline in mind. That is, it provid
 multiple blocks being combined to solve a task. Those blocks are:
 
     - dataset : any collection of inputs or (input-output) pairs
-    
     - pre-processing (optional): pre-processing that can be applied onto any
-    dataset for increased performances s.a. zca whitening
-    
+      dataset for increased performances s.a. zca whitening
     - models : a fully describe DNN form input to output, in term of 
-    layers s.a. LeNet5
-    
+      layers s.a. LeNet5
     - layers : low-level building blocks of any DNN s.a. dense or conv2D
-    
     - optimizer : any updating policy applied onto the learnable weights 
-    of a model s.a. adam or sgd
-    
+      of a model s.a. adam or sgd
     - learning rate schedules: combined with a loss function, a model and 
-    a dataset, the learning rate scheduler plays a crucial role to 
-    guarantee best performances s.a. stepwise or adaptive
-    
+      a dataset, the learning rate scheduler plays a crucial role to 
+      guarantee best performances s.a. stepwise or adaptive
     - trainer : a higher-level method assembling those independent blocks 
-    into a trainable pipeline, also containing the tensorflow session
+      into a trainable pipeline, also containing the tensorflow session
 
 
 In each block, any user can augment the library with their own creation.

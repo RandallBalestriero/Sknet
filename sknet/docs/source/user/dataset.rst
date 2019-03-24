@@ -1,8 +1,14 @@
 Data Loading
 ============
 
-Dataset
--------
+Dataset format
+--------------
+All dataset are classes in the :mod:`sknet.dataset` module. Here is 
+a minimal class
+
+
+Pre-loaded Datasets
+-------------------
 
 Sknet provides comon dataset out-of-the-box in the _sknet.dataset module as
 
@@ -44,6 +50,7 @@ sknet for example). The saved dataset are in compressed format.
 
 Adding a dataset
 ----------------
+
 Each dataset has its correpsonding file in sknet/dataset/dataset_name.py
 in which all the attributes and the load function are defined.
 To add a dataset, one needs to create a .py file with name being the one
@@ -58,11 +65,11 @@ Code Example
 
 Running the code _quickstart_data_loading.py
 
-.. literalinclude:: /quickstart_data_loading.py
+.. literalinclude:: ../../../../quickstart_data_loading.py
     :encoding: latin-1
     :language: python
 
- will generate the following figure
+will generate the following figure
 
 .. figure:: ./test_loading.png
    :scale: 50 %

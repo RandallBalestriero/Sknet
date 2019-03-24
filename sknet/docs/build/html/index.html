@@ -174,12 +174,12 @@
 This library aims ot fulfill two major goals:</p>
 <blockquote>
 <div><ul class="simple">
-<li>provide an out-of-the-box solution for practicioner to reproduce results</li>
-</ul>
-<p>and build upon previous work with a comon working environment
-- provide tools and simple methods following the research direction of
+<li>provide an out-of-the-box solution for practicioner to reproduce results
+and build upon previous work with a comon working environment</li>
+<li>provide tools and simple methods following the research direction of
 the development team around max-affine splines to interpret deep neural
-networks</p>
+networks</li>
+</ul>
 </div></blockquote>
 <p>This toolbox is oriented for research and education, for any scale projects
 do not requiring multi-GPU computing.
@@ -191,27 +191,19 @@ multiple blocks being combined to solve a task. Those blocks are:</p>
 <blockquote>
 <div><ul class="simple">
 <li>dataset : any collection of inputs or (input-output) pairs</li>
-<li>pre-processing (optional): pre-processing that can be applied onto any</li>
-</ul>
-<p>dataset for increased performances s.a. zca whitening</p>
-<ul class="simple">
-<li>models : a fully describe DNN form input to output, in term of</li>
-</ul>
-<p>layers s.a. LeNet5</p>
-<ul class="simple">
+<li>pre-processing (optional): pre-processing that can be applied onto any
+dataset for increased performances s.a. zca whitening</li>
+<li>models : a fully describe DNN form input to output, in term of
+layers s.a. LeNet5</li>
 <li>layers : low-level building blocks of any DNN s.a. dense or conv2D</li>
-<li>optimizer : any updating policy applied onto the learnable weights</li>
+<li>optimizer : any updating policy applied onto the learnable weights
+of a model s.a. adam or sgd</li>
+<li>learning rate schedules: combined with a loss function, a model and
+a dataset, the learning rate scheduler plays a crucial role to
+guarantee best performances s.a. stepwise or adaptive</li>
+<li>trainer : a higher-level method assembling those independent blocks
+into a trainable pipeline, also containing the tensorflow session</li>
 </ul>
-<p>of a model s.a. adam or sgd</p>
-<ul class="simple">
-<li>learning rate schedules: combined with a loss function, a model and</li>
-</ul>
-<p>a dataset, the learning rate scheduler plays a crucial role to
-guarantee best performances s.a. stepwise or adaptive</p>
-<ul class="simple">
-<li>trainer : a higher-level method assembling those independent blocks</li>
-</ul>
-<p>into a trainable pipeline, also containing the tensorflow session</p>
 </div></blockquote>
 <p>In each block, any user can augment the library with their own creation.</p>
 </div>
@@ -224,7 +216,8 @@ developer.</p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/dataset.html">Data Loading</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="user/dataset.html#dataset">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user/dataset.html#dataset-format">Dataset format</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user/dataset.html#pre-loaded-datasets">Pre-loaded Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user/dataset.html#adding-a-dataset">Adding a dataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user/dataset.html#code-example">Code Example</a></li>
 </ul>

@@ -1,13 +1,10 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-__all__ = [
-        "preprocess",
-        "mnist",
-        "fashionmnist",
-        "svhn",
-        "cifar10",
-        "cifar100"]
+__all__ = ["preprocess"]
 
-
-from . import *
+from .mnist import *
+from .svhn import *
+from .cifar10 import *
+from .cifar100 import *
+from .fashionmnist import *
