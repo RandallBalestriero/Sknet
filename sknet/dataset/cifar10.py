@@ -69,9 +69,9 @@ class cifar10:
             train_set[0] = np.transpose(train_set[0],[0,2,3,1])
             test_set[0]  = np.transpose(test_set[0],[0,2,3,1])
             valid_set[0] = np.transpose(valid_set[0],[0,2,3,1])
-            image_shape  = (32,32,3)
+            self.image_shape  = (32,32,3)
         else:
-            image_shape  = (3,32,32)
+            self.image_shape  = (3,32,32)
 
         print('Dataset CIFAR10 loaded in','{0:.2f}'.format(time.time()-t),'s.')
         return train_set,valid_set,test_set

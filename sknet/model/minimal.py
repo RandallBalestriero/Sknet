@@ -36,13 +36,13 @@ class augmentation(Model):
         """
         dnn = [layer.Input(self.input_shape,input_variable, data_format=self.data_format)]
         if self.crop:
-            dnn.append(layer.augment.RandomCrop(dnn[-1],training=training,crop_size=self.crop_size))
+            dnn.append(layer.RandomCrop(dnn[-1],training=training,crop_size=self.crop_size))
         if self.left_right:
-            dnn.append(layer.augment.RandomFlipLeftRight(dnn[-1],training=training))
+            dnn.append(layer.RandomFlipLeftRight(dnn[-1],training=training))
         if self.up_down:
-            dnn.append(layer.augment.RandomFlipUpDown(dnn[-1],training=training))
+            dnn.append(layer.RandomFlipUpDown(dnn[-1],training=training))
         if self.rot90:
-            dnn.append(layer.augment.RandomRot90(dnn[-1],training=training))
+            dnn.append(layer.RandomRot90(dnn[-1],training=training))
         return dnn
 
 

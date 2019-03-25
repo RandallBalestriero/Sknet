@@ -1,5 +1,5 @@
 import sknet
-from sknet.dataset import mnist,svhn,cifar10,fashionmnist,cifar100
+from sknet import dataset
 from sknet.utils import plotting
 import pylab as pl
 
@@ -7,6 +7,7 @@ import os
 # Make Tensorflow quiet.
 os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
+cifar10 = dataset.cifar10()
 
 train_set,valid_set,test_set = cifar10.load(seed=10)
 
@@ -43,6 +44,6 @@ for model,model_name in zip(models,models_names):
     # Reduce side margins
     pl.tight_layout()
     pl.suptitle(model_name)
-    pl.savefig('augmentation_'+model_name+'.png')
+    pl.savefig('./sknet/docs/source/_static/augmentation_'+model_name+'.png')
     pl.close()
 

@@ -10,6 +10,16 @@ Augment Layer
     :private-members:
     :special-members:
 
+.. autoclass:: RandomFlipLeftRight
+    :members:
+    :private-members:
+    :special-members:
+
+.. autoclass:: RandomFlipUpDown
+    :members:
+    :private-members:
+    :special-members:
+
 .. autoclass:: RandomRot90
     :members:
     :private-members:
