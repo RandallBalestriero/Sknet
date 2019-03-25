@@ -107,6 +107,7 @@
 <li class="toctree-l1"><a class="reference internal" href="layer.html">Layer</a></li>
 </ul>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="../modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 </ul>
@@ -177,13 +178,13 @@
 <span id="dataloading-label"></span><h1>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="pre-loaded-datasets">
 <h2>Pre-loaded Datasets<a class="headerlink" href="#pre-loaded-datasets" title="Permalink to this headline">¶</a></h2>
-<p>Sknet provides comon dataset out-of-the-box in the _sknet.dataset module as</p>
+<p>Sknet provides comon dataset out-of-the-box in the <a class="reference internal" href="../modules/dataset/dataset.html#module-sknet.dataset" title="sknet.dataset"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a> module as</p>
 <ul class="simple">
-<li>sknet.dataset.mnist</li>
-<li>sknet.dataset.fashionmnist</li>
-<li>sknet.dataset.svhn</li>
-<li>sknet.dataset.cifar10</li>
-<li>sknet.dataset.cifar100</li>
+<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.mnist" title="sknet.dataset.mnist"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.mnist</span></code></a></li>
+<li><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.fashionmnist</span></code></li>
+<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.svhn" title="sknet.dataset.svhn"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.svhn</span></code></a></li>
+<li><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.cifar10</span></code></li>
+<li><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.cifar100</span></code></li>
 </ul>
 <p>In order to load the train/valid/test set one simply
 calls the load function as in:</p>
@@ -263,16 +264,18 @@ of the dataset. In this file one needs</p>
 <p class="caption"><span class="caption-text">Preloaded dataset from sknet.</span></p>
 </div>
 <p>running for the first time will produce:</p>
-<p>Loading MNIST
-Dataset MNIST loaded in 0.71 s.
-Loading FASHION-MNIST
-Dataset FASHION-MNIST loaded in 0.33 s.
-Loading SVHN
-Dataset SVHN loaded in 2.74 s.
-Loading CIFAR10
-Dataset CIFAR10 loaded in 2.37 s.
-Loading CIFAR100
-Dataset CIFAR100 loaded in 2.39 s.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Loading</span> <span class="n">MNIST</span>
+<span class="n">Dataset</span> <span class="n">MNIST</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">0.71</span> <span class="n">s</span><span class="o">.</span>
+<span class="n">Loading</span> <span class="n">FASHION</span><span class="o">-</span><span class="n">MNIST</span>
+<span class="n">Dataset</span> <span class="n">FASHION</span><span class="o">-</span><span class="n">MNIST</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">0.33</span> <span class="n">s</span><span class="o">.</span>
+<span class="n">Loading</span> <span class="n">SVHN</span>
+<span class="n">Dataset</span> <span class="n">SVHN</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">2.74</span> <span class="n">s</span><span class="o">.</span>
+<span class="n">Loading</span> <span class="n">CIFAR10</span>
+<span class="n">Dataset</span> <span class="n">CIFAR10</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">2.37</span> <span class="n">s</span><span class="o">.</span>
+<span class="n">Loading</span> <span class="n">CIFAR100</span>
+<span class="n">Dataset</span> <span class="n">CIFAR100</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">2.39</span> <span class="n">s</span><span class="o">.</span>
+</pre></div>
+</div>
 </div>
 </div>
 

@@ -101,6 +101,7 @@
 <li class="toctree-l1"><a class="reference internal" href="user/layer.html">Layer</a></li>
 </ul>
 <ul>
+<li class="toctree-l1"><a class="reference internal" href="modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 </ul>
@@ -174,28 +175,50 @@
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
+ | <a href="#E"><strong>E</strong></a>
  | <a href="#G"><strong>G</strong></a>
+ | <a href="#I"><strong>I</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
+ | <a href="#Z"><strong>Z</strong></a>
  
 </div>
 <h2 id="_">_</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/layer/transform.html#sknet.layer.Conv2D.__init__">__init__() (sknet.layer.Conv2D method)</a>
+      <li><a href="modules/dataset/preprocess.html#sknet.dataset.standardize.__init__">__init__() (sknet.dataset.standardize method)</a>
 
       <ul>
-        <li><a href="modules/layer/transform.html#sknet.layer.Dense.__init__">(sknet.layer.Dense method)</a>
+        <li><a href="modules/dataset/preprocess.html#sknet.dataset.zca_whitening.__init__">(sknet.dataset.zca_whitening method)</a>
+</li>
+        <li><a href="modules/layer/shape.html#sknet.layer.Concat.__init__">(sknet.layer.Concat method)</a>
+</li>
+        <li><a href="modules/layer/conv.html#sknet.layer.Conv2D.__init__">(sknet.layer.Conv2D method)</a>
+</li>
+        <li><a href="modules/layer/dense.html#sknet.layer.Dense.__init__">(sknet.layer.Dense method)</a>
+</li>
+        <li><a href="modules/layer/shape.html#sknet.layer.ExpandDim.__init__">(sknet.layer.ExpandDim method)</a>
 </li>
         <li><a href="modules/layer/pool.html#sknet.layer.GlobalSpatialPool.__init__">(sknet.layer.GlobalSpatialPool method)</a>
+</li>
+        <li><a href="modules/layer/io.html#sknet.layer.Input.__init__">(sknet.layer.Input method)</a>
+</li>
+        <li><a href="modules/layer/shape.html#sknet.layer.Merge.__init__">(sknet.layer.Merge method)</a>
+</li>
+        <li><a href="modules/layer/io.html#sknet.layer.Output.__init__">(sknet.layer.Output method)</a>
 </li>
         <li><a href="modules/layer/pool.html#sknet.layer.Pool.__init__">(sknet.layer.Pool method)</a>
 </li>
         <li><a href="modules/layer/augment.html#sknet.layer.RandomCrop.__init__">(sknet.layer.RandomCrop method)</a>
 </li>
         <li><a href="modules/layer/augment.html#sknet.layer.RandomRot90.__init__">(sknet.layer.RandomRot90 method)</a>
+</li>
+        <li><a href="modules/layer/shape.html#sknet.layer.Reshape.__init__">(sknet.layer.Reshape method)</a>
+</li>
+        <li><a href="modules/layer/shape.html#sknet.layer.Stack.__init__">(sknet.layer.Stack method)</a>
 </li>
         <li><a href="modules/model.html#sknet.model.Model.__init__">(sknet.model.Model method)</a>
 </li>
@@ -206,8 +229,18 @@
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/model.html#sknet.model.Model.__weakref__">__weakref__ (sknet.model.Model attribute)</a>
+      <li><a href="modules/dataset/dataset.html#sknet.dataset.mnist.__weakref__">__weakref__ (sknet.dataset.mnist attribute)</a>
+
+      <ul>
+        <li><a href="modules/dataset/preprocess.html#sknet.dataset.standardize.__weakref__">(sknet.dataset.standardize attribute)</a>
 </li>
+        <li><a href="modules/dataset/dataset.html#sknet.dataset.svhn.__weakref__">(sknet.dataset.svhn attribute)</a>
+</li>
+        <li><a href="modules/dataset/preprocess.html#sknet.dataset.zca_whitening.__weakref__">(sknet.dataset.zca_whitening attribute)</a>
+</li>
+        <li><a href="modules/model.html#sknet.model.Model.__weakref__">(sknet.model.Model attribute)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -230,7 +263,11 @@
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/layer/transform.html#sknet.layer.Conv2D">Conv2D (class in sknet.layer)</a>
+      <li><a href="modules/layer/shape.html#sknet.layer.Concat">Concat (class in sknet.layer)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/layer/conv.html#sknet.layer.Conv2D">Conv2D (class in sknet.layer)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -238,7 +275,15 @@
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/layer/transform.html#sknet.layer.Dense">Dense (class in sknet.layer)</a>
+      <li><a href="modules/layer/dense.html#sknet.layer.Dense">Dense (class in sknet.layer)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="E">E</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/layer/shape.html#sknet.layer.ExpandDim">ExpandDim (class in sknet.layer)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -261,10 +306,32 @@
   </ul></td>
 </tr></table>
 
+<h2 id="I">I</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/layer/io.html#sknet.layer.Input">Input (class in sknet.layer)</a>
+</li>
+  </ul></td>
+</tr></table>
+
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/layer/shape.html#sknet.layer.Merge">Merge (class in sknet.layer)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/dataset/dataset.html#sknet.dataset.mnist">mnist (class in sknet.dataset)</a>
+</li>
       <li><a href="modules/model.html#sknet.model.Model">Model (class in sknet.model)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="O">O</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/layer/io.html#sknet.layer.Output">Output (class in sknet.layer)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -286,21 +353,47 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/layer/augment.html#sknet.layer.RandomRot90">RandomRot90 (class in sknet.layer)</a>
 </li>
+      <li><a href="modules/layer/shape.html#sknet.layer.Reshape">Reshape (class in sknet.layer)</a>
+</li>
   </ul></td>
 </tr></table>
 
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/dataset.html#module-sknet.dataset">sknet.dataset (module)</a>, <a href="modules/dataset/dataset.html#module-sknet.dataset">[1]</a>
+</li>
+      <li><a href="modules/dataset/preprocess.html#module-sknet.dataset.preprocess">sknet.dataset.preprocess (module)</a>
+</li>
       <li><a href="modules/layer.html#module-sknet.layer">sknet.layer (module)</a>
 </li>
       <li><a href="modules/layer/augment.html#module-sknet.layer.augment">sknet.layer.augment (module)</a>
 </li>
+      <li><a href="modules/layer/conv.html#module-sknet.layer.conv">sknet.layer.conv (module)</a>
+</li>
+      <li><a href="modules/layer/dense.html#module-sknet.layer.dense">sknet.layer.dense (module)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/layer/io.html#module-sknet.layer.io">sknet.layer.io (module)</a>
+</li>
       <li><a href="modules/layer/pool.html#module-sknet.layer.pool">sknet.layer.pool (module)</a>
 </li>
-      <li><a href="modules/layer/transform.html#module-sknet.layer.transform">sknet.layer.transform (module)</a>
+      <li><a href="modules/layer/shape.html#module-sknet.layer.shape">sknet.layer.shape (module)</a>
+</li>
+      <li><a href="modules/layer/shape.html#sknet.layer.Stack">Stack (class in sknet.layer)</a>
+</li>
+      <li><a href="modules/dataset/preprocess.html#sknet.dataset.standardize">standardize (class in sknet.dataset)</a>
+</li>
+      <li><a href="modules/dataset/dataset.html#sknet.dataset.svhn">svhn (class in sknet.dataset)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="Z">Z</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/dataset/preprocess.html#sknet.dataset.zca_whitening">zca_whitening (class in sknet.dataset)</a>
 </li>
   </ul></td>
 </tr></table>

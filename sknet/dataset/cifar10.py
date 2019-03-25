@@ -10,8 +10,9 @@ import time
 
 
 class cifar10:
-
-    def load(data_format='NCHW', seed=None):
+    def __init__(self):
+        pass
+    def load(self,data_format='NCHW', seed=None):
 
         self.name        = 'cifar10'
         self.classes     = 10

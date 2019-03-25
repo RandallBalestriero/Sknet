@@ -6,19 +6,36 @@
 .. toctree::
     :hidden:
 
-    layer/transform
-    layer/augment
+    layer/io
+    layer/dense
+    layer/conv
     layer/pool
+    layer/augment
+    layer/shape
 
-.. rubric:: :doc:`layer/transform`
+.. rubric:: :doc:`layer/io`
+
+.. autosummary::
+    :nosignatures:
+
+    Input
+    Output
+    
+.. rubric:: :doc:`layer/dense`
 
 .. autosummary::
     :nosignatures:
 
     Dense
+   
+.. rubric:: :doc:`layer/conv`
+
+.. autosummary::
+    :nosignatures:
+
     Conv2D
-    
-.. rubric:: :doc:`layer/pool`
+ 
+ .. rubric:: :doc:`layer/pool`
 
 .. autosummary::
     :nosignatures:
@@ -33,3 +50,15 @@
 
     RandomCrop
     RandomRot90
+
+.. rubric:: :doc:`layer/shape`
+
+.. autosummary::
+    :nosignatures:
+
+    Reshape
+    Stack
+    Concat
+    ExpandDim
+    Merge
+ 

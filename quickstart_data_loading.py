@@ -1,10 +1,14 @@
-from sknet.dataset import mnist,svhn,cifar10,fashionmnist,cifar100
+from sknet import dataset
 from sknet.utils import plotting
 import pylab as pl
 
 # Put the dataset functions into a list s.t. dataset_list[0].load() 
 # loads the dataset 0
-dataset_list = [mnist,fashionmnist,svhn,cifar10,cifar100]
+dataset_list = [dataset.mnist(),
+                dataset.fashionmnist(),
+                dataset.svhn(),
+                dataset.cifar10(),
+                dataset.cifar100()]
 
 # Save number of dataset
 n_dataset    = len(dataset_list)

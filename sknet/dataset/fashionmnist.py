@@ -9,8 +9,9 @@ import time
 
 
 class fashionmnist:
-    def load(data_format='NCHW',seed=None):
-
+    def __init__(self):
+        pass
+    def load(self,data_format='NCHW',seed=None):
 
         self.name          = 'fashionmnist'
         self.data_format   = data_format

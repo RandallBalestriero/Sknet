@@ -9,7 +9,9 @@ import time
 
 
 class cifar100:
-    def load(data_format='NCHW',fine_labels=True, seed=None):
+    def __init__(self):
+        pass
+    def load(self,data_format='NCHW',fine_labels=True, seed=None):
                 
         self.name          = 'cifar100'
         self.data_format   = data_format

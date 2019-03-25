@@ -1,17 +1,17 @@
-Transform Layer
----------------
+Input Output Layer
+------------------
 
-.. automodule:: sknet.layer.transform
+.. automodule:: sknet.layer.io
 
 .. currentmodule:: sknet.layer
 
 
-.. autoclass:: Dense
+.. autoclass:: Input
     :members:
     :private-members:
     :special-members:
     
-.. autoclass:: Conv2D
+.. autoclass:: Output
     :members:
     :private-members:
     :special-members:

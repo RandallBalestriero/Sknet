@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Transform Layer" href="layer/transform.html" />
+    <link rel="next" title="Input Output Layer" href="layer/io.html" />
     <link rel="prev" title="sknet.model" href="model.html" /> 
 </head>
 
@@ -102,11 +102,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../user/layer.html">Layer</a></li>
 </ul>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="layer/transform.html">Transform Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer/augment.html">Augment Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layer/io.html">Input Output Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layer/dense.html">Dense Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layer/conv.html">Convolutional Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="layer/pool.html">Pool Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layer/augment.html">Augment Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="layer/shape.html">Shape Layer</a></li>
 </ul>
 </li>
 </ul>
@@ -177,22 +181,45 @@
 <span id="sknet-layer"></span><h1><a class="reference internal" href="#module-sknet.layer" title="sknet.layer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><a class="headerlink" href="#module-sknet.layer" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p class="rubric"><a class="reference internal" href="layer/transform.html"><span class="doc">Transform Layer</span></a></p>
+<p class="rubric"><a class="reference internal" href="layer/io.html"><span class="doc">Input Output Layer</span></a></p>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/transform.html#sknet.layer.Dense" title="sknet.layer.Dense"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dense</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="layer/io.html#sknet.layer.Input" title="sknet.layer.Input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Input</span></code></a></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="layer/transform.html#sknet.layer.Conv2D" title="sknet.layer.Conv2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv2D</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="layer/io.html#sknet.layer.Output" title="sknet.layer.Output"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Output</span></code></a></td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<p class="rubric"><a class="reference internal" href="layer/pool.html"><span class="doc">Pool Layer</span></a></p>
+<p class="rubric"><a class="reference internal" href="layer/dense.html"><span class="doc">Dense Layer</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="layer/dense.html#sknet.layer.Dense" title="sknet.layer.Dense"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dense</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric"><a class="reference internal" href="layer/conv.html"><span class="doc">Convolutional Layer</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="layer/conv.html#sknet.layer.Conv2D" title="sknet.layer.Conv2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv2D</span></code></a>(incoming,&nbsp;filters[,&nbsp;nonlinearity_c,&nbsp;…])</td>
+<td></td>
+</tr>
+</tbody>
+</table>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
@@ -222,6 +249,30 @@
 </tr>
 </tbody>
 </table>
+<p class="rubric"><a class="reference internal" href="layer/shape.html"><span class="doc">Shape Layer</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="layer/shape.html#sknet.layer.Reshape" title="sknet.layer.Reshape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reshape</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="layer/shape.html#sknet.layer.Stack" title="sknet.layer.Stack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Stack</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="layer/shape.html#sknet.layer.Concat" title="sknet.layer.Concat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Concat</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="layer/shape.html#sknet.layer.ExpandDim" title="sknet.layer.ExpandDim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExpandDim</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="layer/shape.html#sknet.layer.Merge" title="sknet.layer.Merge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Merge</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
 </div>
 
 
@@ -232,7 +283,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="layer/transform.html" class="btn btn-neutral float-right" title="Transform Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="layer/io.html" class="btn btn-neutral float-right" title="Input Output Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="model.html" class="btn btn-neutral float-left" title="sknet.model" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

@@ -60,9 +60,11 @@ If you are looking for information on a specific function:
 .. toctree::
   :maxdepth: 2
 
+  modules/dataset
   modules/model
   modules/layer
-  
+
+
 Quickstart
 ==========
 

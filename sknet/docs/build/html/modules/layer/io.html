@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Transform Layer &mdash; Sknet alpha.1 documentation</title>
+  <title>Input Output Layer &mdash; Sknet alpha.1 documentation</title>
   
 
   
@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Augment Layer" href="augment.html" />
+    <link rel="next" title="Dense Layer" href="dense.html" />
     <link rel="prev" title="sknet.layer" href="../layer.html" /> 
 </head>
 
@@ -102,11 +102,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 </ul>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Transform Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="augment.html">Augment Layer</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Input Output Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="augment.html">Augment Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
 </ul>
 </li>
 </ul>
@@ -156,13 +160,13 @@
         
           <li><a href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> &raquo;</li>
         
-      <li>Transform Layer</li>
+      <li>Input Output Layer</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/modules/layer/transform.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/modules/layer/io.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -175,29 +179,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.layer.transform">
-<span id="transform-layer"></span><h1>Transform Layer<a class="headerlink" href="#module-sknet.layer.transform" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-sknet.layer.io">
+<span id="input-output-layer"></span><h1>Input Output Layer<a class="headerlink" href="#module-sknet.layer.io" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="sknet.layer.Dense">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Dense</code><span class="sig-paren">(</span><em>incoming</em>, <em>units</em>, <em>nonlinearity_c=0.0</em>, <em>training=None</em>, <em>batch_norm=False</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Dense" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.layer.Input">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Input</code><span class="sig-paren">(</span><em>in_shape</em>, <em>x=None</em>, <em>data_format='NCHW'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Input" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="sknet.layer.Dense.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>units</em>, <em>nonlinearity_c=0.0</em>, <em>training=None</em>, <em>batch_norm=False</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Dense.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>2D pooling layer
-Performs 2D mean- or max-pooling over the two trailing axes of a 4D input
-tensor. This is an alternative implementation which uses</p>
+<dt id="sknet.layer.Input.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>in_shape</em>, <em>x=None</em>, <em>data_format='NCHW'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Input.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="sknet.layer.Conv2D">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Conv2D</code><span class="sig-paren">(</span><em>incoming</em>, <em>filters</em>, <em>nonlinearity_c=0.0</em>, <em>training=None</em>, <em>batch_norm=True</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>strides=1</em>, <em>pad='valid'</em>, <em>mode='CONSTANT'</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Conv2D" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.layer.Output">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Output</code><span class="sig-paren">(</span><em>incoming</em>, <em>classes</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Output" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
-<dt id="sknet.layer.Conv2D.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>filters</em>, <em>nonlinearity_c=0.0</em>, <em>training=None</em>, <em>batch_norm=True</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>strides=1</em>, <em>pad='valid'</em>, <em>mode='CONSTANT'</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Conv2D.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>incoming: a ranet.layer instance
-filters :  tuple of length 3 with (number_of_filters,filters_height,filters_width)</p>
+<dt id="sknet.layer.Output.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>classes</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Output.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
 </dd></dl>
@@ -212,7 +213,7 @@ filters :  tuple of length 3 with (number_of_filters,filters_height,filters_widt
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="augment.html" class="btn btn-neutral float-right" title="Augment Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="dense.html" class="btn btn-neutral float-right" title="Dense Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../layer.html" class="btn btn-neutral float-left" title="sknet.layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

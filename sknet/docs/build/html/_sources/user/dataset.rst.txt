@@ -7,17 +7,17 @@ Dataset
 Pre-loaded Datasets
 -------------------
 
-Sknet provides comon dataset out-of-the-box in the _sknet.dataset module as
+Sknet provides comon dataset out-of-the-box in the :mod:`sknet.dataset` module as
 
-- sknet.dataset.mnist
+- :class:`sknet.dataset.mnist`
 
-- sknet.dataset.fashionmnist
+- :class:`sknet.dataset.fashionmnist`
 
-- sknet.dataset.svhn
+- :class:`sknet.dataset.svhn`
 
-- sknet.dataset.cifar10
+- :class:`sknet.dataset.cifar10`
 
-- sknet.dataset.cifar100
+- :class:`sknet.dataset.cifar100`
 
 In order to load the train/valid/test set one simply 
 calls the load function as in::
@@ -70,24 +70,24 @@ Running the code _quickstart_data_loading.py
 will generate the following figure
 
 .. figure:: ../_static/test_loading.png
-   :scale: 50 %
-   :alt: dataset figure
+    :scale: 50 %
+    :alt: dataset figure
 
-   Preloaded dataset from sknet.
+    Preloaded dataset from sknet.
 
 
 running for the first time will produce::
 
-Loading MNIST
-Dataset MNIST loaded in 0.71 s.
-Loading FASHION-MNIST
-Dataset FASHION-MNIST loaded in 0.33 s.
-Loading SVHN
-Dataset SVHN loaded in 2.74 s.
-Loading CIFAR10
-Dataset CIFAR10 loaded in 2.37 s.
-Loading CIFAR100
-Dataset CIFAR100 loaded in 2.39 s.
+    Loading MNIST
+    Dataset MNIST loaded in 0.71 s.
+    Loading FASHION-MNIST
+    Dataset FASHION-MNIST loaded in 0.33 s.
+    Loading SVHN
+    Dataset SVHN loaded in 2.74 s.
+    Loading CIFAR10
+    Dataset CIFAR10 loaded in 2.37 s.
+    Loading CIFAR100
+    Dataset CIFAR100 loaded in 2.39 s.
 
 
 .. _quickstart_data_loading.py: https://github.org/RandallBalestriero/sknet/quickstart_data_loading.py

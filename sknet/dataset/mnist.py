@@ -7,7 +7,9 @@ import time
 
 
 class mnist:
-    def load(data_format='NCHW',seed=None):
+    def __init__(self):
+        pass
+    def load(self,data_format='NCHW',seed=None):
         self.data_format = data_format
         self.classes      = 10
         self.name        = 'mnist'

@@ -1,14 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-#__all__ = [
-#        "special",
-#        "normalize",
-#        "pool",
-#        "augment",
-#        "transform",
-#        "nonlinearity"]
-
 
 class Layer:
     def __init__(self,incoming,**kwargs):
@@ -29,5 +21,8 @@ class Layer:
 from .pool import *
 from .augment import *
 from .normalize import *
-from .transform import *
-from .special import *
+from .conv import *
+from .dense import *
+from .shape import *
+from .io import *
+
