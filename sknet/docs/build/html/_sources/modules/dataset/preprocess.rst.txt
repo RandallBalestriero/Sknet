@@ -6,12 +6,17 @@ Preprocessing
 .. currentmodule:: sknet.dataset
 
 
-.. autoclass:: standardize
+.. autoclass:: Identity
+    :members:
+    :private-members:
+    :special-members:
+
+.. autoclass:: Standardize
     :members:
     :private-members:
     :special-members:
     
-.. autoclass:: zca_whitening
+.. autoclass:: ZCAWhitening
     :members:
     :private-members:
     :special-members:

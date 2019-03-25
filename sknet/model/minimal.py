@@ -38,9 +38,9 @@ class augmentation(Model):
         if self.crop:
             dnn.append(layer.RandomCrop(dnn[-1],training=training,crop_size=self.crop_size))
         if self.left_right:
-            dnn.append(layer.RandomFlipLeftRight(dnn[-1],training=training))
+            dnn.append(layer.RandomAxisReverse(dnn[-1],training=training,axis=[-1]))
         if self.up_down:
-            dnn.append(layer.RandomFlipUpDown(dnn[-1],training=training))
+            dnn.append(layer.RandomAxisReverse(dnn[-1],training=training,axis=[-2]))
         if self.rot90:
             dnn.append(layer.RandomRot90(dnn[-1],training=training))
         return dnn

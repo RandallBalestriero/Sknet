@@ -25,7 +25,7 @@ models      = [
         sknet.model.minimal.augmentation(input_shape=input_shape,
         crop=False,crop_size=(26,26),left_right=False,up_down=False,rot90=True,data_format=cifar10.data_format)
         ]
-models_names = ['Random Crop (26,26)','Random Left-Right Flip','Random Up-Down Flip','Random Rot90']
+models_names = ['RandomCrop(26,26)','RandomLeftRight','RandomUpDown','RandomRot90']
 
 
 for model,model_name in zip(models,models_names):

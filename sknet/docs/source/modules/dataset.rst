@@ -22,7 +22,8 @@
 .. autosummary::
     :nosignatures:
 
-    standardize
-    zca_whitening
+    Identity
+    Standardize
+    ZCAWhitening
    
  

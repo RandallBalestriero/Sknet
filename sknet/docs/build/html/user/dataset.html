@@ -181,10 +181,10 @@
 <p>Sknet provides comon dataset out-of-the-box in the <a class="reference internal" href="../modules/dataset/dataset.html#module-sknet.dataset" title="sknet.dataset"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a> module as</p>
 <ul class="simple">
 <li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.mnist" title="sknet.dataset.mnist"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.mnist</span></code></a></li>
-<li><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.fashionmnist</span></code></li>
+<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.fashionmnist" title="sknet.dataset.fashionmnist"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.fashionmnist</span></code></a></li>
 <li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.svhn" title="sknet.dataset.svhn"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.svhn</span></code></a></li>
-<li><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.cifar10</span></code></li>
-<li><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.cifar100</span></code></li>
+<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.cifar10" title="sknet.dataset.cifar10"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.cifar10</span></code></a></li>
+<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.cifar100" title="sknet.dataset.cifar100"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.cifar100</span></code></a></li>
 </ul>
 <p>In order to load the train/valid/test set one simply
 calls the load function as in:</p>
@@ -226,13 +226,17 @@ of the dataset. In this file one needs</p>
 <div class="section" id="code-example">
 <h2>Code Example<a class="headerlink" href="#code-example" title="Permalink to this headline">¶</a></h2>
 <p>Running the code _quickstart_data_loading.py</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sknet.dataset</span> <span class="kn">import</span> <span class="n">mnist</span><span class="p">,</span><span class="n">svhn</span><span class="p">,</span><span class="n">cifar10</span><span class="p">,</span><span class="n">fashionmnist</span><span class="p">,</span><span class="n">cifar100</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sknet</span> <span class="kn">import</span> <span class="n">dataset</span>
 <span class="kn">from</span> <span class="nn">sknet.utils</span> <span class="kn">import</span> <span class="n">plotting</span>
 <span class="kn">import</span> <span class="nn">pylab</span> <span class="kn">as</span> <span class="nn">pl</span>
 
 <span class="c1"># Put the dataset functions into a list s.t. dataset_list[0].load() </span>
 <span class="c1"># loads the dataset 0</span>
-<span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">mnist</span><span class="p">,</span><span class="n">fashionmnist</span><span class="p">,</span><span class="n">svhn</span><span class="p">,</span><span class="n">cifar10</span><span class="p">,</span><span class="n">cifar100</span><span class="p">]</span>
+<span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">dataset</span><span class="o">.</span><span class="n">mnist</span><span class="p">(),</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">fashionmnist</span><span class="p">(),</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">svhn</span><span class="p">(),</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">cifar10</span><span class="p">(),</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">cifar100</span><span class="p">()]</span>
 
 <span class="c1"># Save number of dataset</span>
 <span class="n">n_dataset</span>    <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">)</span>

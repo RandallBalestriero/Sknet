@@ -183,10 +183,43 @@
 <span id="augment-layer"></span><h1>Augment Layer<a class="headerlink" href="#module-sknet.layer.augment" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="sknet.layer.RandomCrop">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomCrop</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_size</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomCrop</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_size</em>, <em>training=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Random cropping of input images</p>
+<p>During training, a random continuous part of the image
+of shape crop_size is extracted and used as layer output.
+During testing, the center part of the image of shape
+crop_size is used as output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>incoming</strong> (tuple of positive int or <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instance) – The input to the layer</li>
+<li><strong>crop_size</strong> – Shape of the image after crop</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example of use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_layer</span> <span class="o">=</span> <span class="n">Input</span><span class="p">((</span><span class="mi">64</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">),</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span> <span class="c1"># Init an input layer with input shape</span>
+<span class="n">crop_layer</span>  <span class="o">=</span> <span class="n">RandomCrop</span><span class="p">(</span><span class="n">input_layer</span><span class="p">,(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>        <span class="c1"># output of this layer is (64,3,28,28)</span>
+</pre></div>
+</div>
+<dl class="method">
 <dt id="sknet.layer.RandomCrop.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_size</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_size</em>, <em>training=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.layer.RandomAxisReverse">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomAxisReverse</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="sknet.layer.RandomAxisReverse.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 

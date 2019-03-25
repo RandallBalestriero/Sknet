@@ -50,6 +50,7 @@
 
     RandomCrop
     RandomRot90
+    RandomAxisReverse
 
 .. rubric:: :doc:`layer/shape`
 

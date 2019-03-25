@@ -10,6 +10,11 @@ Augment Layer
     :private-members:
     :special-members:
 
+.. autoclass:: RandomAxisReverse
+    :members:
+    :private-members:
+    :special-members:
+
 .. autoclass:: RandomRot90
     :members:
     :private-members:
