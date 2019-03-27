@@ -70,9 +70,9 @@ class fashionmnist:
             train_set[0] = np.transpose(train_set[0],[0,2,3,1])
             test_set[0]  = np.transpose(test_set[0],[0,2,3,1])
             valid_set[0] = np.transpose(valid_set[0],[0,2,3,1])
-            self.image_shape = (28,28,1)
+            self.datum_shape = (28,28,1)
         else:
-            self.image_shape = (1,28,28)
+            self.datum_shape = (1,28,28)
 
         print('Dataset FASHION-MNIST loaded in','{0:.2f}'.format(time.time()-t),'s.')
 

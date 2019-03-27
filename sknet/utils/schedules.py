@@ -65,7 +65,14 @@ class stepwise:
 
 
 
-def adaptive(valid_accu):
+def adaptive(valid_accu,patience=5):
+    """
+    Reduce learning rate when a metric has stopped improving. 
+    Models often benefit from reducing the learning rate by a 
+    factor of 2-10 once learning stagnates. This scheduler reads 
+    a metrics quantity and if no improvement is seen for a ‘patience’ 
+    number of epochs, the learning rate is reduced.
+    """
     if len(valid_accu)<10:
         return False
     if np.std(valid_accu[-10])<0.1:

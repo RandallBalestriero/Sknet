@@ -16,6 +16,12 @@
 
     mnist
     svhn
+    cifar10
+    cifar100
+    stl10
+    cub200
+    warblr
+    freefield1010
     
 .. rubric:: :doc:`dataset/preprocess`
 

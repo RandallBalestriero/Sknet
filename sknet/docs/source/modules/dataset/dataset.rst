@@ -31,6 +31,24 @@ Dataset
     :private-members:
     :special-members:
     
+.. autoclass:: stl10
+    :members:
+    :private-members:
+    :special-members:
+ 
+.. autoclass:: cub200
+    :members:
+    :private-members:
+    :special-members:
+    
+.. autoclass:: warblr
+    :members:
+    :private-members:
+    :special-members:
 
+.. autoclass:: freefield1010
+    :members:
+    :private-members:
+    :special-members:
 
 
