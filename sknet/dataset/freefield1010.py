@@ -32,12 +32,12 @@ class freefield1010(dict):
             datum_shape = (1,441000)
         else:
             datum_shape = (441000,1)
-        dict_init = [("train_set",None),
+        dict_init = [("train_set",None),('sampling_rate',44100),
                     ("datum_shape",datum_shape),("n_classes",2),
                     ("n_channels",1),("spatial_shape",(441000,)),
                     ("path",path),("data_format",data_format),("name","freefield1010"),
                     ('classes',["no bird","bird"])]
-        super().__init__(dict_init+[('classes',classes)])
+        super().__init__(dict_init)
 
 
     def load(self):

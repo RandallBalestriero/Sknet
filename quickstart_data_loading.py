@@ -7,8 +7,10 @@ dataset_list = [dataset.mnist(),
 #                dataset.fashionmnist(),
 #                dataset.svhn(),
 #                dataset.cifar10(),
-                dataset.cifar100(),
-                dataset.stl10()]
+#                dataset.cifar100(),
+                dataset.stl10(),
+                dataset.warblr(),
+                dataset.freefield1010()]
 
 # Loop over the dataset_list to load them (download them if necessary)
 # and display the first 20 images
@@ -34,8 +36,15 @@ for dataset in dataset_list:
         labels = dataset['train_set'][1][:20]
         for im,label,cpt in zip(images,labels,range(20)):
             pl.subplot(2,10,cpt+1)
+            if len(im)>2:
+                plotting.imshow(im)
+            else:
+                signal = pl.squeeze(im)
+                pl.plot(signal)
+                pl.xlim([0,len(signal)])
+                pl.xticks([])
+                pl.yticks([])
             pl.title(str(label)+": "+dataset['classes'][label])
-            plotting.imshow(im)
 
     # Reduce side margins and save fig
     pl.tight_layout()

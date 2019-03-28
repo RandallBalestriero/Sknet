@@ -5,6 +5,7 @@ Dataset
 
 Dataset format
 --------------
+
 Each dataset has its own attiributes and specificities. To allow such
 flexibility in Python we represent each dataset in a class inheriting from
 a :mod:`dict` object. That is, each dataset is a Python dictionnary with
@@ -26,36 +27,41 @@ Sknet provides comon dataset out-of-the-box in the :mod:`sknet.dataset` module a
 
 - :class:`sknet.dataset.cifar100`
 
-In order to load the train/valid/test set one simply 
-calls the load function as in::
+- :class:`sknet.dataset.stl10`
 
-	train_set,valid_set,test_set = sknet.dataset.mnist.load()
+- :class:`sknet.dataset.warblr`
+
+- :class:`sknet.dataset.freefield1010`
+
+In order to work with a dataset one simply initializes the 
+dataset class (we leave the constructor parameters as default)::
+
+	cifar10 = sknet.dataset.cifar10()
 	
-where each set contains first the inputs and then the labels as in::
+the variable cifar10 is of DictType with all the dataset details as keys. For example, to lad the train and test set::
 
-	train_x,train_y = train_set
-	valid_x,valid_y = valid_set
-	test_x,test_y   = test_set
+	train_x,train_y = cifar10["train_set"]
+	test_x,test_y   = cifar10["test_set"]
 
+Since cifar10 does not impose a valid set, :python:`cifar10["valid_set"]` will return an error as "valid_set" is not a key of cifar10 by default.
 To access the image shape, the data format or additional dataset 
 specific attributes simply do::
 
-	mnist_image_shape = sknet.dataset.mnist.image_shape #(1,28,28)
-	mnist_data_format = sknet.dataset.mnist.data_format # 'NCHW'
+        data_format = cifar10["data_format"] # 'NCHW'
+        datum_shape = cifar10["datum_shape"] # (3,32,32)
 
-The standard format is 'NCHW'. But the 
-library supports transparently the 'NHWC'.
+Accessing all the dataset attributes are obtained from :python:`cifar10.keys()` as with a standard dictionnary. 
 
 All the pre-coded dataset will be loaded from the path given by the 
-environment variable DATASET_PATH. If needs be, the dataset will first
-be downloaded into this path prior loading (at first utilisation of
+environment variable :envvar:`DATASET_PATH`, or an alternative path given at initialization of the dataset class. If needs be, the dataset will
+be downloaded into this path, prior loading (at first utilisation of
 sknet for example). The saved dataset are in compressed format.
 
 
 Adding a dataset
 ----------------
 
-Each dataset has its correpsonding file in sknet/dataset/dataset_name.py
+Each dataset has its corresponding file in sknet/dataset/dataset_name.py
 in which all the attributes and the load function are defined.
 To add a dataset, one needs to create a .py file with name being the one
 of the dataset. In this file one needs
@@ -64,8 +70,8 @@ of the dataset. In this file one needs
     - image_shape, data_format attributes
 
 
-Code Example
-------------
+Open a pre-loaded dataset
+-------------------------
 
 Running the code _quickstart_data_loading.py
 
@@ -96,8 +102,8 @@ cifar10
 
 .. image:: https://i.imgur.com/rSRJXAm.png
 
-cifar100
-^^^^^^^^
+cifar100 (superclass,class)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. image:: https://i.imgur.com/htPYkpn.png 
 
@@ -106,6 +112,15 @@ stl10
 
 .. image:: https://i.imgur.com/w4HlyjK.png
 
+warblr
+^^^^^^
+
+.. image:: https://i.imgur.com/w4HlyjK.png
+
+freefield1010
+^^^^^^^^^^^^^
+
+.. image:: https://i.imgur.com/w4HlyjK.png
 
 
 
@@ -123,10 +138,17 @@ running for the next times will produce:
    :literal:
 
 
-Custom dataset
---------------
+Adding a dataset
+----------------
 
-You can simply use the :mod:`dataset.custom` and give (at least) the training set as well as the data_format and the number of classes.
+You can simply use the :mod:`dataset.custom` and give (at least) the 
+training set as well as the data_format and the number of classes.
+We provide in the following minimal example using a random dataset 
+highlighting the key features:
+
+.. literalinclude:: ../../../../quickstart_custom_dataset.py
+    :encoding: latin-1
+    :language: python
 
 .. _quickstart_data_loading.py: https://github.org/RandallBalestriero/sknet/quickstart_data_loading.py
 .. _sknet.dataset: https://github.org/RandallBalestriero/sknet/sknet/dataset
