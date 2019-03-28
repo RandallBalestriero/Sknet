@@ -6,8 +6,8 @@ import time
 
 
 
-class mnist:
-    """
+class mnist(dict):
+    """Grayscale digit classification.
     The `MNIST <http://yann.lecun.com/exdb/mnist/>`_ database of handwritten 
     digits, available from this page, has a training set of 60,000 examples, 
     and a test set of 10,000 examples. It is a subset of a larger set available 
@@ -16,38 +16,55 @@ class mnist:
     techniques and pattern recognition methods on real-world data while 
     spending minimal efforts on preprocessing and formatting.
     """
-    def __init__(self,data_format='NCHW'):
-        self.data_format     = data_format
-        self.given_test_set  = True
-        self.given_valid_set = True
-        self.given_unlabeled = False
-        self.n_classes       = 10
-        self.name            = 'mnist'
-        self.classes         = {0:"0",
-                                1:"1",
-                                2:"2",
-                                3:"3",
-                                4:"4",
-                                5:"5",
-                                6:"6",
-                                7:"7",
-                                8:"8",
-                                9:"9"}
+    def __init__(self,data_format='NCHW',path=None):
+        """Set up the configuration for data loading and data format
+
+        :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
+        :type data_format: 'NCHW' or 'NHWC'
+        :param path:(optional, default $DATASET_PATH), the path to look for the data and 
+                    where the data will be downloaded if not present
+        :type path: str
+        """
+        if path is None:
+            path = os.environ['DATASET_PATH']
+        if data_format=='NCHW':
+            datum_shape = (1,28,28)
+        else:
+            datum_shape = (28,28,1)
+        dict_init = [("train_set",None),("test_set",None),("valid_set",None),
+                    ("datum_shape",datum_shape),("n_classes",10),
+                    ("n_channels",1),("spatial_shape",(28,28)),
+                    ("path",path),("data_format",data_format),("name","mnist"),
+                    ('classes',[str(u) for u in range(10)])]
+        super().__init__(dict_init)
     def load(self):
-        t = time.time()
-        PATH = os.environ['DATASET_PATH']
+        """Load the dataset (download if necessary) and adapt
+        the class attributes based on the given data format.
+
+        :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
+        :type data_format: 'NCHW' or 'NHWC'
+        :return: None, nothing is returned as the data and specific dataset informations are set as attributes
+        :rtype: NoneType
+        """
+        print('Loading mnist')
+
+        t    = time.time()
+        PATH = self['path']
 
         # Check if directory exists
         if not os.path.isdir(PATH+'mnist'):
-            print('Creating Directory')
+            print('Creating mnist Directory')
             os.mkdir(PATH+'mnist')
 
         # Check if file exists
         if not os.path.exists(PATH+'mnist/mnist.pkl.gz'):
-            print('Downloading Data')
-            urllib.request.urlretrieve('http://deeplearning.net/data/mnist/mnist.pkl.gz',PATH+'mnist/mnist.pkl.gz')  
+            print('\tDownloading mnist Dataset...')
+            td  = time.time()
+            url = 'http://deeplearning.net/data/mnist/mnist.pkl.gz'
+            urllib.request.urlretrieve(url,PATH+'mnist/mnist.pkl.gz')
+            print("\tDone in {:.2f}".format(time.time()-td))
 
-        print('Loading MNIST')
+        print('\tOpening mnist')
         # Loading the file
         f = gzip.open(PATH+'mnist/mnist.pkl.gz', 'rb')
         train_set, valid_set, test_set = pickle.load(f,encoding='latin1')
@@ -56,20 +73,14 @@ class mnist:
         test_set  = [test_set[0].reshape((-1,1,28,28)),test_set[1]]
         valid_set = [valid_set[0].reshape((-1,1,28,28)),valid_set[1]]
         # Check formatting
-        if data_format=='NHWC':
+        if self["data_format"]=='NHWC':
             train_set[0] = np.transpose(train_set[0],[0,2,3,1])
             test_set[0]  = np.transpose(test_set[0],[0,2,3,1])
             valid_set[0] = np.transpose(valid_set[0],[0,2,3,1])
-            self.datum_shape = (28,28,1)
-        else:
-            self.datum_shape = (1,28,28)
     
-        self.train_set = train_set
-        self.test_set  = test_set
-        self.valid_set = valid_set
-        print('Dataset MNIST loaded in','{0:.2f}'.format(time.time()-t),'s.')
+        self['train_set'] = train_set
+        self['test_set']  = test_set
+        self['valid_set'] = valid_set
 
-
-
-
+        print('Dataset mnist loaded in','{0:.2f}'.format(time.time()-t),'s.')
 

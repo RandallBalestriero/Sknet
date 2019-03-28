@@ -1,0 +1,18 @@
+Loading mnist
+	Opening mnist
+Dataset mnist loaded in 0.69 s.
+Loading fashionmnist
+	Opening fashionmnist
+Dataset fashionmnist loaded in 0.29 s.
+Loading svhn
+	Opening svhn
+Dataset svhn loaded in 2.05 s.
+Loading cifar10
+	Opening cifar10
+Dataset cifar10 loaded in 6.60 s.
+Loading cifar100
+	Opening cifar100
+Dataset cifar100 loaded in 2.21 s.
+Loading stl10
+	Opening stl10
+Dataset stl10 loaded in 37.29 s.

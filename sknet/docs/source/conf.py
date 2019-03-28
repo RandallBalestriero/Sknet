@@ -71,7 +71,7 @@ def linkcode_resolve(domain, info):
     except Exception:
         filename = info['module'].replace('.', '/') + '.py'
     tag = 'master' if 'dev' in release else ('v' + release)
-    return "https://github.com/RandallBalestriero/Sknet/blob/%s/%s" % (tag, filename)
+    return "https://github.com/RandallBalestriero/Sknet/%s/%s" % (tag, filename)
 
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
@@ -93,7 +93,9 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-
+autodoc_default_options = {
+    'autodoc_member_order': 'groupwise'
+}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 

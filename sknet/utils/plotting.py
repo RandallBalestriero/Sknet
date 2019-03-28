@@ -9,7 +9,6 @@ def imshow(x,cmap='jet'):
     xmin = x.min()
     xmax = x.max()
     # Ensure that color channel is last
-    print(x.shape)
     if x.shape[0]==3:
         x = x.transpose([1,2,0])
     # Squeeze to remove the case of single channel

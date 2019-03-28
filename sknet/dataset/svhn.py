@@ -7,8 +7,9 @@ import time
 
 
 
-class svhn:
-    """ The `SVHN <http://ufldl.stanford.edu/housenumbers/>`_
+class svhn(dict):
+    """Street number classification.
+    The `SVHN <http://ufldl.stanford.edu/housenumbers/>`_
     dataset is a real-world 
     image dataset for developing machine learning and object 
     recognition algorithms with minimal requirement on data 
@@ -20,63 +21,76 @@ class svhn:
     scene images). SVHN is obtained from house numbers in Google 
     Street View images. 
     """
-    def __init__(self,data_format='NCHW'):
-        self.data_format     = data_format
-        self.given_test_set  = True
-        self.given_valid_set = False
-        self.given_unlabeled = False
-        self.n_classes       = 10
-        self.classes         = dict([[u,str(u)] for u in range(10)])
-        self.name            = 'svhn'
+    def __init__(self,data_format='NCHW',path=None):
+        """Set up the configuration for data loading and data format
+
+        :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
+        :type data_format: 'NCHW' or 'NHWC'
+        :param path:(optional, default $DATASET_PATH), the path to look for the data and 
+                    where the data will be downloaded if not present
+        :type path: str
+        """
+        if path is None:
+            path = os.environ['DATASET_PATH']
+        if data_format=='NCHW':
+            datum_shape = (3,32,32)
+        else:
+            datum_shape = (32,32,3)
+        dict_init = [("train_set",None),("test_set",None),
+                    ("datum_shape",datum_shape),("n_classes",10),
+                    ("n_channels",3),("spatial_shape",(32,32)),
+                    ("path",path),("data_format",data_format),("name","svhn"),
+                    ("classes",[str(u) for u in range(10)])]
+        super().__init__(dict_init)
+
     def load(self):
+        """Load the dataset (download if necessary) and adapt
+        the class attributes based on the given data format.
+
+        :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
+        :type data_format: 'NCHW' or 'NHWC'
+        :return: return the train and test set, each as a couple (images,labels)
+        :rtype: [(train_images,train_labels),
+                (test_images,test_labels)]
+        """
+        print('Loading svhn')
 
         t = time.time()
 
-        PATH = os.environ['DATASET_PATH']
+        PATH = self["path"]
 
         if not os.path.isdir(PATH+'svhn'):
             os.mkdir(PATH+'svhn')
-            print('Creating Data Directory')
+            print('\tCreating svhn Directory')
 
         if not os.path.exists(PATH+'svhn/train_32x32.mat'):
-            print('Downloading Training File')
+            print('\tDownloading svhn Train Set')
+            td = time.time()
             url = 'http://ufldl.stanford.edu/housenumbers/train_32x32.mat'
             urllib.request.urlretrieve(url,PATH+'svhn/train_32x32.mat')
+            print("\tDone in {:.2f} s.".format(time.time()-td))
 
         if not os.path.exists(PATH+'svhn/test_32x32.mat'):
-            print('Downloading Testing File')
+            print('\tDownloading svhn Test Set')
+            td = time.time()
             url = 'http://ufldl.stanford.edu/housenumbers/test_32x32.mat'
             urllib.request.urlretrieve(url,PATH+'svhn/test_32x32.mat')
+            print("\tDone in {:.2f} s.".format(time.time()-td))
 
-        print('Loading SVHN')
+        print('\tOpening svhn')
         train_set = sio.loadmat(PATH+'svhn/train_32x32.mat')
         train_set = [train_set['X'].transpose([3,2,0,1]).astype('float32'),
-                    train_set['y'].astype('int32')-1]
+                    np.squeeze(train_set['y']).astype('int32')-1]
         test_set  = sio.loadmat(PATH+'svhn/test_32x32.mat')
         test_set  = [test_set['X'].transpose([3,2,0,1]).astype('float32'),
-                    test_set['y'].astype('int32')-1]
+                    np.squeeze(test_set['y']).astype('int32')-1]
 
         # Check formatting
-        if data_format=='NHWC':
+        if self["data_format"]=='NHWC':
             train_set[0] = np.transpose(train_set[0],[0,2,3,1])
             test_set[0]  = np.transpose(test_set[0],[0,2,3,1])
-            self.datum_shape = (32,32,3)
-        else:
-            self.datum_shape = (3,32,32)
 
-        self.train_set = train_set
-        self.test_set  = test_set
+        self["train_set"]= train_set
+        self["test_set"] = test_set
 
-        print('Dataset SVHN loaded in','{0:.2f}'.format(time.time()-t),'s.')
-
-
-
-
-
-
-
-
-
-
-
-
+        print('Dataset svhn loaded in','{0:.2f}'.format(time.time()-t),'s.')

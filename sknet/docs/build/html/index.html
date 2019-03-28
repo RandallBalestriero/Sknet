@@ -170,15 +170,35 @@
             
   <div class="section" id="welcome-to-sknet-in-construction">
 <h1>Welcome to Sknet (in construction)<a class="headerlink" href="#welcome-to-sknet-in-construction" title="Permalink to this headline">¶</a></h1>
-<p>Sknet is a lightweight library to build and train neural networks in Tensorflow.
-This library aims ot fulfill two major goals:</p>
+<p>Sknet is a lightweight library built mainly upon numpy and tensorflow.
+The aim is to provide a fully independent and self content toolbox. Similarly
+to matplotlib, the user can either run some state-of-the-art deep learning
+methods on the most comon dataset with just a few lines of codes and no prerequisites;
+but also accees any block and any subtleties of the provided methods to
+tweak, experiment, or improve upon them. As such, this library aims to
+fulfill two major goals:</p>
 <blockquote>
 <div><ul class="simple">
-<li>provide an out-of-the-box solution for practicioner to reproduce results
-and build upon previous work with a comon working environment</li>
-<li>provide tools and simple methods following the research direction of
-the development team around max-affine splines to interpret deep neural
-networks</li>
+<li>provide an out-of-the-box solution for practicioner allowing to reproduce
+results and build upon previous work with a comon working environment without
+any prerequisites or additional ressources</li>
+<li>Allow easy access and modification of any of the provided methods to allow
+anyone to experiment and improve upon existing methods</li>
+</ul>
+</div></blockquote>
+<p>The above makes this toolbox oriented for any party interested in trying deep
+learning methods for some specific tasks to researchers in need of a qualitative
+and self content toolbox. By providing to the user enough transparency and
+flexibility to implement their own creation without requiring to redo all the
+other parts of the pipeline we hope to</p>
+<blockquote>
+<div><ul class="simple">
+<li>allow fast and easy experimenting on any part of the deep learning
+pipeline</li>
+<li>allow anyone to easily validate their idea without requiring time
+ressources in coding parts independent from the idea to test</li>
+<li>ensure that provided and used methods follow the guidelines used by
+the developers and practicioners</li>
 </ul>
 </div></blockquote>
 <p>This toolbox is oriented for research and education, and any projects
@@ -187,7 +207,8 @@ We briefly describe here the fundamentals of the toolbox. The project is on _Git
 <div class="section" id="sknet-way-of-working">
 <h2>Sknet way of working<a class="headerlink" href="#sknet-way-of-working" title="Permalink to this headline">¶</a></h2>
 <p>The library is built with the deep learning pipeline in mind. That is, it provides
-multiple blocks being combined to solve a task. Those blocks are:</p>
+multiple blocks which are highly customizable. Those blocks are then combined into a
+pipeline to solve a task. Those blocks are:</p>
 <blockquote>
 <div><ul class="simple">
 <li><a class="reference internal" href="user/dataset.html#dataloading-label"><span class="std std-ref">Dataset</span></a>: any collection of inputs or (input-output) pairs</li>
@@ -209,15 +230,16 @@ into a trainable pipeline, also containing the tensorflow session</li>
 <div class="section" id="user-guide">
 <h2>User Guide<a class="headerlink" href="#user-guide" title="Permalink to this headline">¶</a></h2>
 <p>The Sknet user guide explains how to install Sknet, how to build and train
-neural networks, and how to contribute to the library as a
-developer.</p>
+neural networks, and how to contribute to the library as a developer.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/dataset.html">Dataset</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="user/dataset.html#dataset-format">Dataset format</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user/dataset.html#pre-loaded-datasets">Pre-loaded Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user/dataset.html#adding-a-dataset">Adding a dataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user/dataset.html#code-example">Code Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user/dataset.html#custom-dataset">Custom dataset</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user/preprocess.html">Preprocess</a><ul>

@@ -15,11 +15,11 @@
     :nosignatures:
 
     mnist
+    fashionmnist
     svhn
     cifar10
     cifar100
     stl10
-    cub200
     warblr
     freefield1010
     

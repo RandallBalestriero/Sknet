@@ -3,6 +3,13 @@
 Dataset
 =======
 
+Dataset format
+--------------
+Each dataset has its own attiributes and specificities. To allow such
+flexibility in Python we represent each dataset in a class inheriting from
+a :mod:`dict` object. That is, each dataset is a Python dictionnary with
+some key attributes s.a. "train_set" or "n_classes".
+We refer to the last section for details and how to create its own dataset.
 
 Pre-loaded Datasets
 -------------------
@@ -69,26 +76,26 @@ Running the code _quickstart_data_loading.py
 
 will generate the following figure
 
-.. figure:: ../_static/test_loading.png
-    :scale: 50 %
-    :alt: dataset figure
-
-    Preloaded dataset from sknet.
+.. image:: /_static/test_loading.png
 
 
-running for the first time will produce::
+running for the first time will produce:
 
-    Loading MNIST
-    Dataset MNIST loaded in 0.71 s.
-    Loading FASHION-MNIST
-    Dataset FASHION-MNIST loaded in 0.33 s.
-    Loading SVHN
-    Dataset SVHN loaded in 2.74 s.
-    Loading CIFAR10
-    Dataset CIFAR10 loaded in 2.37 s.
-    Loading CIFAR100
-    Dataset CIFAR100 loaded in 2.39 s.
 
+.. include:: ../_static/data_loading_output_1.txt
+   :literal:
+
+
+running for the next times will produce:
+
+.. include:: ../_static/data_loading_output_2.txt
+   :literal:
+
+
+Custom dataset
+--------------
+
+You can simply use the :mod:`dataset.custom` and give (at least) the training set as well as the data_format and the number of classes.
 
 .. _quickstart_data_loading.py: https://github.org/RandallBalestriero/sknet/quickstart_data_loading.py
 .. _sknet.dataset: https://github.org/RandallBalestriero/sknet/sknet/dataset

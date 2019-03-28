@@ -183,12 +183,12 @@
 <span id="pool-layer"></span><h1>Pool Layer<a class="headerlink" href="#module-sknet.layer.pool" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="sknet.layer.Pool">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Pool</code><span class="sig-paren">(</span><em>incoming</em>, <em>windows</em>, <em>strides=None</em>, <em>pool_type='MAX'</em>, <em>padding='VALID'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Pool" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Pool</code><span class="sig-paren">(</span><em>incoming</em>, <em>windows</em>, <em>strides=None</em>, <em>pool_type='MAX'</em>, <em>padding='VALID'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Pool" title="Permalink to this definition">¶</a></dt>
 <dd><p>Pooling layer over spatial and/or channel dimensions.
 Finish</p>
 <dl class="method">
 <dt id="sknet.layer.Pool.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>windows</em>, <em>strides=None</em>, <em>pool_type='MAX'</em>, <em>padding='VALID'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Pool.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>windows</em>, <em>strides=None</em>, <em>pool_type='MAX'</em>, <em>padding='VALID'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Pool.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Example of use:</p>
 <p># (3,3) max pooling with (3,3) strides
 # All ther below are equivalent
@@ -216,10 +216,10 @@ over the corresponding region in the input</p>
 
 <dl class="class">
 <dt id="sknet.layer.GlobalSpatialPool">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">GlobalSpatialPool</code><span class="sig-paren">(</span><em>incoming</em>, <em>pool_type='AVG'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.GlobalSpatialPool" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">GlobalSpatialPool</code><span class="sig-paren">(</span><em>incoming</em>, <em>pool_type='AVG'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.GlobalSpatialPool" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="sknet.layer.GlobalSpatialPool.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>pool_type='AVG'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/blob/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.GlobalSpatialPool.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>pool_type='AVG'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.GlobalSpatialPool.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>incoming: a ranet.layer</p>
 <p>pool_type: str, ‘MAX’ or ‘AVG’</p>
 <p>data_format: str, ‘NCHW’ or ‘NHWC’</p>

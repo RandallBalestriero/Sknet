@@ -97,9 +97,11 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Dataset</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dataset-format">Dataset format</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pre-loaded-datasets">Pre-loaded Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#adding-a-dataset">Adding a dataset</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-example">Code Example</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-dataset">Custom dataset</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocess</a></li>
@@ -176,6 +178,14 @@
             
   <div class="section" id="dataset">
 <span id="dataloading-label"></span><h1>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="dataset-format">
+<h2>Dataset format<a class="headerlink" href="#dataset-format" title="Permalink to this headline">¶</a></h2>
+<p>Each dataset has its own attiributes and specificities. To allow such
+flexibility in Python we represent each dataset in a class inheriting from
+a <code class="xref py py-mod docutils literal notranslate"><span class="pre">dict</span></code> object. That is, each dataset is a Python dictionnary with
+some key attributes s.a. “train_set” or “n_classes”.
+We refer to the last section for details and how to create its own dataset.</p>
+</div>
 <div class="section" id="pre-loaded-datasets">
 <h2>Pre-loaded Datasets<a class="headerlink" href="#pre-loaded-datasets" title="Permalink to this headline">¶</a></h2>
 <p>Sknet provides comon dataset out-of-the-box in the <a class="reference internal" href="../modules/dataset/dataset.html#module-sknet.dataset" title="sknet.dataset"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a> module as</p>
@@ -236,50 +246,118 @@ of the dataset. In this file one needs</p>
                 <span class="n">dataset</span><span class="o">.</span><span class="n">fashionmnist</span><span class="p">(),</span>
                 <span class="n">dataset</span><span class="o">.</span><span class="n">svhn</span><span class="p">(),</span>
                 <span class="n">dataset</span><span class="o">.</span><span class="n">cifar10</span><span class="p">(),</span>
-                <span class="n">dataset</span><span class="o">.</span><span class="n">cifar100</span><span class="p">()]</span>
-
-<span class="c1"># Save number of dataset</span>
-<span class="n">n_dataset</span>    <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">)</span>
-
-<span class="c1"># Initialize the counter for subplot</span>
-<span class="n">cpt</span>          <span class="o">=</span> <span class="mi">1</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">cifar100</span><span class="p">(),</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">stl10</span><span class="p">()]</span>
 
 <span class="c1"># Loop over the dataset_list to load them (download them if necessary)</span>
 <span class="c1"># and display the first 10 images</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="n">n_dataset</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span>
+
 <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">dataset_list</span><span class="p">:</span>
-    <span class="n">train_set</span><span class="p">,</span><span class="n">valid_set</span><span class="p">,</span><span class="n">test_set</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">seed</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">im</span><span class="p">,</span><span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">train_set</span><span class="p">[</span><span class="mi">0</span><span class="p">][:</span><span class="mi">10</span><span class="p">],</span><span class="n">train_set</span><span class="p">[</span><span class="mi">1</span><span class="p">][:</span><span class="mi">10</span><span class="p">]):</span>
-        <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">n_dataset</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">cpt</span><span class="p">)</span>
-        <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">label</span><span class="p">))</span>
-        <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
-        <span class="n">cpt</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
 
-<span class="c1"># Reduce side margins</span>
-<span class="n">pl</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="c1"># Create the figure</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">4</span><span class="p">))</span>
 
-<span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;./sknet/docs/source/user/test_loading.png&#39;</span><span class="p">)</span>
+    <span class="c1"># Initialize the counter for subplot</span>
+    <span class="n">cpt</span> <span class="o">=</span> <span class="mi">1</span>
 
+    <span class="c1"># distinguish the cifrar100 case as it has coarse and</span>
+    <span class="c1"># fine labels</span>
+    <span class="k">if</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span><span class="o">==</span><span class="s1">&#39;cifar100&#39;</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">im</span><span class="p">,</span><span class="n">coarse_label</span><span class="p">,</span><span class="n">fine_label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_set&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][:</span><span class="mi">20</span><span class="p">],</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_set&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][:</span><span class="mi">20</span><span class="p">],</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_set&#39;</span><span class="p">][</span><span class="mi">2</span><span class="p">][:</span><span class="mi">20</span><span class="p">]):</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">cpt</span><span class="p">)</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;superclasses&#39;</span><span class="p">][</span><span class="n">label</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;, &#39;</span><span class="o">+</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">][</span><span class="n">label</span><span class="p">])</span>
+            <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+            <span class="n">cpt</span><span class="o">+=</span><span class="mi">1</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">im</span><span class="p">,</span><span class="n">label</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_set&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">][:</span><span class="mi">20</span><span class="p">],</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;train_set&#39;</span><span class="p">][</span><span class="mi">1</span><span class="p">][:</span><span class="mi">20</span><span class="p">]):</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">cpt</span><span class="p">)</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;classes&#39;</span><span class="p">][</span><span class="n">label</span><span class="p">])</span>
+            <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+            <span class="n">cpt</span><span class="o">+=</span><span class="mi">1</span>
+
+    <span class="c1"># Reduce side margins and save</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;./sknet/docs/source/_static/&#39;</span><span class="o">+</span><span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="o">+</span><span class="s1">&#39;_samples.png&#39;</span><span class="p">)</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
 <p>will generate the following figure</p>
-<div class="figure" id="id1">
-<a class="reference internal image-reference" href="../_images/test_loading.png"><img alt="dataset figure" src="../_images/test_loading.png" style="width: 1000.0px; height: 500.0px;" /></a>
-<p class="caption"><span class="caption-text">Preloaded dataset from sknet.</span></p>
-</div>
+<img alt="../_images/test_loading.png" src="../_images/test_loading.png" />
 <p>running for the first time will produce:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Loading</span> <span class="n">MNIST</span>
-<span class="n">Dataset</span> <span class="n">MNIST</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">0.71</span> <span class="n">s</span><span class="o">.</span>
-<span class="n">Loading</span> <span class="n">FASHION</span><span class="o">-</span><span class="n">MNIST</span>
-<span class="n">Dataset</span> <span class="n">FASHION</span><span class="o">-</span><span class="n">MNIST</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">0.33</span> <span class="n">s</span><span class="o">.</span>
-<span class="n">Loading</span> <span class="n">SVHN</span>
-<span class="n">Dataset</span> <span class="n">SVHN</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">2.74</span> <span class="n">s</span><span class="o">.</span>
-<span class="n">Loading</span> <span class="n">CIFAR10</span>
-<span class="n">Dataset</span> <span class="n">CIFAR10</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">2.37</span> <span class="n">s</span><span class="o">.</span>
-<span class="n">Loading</span> <span class="n">CIFAR100</span>
-<span class="n">Dataset</span> <span class="n">CIFAR100</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">2.39</span> <span class="n">s</span><span class="o">.</span>
-</pre></div>
+<pre class="literal-block">
+Loading mnist
+Creating mnist Directory
+        Downloading mnist Dataset...
+        Done in 2.25
+        Opening mnist
+Dataset mnist loaded in 3.00 s.
+Loading fashionmnist
+        Creating Directory
+        Downloading fashionmnist Train Images...
+        Done in 13.53 s.
+        Downloading fashionmnist Train Labels...
+        Done in 0.50 s.
+        Downloading fashionmnist Test Images...
+        Done in 1.87 s.
+        Downloading fashionmnist Test Labels...
+        Done in 0.31 s.
+        Opening fashionmnist
+Dataset fashionmnist loaded in 16.54 s.
+Loading svhn
+        Creating svhn Directory
+        Downloading svhn Train Set
+        Done in 6.33 s.
+        Downloading svhn Test Set
+        Done in 12.99 s.
+        Opening svhn
+Dataset svhn loaded in 21.43 s.
+Loading cifar10
+        Creating Directory
+        Downloading cifar10 Dataset...
+        Done in 49.70 s.
+        Opening cifar10
+Dataset cifar10 loaded in 56.38 s.
+Loading cifar100
+        Creating cifar100 Directory
+        Downloading cifar100 Dataset...
+        Done in 13.92
+        Opening cifar100
+Dataset cifar100 loaded in 16.16 s.
+Loading stl10
+        Creating stl10 Directory
+        Downloading stl10 Dataset...
+        Done in 64.77 s.
+        Opening stl10
+Dataset stl10 loaded in 102.04 s.
+
+</pre>
+<p>running for the next times will produce:</p>
+<pre class="literal-block">
+Loading mnist
+        Opening mnist
+Dataset mnist loaded in 0.69 s.
+Loading fashionmnist
+        Opening fashionmnist
+Dataset fashionmnist loaded in 0.29 s.
+Loading svhn
+        Opening svhn
+Dataset svhn loaded in 2.05 s.
+Loading cifar10
+        Opening cifar10
+Dataset cifar10 loaded in 6.60 s.
+Loading cifar100
+        Opening cifar100
+Dataset cifar100 loaded in 2.21 s.
+Loading stl10
+        Opening stl10
+Dataset stl10 loaded in 37.29 s.
+
+</pre>
 </div>
+<div class="section" id="custom-dataset">
+<h2>Custom dataset<a class="headerlink" href="#custom-dataset" title="Permalink to this headline">¶</a></h2>
+<p>You can simply use the <code class="xref py py-mod docutils literal notranslate"><span class="pre">dataset.custom</span></code> and give (at least) the training set as well as the data_format and the number of classes.</p>
 </div>
 </div>
 
