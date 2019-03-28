@@ -100,7 +100,7 @@ will generate the following figure
 
 .. image:: /_static/test_loading.png
 
-
+.. image:: https://en.wikipedia.org/wiki/MNIST_database#/media/File:MnistExamples.png
 
 
 
