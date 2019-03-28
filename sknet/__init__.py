@@ -7,7 +7,9 @@ __all__ = [
         "layer",
         "utils",
         "model",
-        "samples"]
+        "schedule",
+        "sampler"]
+
 
 __version__ = 'alpha.1'
 

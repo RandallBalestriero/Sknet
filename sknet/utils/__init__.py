@@ -3,7 +3,6 @@
 
 
 __all__ = [
-        "schedules",
         "plotting",
         "geometry",
         "trainer"]

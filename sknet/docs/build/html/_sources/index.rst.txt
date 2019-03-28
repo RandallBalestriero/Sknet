@@ -82,7 +82,7 @@ If you are looking for information on a specific function:
   modules/dataset
   modules/model
   modules/layer
-
+  modules/schedule
 
 Quickstart
 ==========

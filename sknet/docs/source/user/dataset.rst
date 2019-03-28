@@ -43,31 +43,19 @@ the variable cifar10 is of DictType with all the dataset details as keys. For ex
 	train_x,train_y = cifar10["train_set"]
 	test_x,test_y   = cifar10["test_set"]
 
-Since cifar10 does not impose a valid set, :python:`cifar10["valid_set"]` will return an error as "valid_set" is not a key of cifar10 by default.
+Since cifar10 does not impose a valid set, :py:data:`cifar10["valid_set"]` will return an error as "valid_set" is not a key of cifar10 by default.
 To access the image shape, the data format or additional dataset 
 specific attributes simply do::
 
         data_format = cifar10["data_format"] # 'NCHW'
         datum_shape = cifar10["datum_shape"] # (3,32,32)
 
-Accessing all the dataset attributes are obtained from :python:`cifar10.keys()` as with a standard dictionnary. 
+Accessing all the dataset attributes are obtained from :py:func:`cifar10.keys()` as with a standard dictionnary. 
 
 All the pre-coded dataset will be loaded from the path given by the 
 environment variable :envvar:`DATASET_PATH`, or an alternative path given at initialization of the dataset class. If needs be, the dataset will
 be downloaded into this path, prior loading (at first utilisation of
 sknet for example). The saved dataset are in compressed format.
-
-
-Adding a dataset
-----------------
-
-Each dataset has its corresponding file in sknet/dataset/dataset_name.py
-in which all the attributes and the load function are defined.
-To add a dataset, one needs to create a .py file with name being the one
-of the dataset. In this file one needs
-
-    - load function
-    - image_shape, data_format attributes
 
 
 Open a pre-loaded dataset
@@ -82,55 +70,45 @@ Running the code _quickstart_data_loading.py
 
 will generate the following figure
 
-mnist
-^^^^^
+.. rubric:: mnist
 
 .. image:: https://i.imgur.com/Zri9DXy.png
 
-fashionmnist
-^^^^^^^^^^^^
+.. rubric:: fashionmnist
 
 .. image:: https://i.imgur.com/UxGv0Yc.png
 
-svhn
-^^^^
+.. rubric:: svhn
 
 .. image:: https://i.imgur.com/4kfgD9a.png
 
-cifar10
-^^^^^^^
+.. rubric:: cifar10
 
 .. image:: https://i.imgur.com/rSRJXAm.png
 
-cifar100 (superclass,class)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+.. rubric:: cifar100 (superclass,class)
 
 .. image:: https://i.imgur.com/htPYkpn.png 
 
-stl10
-^^^^^
+.. rubric:: stl10
 
 .. image:: https://i.imgur.com/w4HlyjK.png
 
-warblr
-^^^^^^
+.. rubric:: warblr
 
-.. image:: https://i.imgur.com/w4HlyjK.png
+.. image:: https://i.imgur.com/LlHsFIZ.png
 
-freefield1010
-^^^^^^^^^^^^^
+.. rubric:: freefield1010
 
-.. image:: https://i.imgur.com/w4HlyjK.png
+.. image:: https://i.imgur.com/aleEcQa.png
 
 
-
-
-running for the first time will produce:
+Running for the first time will produce the following output and 
+download all the dataset not already present in the default path:
 
 
 .. include:: ../_static/data_loading_output_1.txt
    :literal:
-
 
 running for the next times will produce:
 

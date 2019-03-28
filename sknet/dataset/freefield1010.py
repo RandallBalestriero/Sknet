@@ -17,13 +17,14 @@ class freefield1010(dict):
     and for the BAD Challenge we have newly annotated it for the 
     presence/absence of birds.
     """
+
     def __init__(self,data_format='NCT',path=None):
         """Set up the configuration for data loading and data format
 
         :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
         :type data_format: 'NCHW' or 'NHWC'
-        :param path:(optional, default $DATASET_PATH), the path to look for the data and 
-                    where the data will be downloaded if not present
+        :param path: (optional, default $DATASET_PATH), the path to look for the data and 
+                     where the data will be downloaded if not present
         :type path: str
         """
         if path is None:
@@ -35,13 +36,14 @@ class freefield1010(dict):
         dict_init = [("train_set",None),('sampling_rate',44100),
                     ("datum_shape",datum_shape),("n_classes",2),
                     ("n_channels",1),("spatial_shape",(441000,)),
-                    ("path",path),("data_format",data_format),("name","freefield1010"),
-                    ('classes',["no bird","bird"])]
+                    ("path",path),("data_format",data_format),
+                    ("name","freefield1010"),('classes',["no bird","bird"])]
         super().__init__(dict_init)
 
 
     def load(self):
         """Load the dataset (download if necessary)
+
         :return: return the train as a couple (signals,labels)
         :rtype: [(train_images,train_labels)]
         """
@@ -71,7 +73,7 @@ class freefield1010(dict):
         labels = np.loadtxt(PATH+'freefield1010/ff1010bird_metadata.csv',
                 delimiter=',',skiprows=1,dtype='int32')
         # Loading the files
-        f    = zipfile.ZipFile(PATH+'freefield1010/ff1010bird_wav.zip')
+        f       = zipfile.ZipFile(PATH+'freefield1010/ff1010bird_wav.zip')
         # Load the first file to get the time length (same for all files)
         wavfile = f.read('wav/'+str(labels[0,0])+'.wav')
         byt     = io.BytesIO(wavfile)
@@ -79,12 +81,12 @@ class freefield1010(dict):
         # Init. the wavs matrix
         N       = labels.shape[0]
         wavs    = np.empty((N,441000),dtype='float32')
-        for i,files_ in enumerate(labels):
-            wavfile   = f.read('wav/'+str(files_[0])+'.wav')
+        for i,files_ in enumerate(labels[:,0]):
+            wavfile   = f.read('wav/'+str(files_)+'.wav')
             byt       = io.BytesIO(wavfile)
-            wavs[i] = wav_read(byt)[1].astype('float32')
+            wavs[i]   = wav_read(byt)[1].astype('float32')
         labels = labels[:,1]
-        wavs = np.expand_dims(wavs,int(self["data_format"]=="NTC"))
+        wavs   = np.expand_dims(wavs,1+int(self["data_format"]=="NTC"))
         self["train_set"] = [wavs,labels]
         print('Dataset freefield1010 loaded in','{0:.2f}'.format(time.time()-t),'s.')
 

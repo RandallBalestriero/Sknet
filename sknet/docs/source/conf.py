@@ -93,9 +93,6 @@ exclude_patterns = []
 # The name of the Pygments (syntax highlighting) style to use.
 pygments_style = 'sphinx'
 
-autodoc_default_options = {
-    'autodoc_member_order': 'groupwise'
-}
 
 # -- Options for HTMLHelp output ---------------------------------------------
 

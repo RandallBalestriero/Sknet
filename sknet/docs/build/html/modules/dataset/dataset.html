@@ -109,6 +109,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
 </ul>
 
             
@@ -189,6 +190,25 @@ fixed-size image. It is a good database for people who want to try learning
 techniques and pattern recognition methods on real-world data while 
 spending minimal efforts on preprocessing and formatting.</p>
 <dl class="method">
+<dt id="sknet.dataset.mnist.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.mnist.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the configuration for data loading and data format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></li>
+<li><strong>path</strong> (<em>str</em>) – (optional, default $DATASET_PATH), the path to look for the data and 
+where the data will be downloaded if not present</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="sknet.dataset.mnist.load">
 <code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.mnist.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the dataset (download if necessary) and adapt
@@ -221,6 +241,25 @@ with a label from 10 classes. We intend Fashion-MNIST to serve as a direct
 drop-in replacement for the original MNIST dataset for benchmarking 
 machine learning algorithms. It shares the same image size and structure 
 of training and testing splits.</p>
+<dl class="method">
+<dt id="sknet.dataset.fashionmnist.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.fashionmnist.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the configuration for data loading and data format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></li>
+<li><strong>path</strong> (<em>str</em>) – (optional, default $DATASET_PATH), the path to look for the data and 
+where the data will be downloaded if not present</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="sknet.dataset.fashionmnist.load">
 <code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.fashionmnist.load" title="Permalink to this definition">¶</a></dt>
@@ -258,6 +297,25 @@ real world problem (recognizing digits and numbers in natural
 scene images). SVHN is obtained from house numbers in Google 
 Street View images.</p>
 <dl class="method">
+<dt id="sknet.dataset.svhn.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.svhn.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the configuration for data loading and data format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></li>
+<li><strong>path</strong> (<em>str</em>) – (optional, default $DATASET_PATH), the path to look for the data and 
+where the data will be downloaded if not present</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="sknet.dataset.svhn.load">
 <code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.svhn.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the dataset (download if necessary) and adapt
@@ -294,6 +352,25 @@ remaining images in random order, but some training batches may
 contain more images from one class than another. Between them, the 
 training batches contain exactly 5000 images from each class.</p>
 <dl class="method">
+<dt id="sknet.dataset.cifar10.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.cifar10.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the configuration for data loading and data format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></li>
+<li><strong>path</strong> (<em>str</em>) – (optional, default <span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">$DATASET_PATH</span></code>), the path to look for the data and 
+where the data will be downloaded if not present</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="sknet.dataset.cifar10.load">
 <code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.cifar10.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the dataset (download if necessary) and adapt
@@ -325,6 +402,25 @@ each. There are 500 training images and 100 testing images per class.
 The 100 classes in the CIFAR-100 are grouped into 20 superclasses. Each 
 image comes with a “fine” label (the class to which it belongs) and a 
 “coarse” label (the superclass to which it belongs).</p>
+<dl class="method">
+<dt id="sknet.dataset.cifar100.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em>, <em>default_classes='fine_labels'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.cifar100.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the configuration for data loading and data format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></li>
+<li><strong>path</strong> (<em>str</em>) – (optional, default $DATASET_PATH), the path to look for the data and 
+where the data will be downloaded if not present</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
 <dl class="method">
 <dt id="sknet.dataset.cifar100.load">
 <code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.cifar100.load" title="Permalink to this definition">¶</a></dt>
@@ -364,6 +460,25 @@ the labeled data) to build a useful prior. We also expect that the higher
 resolution of this dataset (96x96) will make it a challenging benchmark 
 for developing more scalable unsupervised learning methods.</p>
 <dl class="method">
+<dt id="sknet.dataset.stl10.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.stl10.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the configuration for data loading and data format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></li>
+<li><strong>path</strong> (<em>str</em>) – (optional, default $DATASET_PATH), the path to look for the data and 
+where the data will be downloaded if not present</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="sknet.dataset.stl10.load">
 <code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.stl10.load" title="Permalink to this definition">¶</a></dt>
 <dd><p>Load the dataset (download if necessary) and adapt
@@ -401,11 +516,38 @@ includes weather noise, traffic noise, human speech and even human
 bird imitations. It is directly representative of the data that is 
 collected from a mobile crowdsourcing initiative.</p>
 <dl class="method">
+<dt id="sknet.dataset.warblr.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>data_format='NCT'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.warblr.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the configuration for data loading and data format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></li>
+<li><strong>path</strong> (<em>str</em>) – (optional, default $DATASET_PATH), the path to look for the data and 
+where the data will be downloaded if not present</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="sknet.dataset.warblr.load">
 <code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.warblr.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load the dataset (download if necessary)
-:return: return the train as a couple (signals,labels)
-:rtype: (train_images,train_labels)</p>
+<dd><p>Load the dataset (download if necessary)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">return the train as a couple (signals,labels)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">(train_images,train_labels)</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -421,11 +563,38 @@ for research. This collection is very diverse in location and environment,
 and for the BAD Challenge we have newly annotated it for the 
 presence/absence of birds.</p>
 <dl class="method">
+<dt id="sknet.dataset.freefield1010.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>data_format='NCT'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.freefield1010.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up the configuration for data loading and data format</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></li>
+<li><strong>path</strong> (<em>str</em>) – (optional, default $DATASET_PATH), the path to look for the data and 
+where the data will be downloaded if not present</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="method">
 <dt id="sknet.dataset.freefield1010.load">
 <code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.freefield1010.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load the dataset (download if necessary)
-:return: return the train as a couple (signals,labels)
-:rtype: [(train_images,train_labels)]</p>
+<dd><p>Load the dataset (download if necessary)</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Returns:</th><td class="field-body">return the train as a couple (signals,labels)</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Return type:</th><td class="field-body">[(train_images,train_labels)]</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>

@@ -25,8 +25,8 @@ class warblr(dict):
 
         :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
         :type data_format: 'NCHW' or 'NHWC'
-        :param path:(optional, default $DATASET_PATH), the path to look for the data and 
-                    where the data will be downloaded if not present
+        :param path: (optional, default $DATASET_PATH), the path to look for the data and 
+                     where the data will be downloaded if not present
         :type path: str
         """
         if path is None:
@@ -45,6 +45,7 @@ class warblr(dict):
 
     def load(self):
         """Load the dataset (download if necessary)
+
         :return: return the train as a couple (signals,labels)
         :rtype: (train_images,train_labels)
         """
