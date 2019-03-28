@@ -76,7 +76,7 @@ Running the code _quickstart_data_loading.py
 
 will generate the following figure
 
-.. image:: ../_statics/test_loading.png
+.. image:: ./test_loading.png
 
 
 running for the first time will produce:
