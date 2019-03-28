@@ -78,6 +78,34 @@ will generate the following figure
 
 .. image:: _static/test_loading.png
 
+.. image:: ./_static/test_loading.png
+
+.. image:: ../_static/test_loading.png
+
+.. image:: ../../_static/test_loading.png
+
+.. image:: test_loading.png
+
+.. image:: ./test_loading.png
+
+.. image:: _static/test_loading.png
+
+.. image:: ./_static/test_loading.png
+
+.. image:: ../_static/test_loading.png
+
+.. image:: test_loading
+
+.. image:: /test_loading.png
+
+.. image:: /_static/test_loading.png
+
+
+
+
+
+
+
 
 running for the first time will produce:
 
