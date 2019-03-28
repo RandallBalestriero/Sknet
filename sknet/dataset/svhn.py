@@ -40,7 +40,7 @@ class svhn(dict):
                     ("datum_shape",datum_shape),("n_classes",10),
                     ("n_channels",3),("spatial_shape",(32,32)),
                     ("path",path),("data_format",data_format),("name","svhn"),
-                    ("classes",[str(u) for u in range(10)])]
+                    ("classes",[str(1+u) for u in range(10)])]
         super().__init__(dict_init)
 
     def load(self):

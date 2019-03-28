@@ -84,13 +84,13 @@ class stl10(dict):
         train_y = np.frombuffer(io.BytesIO(read_file).read(), dtype=np.uint8)-1
         # load test images
         read_file = file_.extractfile('stl10_binary/test_X.bin').read()
-        test_X = np.frombuffer(io.BytesIO(read_file).read(), dtype=np.uint8).reshape((-1,3,96,96))
+        test_X = np.frombuffer(io.BytesIO(read_file).read(), dtype=np.uint8).reshape((-1,3,96,96)).transpose([0,1,3,2])
         # load train images
         read_file = file_.extractfile('stl10_binary/train_X.bin').read()
-        train_X = np.frombuffer(io.BytesIO(read_file).read(), dtype=np.uint8).reshape((-1,3,96,96))
+        train_X = np.frombuffer(io.BytesIO(read_file).read(), dtype=np.uint8).reshape((-1,3,96,96)).transpose([0,1,3,2])
         # load unlabelled images
         read_file = file_.extractfile('stl10_binary/unlabeled_X.bin').read()
-        unlabeled_X = np.frombuffer(io.BytesIO(read_file).read(), dtype=np.uint8).reshape((-1,3,96,96))
+        unlabeled_X = np.frombuffer(io.BytesIO(read_file).read(), dtype=np.uint8).reshape((-1,3,96,96)).transpose([0,1,3,2])
 
         # Check formatting
         if self["data_format"]=='NHWC':

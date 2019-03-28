@@ -5,39 +5,23 @@ import os
 import pickle
 import time
 
-
-_fine_labels = "beaver,dolphin,otter,seal,whale,\
-aquarium fish,flatfish,ray,shark,trout,\
-orchids,poppies,roses,sunflowers,tulips,\
-bottles,bowls,cans,cups,plates,\
-apples,mushrooms,oranges,pears,sweet peppers,\
-clock,computer keyboard,lamp,telephone,television,\
-bed,chair,couch,table,wardrobe,\
-bee,beetle,butterfly,caterpillar,cockroach,\
-bear,leopard,lion,tiger,wolf,\
-bridge,castle,house,road,skyscraper,\
-cloud,forest,mountain,plain,sea,\
-camel,cattle,chimpanzee,elephant,kangaroo,\
-fox,porcupine,possum,raccoon,skunk,\
-crab,lobster,snail,spider,worm,\
-baby,boy,girl,man,woman,\
-crocodile,dinosaur,lizard,snake,turtle,\
-hamster,mouse,rabbit,shrew,squirrel,\
-maple,oak,palm,pine,willow,\
-bicycle,bus,motorcycle,pickup truck,train,\
-lawn-mower,rocket, streetcar, tank, tractor"
-_coarse_labels = "aquatic mammals,fish,lowers,\
-food containers,fruit and vegetables,\
-household electrical devices,\
-household furniture,insects,\
-large carnivores,\
-large man-made outdoor things,\
-large natural outdoor scenes,\
-large omnivores and herbivores,\
-medium-sized mammals,\
-non-insect invertebrates,\
-people,reptiles,small mammals,\
-trees,vehicles 1,vehicles 2"
+labels_list = [
+    'apple', 'aquarium_fish', 'baby', 'bear', 'beaver', 'bed', 'bee', 'beetle', 
+    'bicycle', 'bottle', 'bowl', 'boy', 'bridge', 'bus', 'butterfly', 'camel', 
+    'can', 'castle', 'caterpillar', 'cattle', 'chair', 'chimpanzee', 'clock', 
+    'cloud', 'cockroach', 'couch', 'crab', 'crocodile', 'cup', 'dinosaur', 
+    'dolphin', 'elephant', 'flatfish', 'forest', 'fox', 'girl', 'hamster', 
+    'house', 'kangaroo', 'keyboard', 'lamp', 'lawn_mower', 'leopard', 'lion',
+    'lizard', 'lobster', 'man', 'maple_tree', 'motorcycle', 'mountain', 'mouse',
+    'mushroom', 'oak_tree', 'orange', 'orchid', 'otter', 'palm_tree', 'pear',
+    'pickup_truck', 'pine_tree', 'plain', 'plate', 'poppy', 'porcupine',
+    'possum', 'rabbit', 'raccoon', 'ray', 'road', 'rocket', 'rose',
+    'sea', 'seal', 'shark', 'shrew', 'skunk', 'skyscraper', 'snail', 'snake',
+    'spider', 'squirrel', 'streetcar', 'sunflower', 'sweet_pepper', 'table',
+    'tank', 'telephone', 'television', 'tiger', 'tractor', 'train', 'trout',
+    'tulip', 'turtle', 'wardrobe', 'whale', 'willow_tree', 'wolf', 'woman',
+    'worm'
+]
 
 
 class cifar100(dict):
@@ -71,11 +55,9 @@ class cifar100(dict):
         dict_init = [("train_set",None),("test_set",None),
                     ("datum_shape",datum_shape),("n_classes",classes),
                     ("n_channels",3),("spatial_shape",(32,32)),
-                    ("path",path),("data_format",data_format),("name","cifar100")]
-        classes      = _fine_labels.split(',')
-        superclasses = _coarse_labels.split(',')
-        super().__init__(dict_init+[('classes',classes),
-                    ('superclasses',superclasses)])
+                    ("path",path),("data_format",data_format),("name","cifar100"),
+                    ("classes",labels_list)]
+        super().__init__(dict_init)
  
     def load(self):
         """Load the dataset (download if necessary) and adapt

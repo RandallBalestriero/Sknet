@@ -76,10 +76,35 @@ Running the code _quickstart_data_loading.py
 
 will generate the following figure
 
+mnist
+^^^^^
 
-.. image:: http://i.imgur.com/CVYBCCy.jpg
+.. image:: https://i.imgur.com/Zri9DXy.png
 
+fashionmnist
+^^^^^^^^^^^^
 
+.. image:: https://i.imgur.com/UxGv0Yc.png
+
+svhn
+^^^^
+
+.. image:: https://i.imgur.com/4kfgD9a.png
+
+cifar10
+^^^^^^^
+
+.. image:: https://i.imgur.com/rSRJXAm.png
+
+cifar100
+^^^^^^^^
+
+.. image:: https://i.imgur.com/htPYkpn.png 
+
+stl10
+^^^^^
+
+.. image:: https://i.imgur.com/w4HlyjK.png
 
 
 

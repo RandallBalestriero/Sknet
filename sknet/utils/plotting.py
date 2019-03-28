@@ -12,7 +12,7 @@ def imshow(x,cmap='jet'):
     if x.shape[0]==3:
         x = x.transpose([1,2,0])
     # Squeeze to remove the case of single channel
-    mp.imshow((np.squeeze(x)-xmin)/(xmax-xmin),cmap=cmap,aspect='auto',interpolation='gaussian')
+    mp.imshow((np.squeeze(x)-xmin)/(xmax-xmin),cmap=cmap,aspect='auto',interpolation='kaiser')
     mp.xticks([])
     mp.yticks([])
 
