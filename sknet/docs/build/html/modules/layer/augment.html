@@ -1,0 +1,290 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Augment Layer &mdash; Sknet alpha.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'alpha.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Shape Layer" href="shape.html" />
+    <link rel="prev" title="Pool Layer" href="pool.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Sknet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/model.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Augment Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Sknet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> &raquo;</li>
+        
+      <li>Augment Layer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/modules/layer/augment.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-sknet.layer.augment">
+<span id="augment-layer"></span><h1>Augment Layer<a class="headerlink" href="#module-sknet.layer.augment" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sknet.layer.RandomCrop">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomCrop</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_size</em>, <em>training=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Random cropping of input images</p>
+<p>During training, a random continuous part of the image
+of shape crop_size is extracted and used as layer output.
+During testing, the center part of the image of shape
+crop_size is used as output.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>incoming</strong> (tuple of positive int or <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instance) – The input to the layer</li>
+<li><strong>crop_size</strong> – Shape of the image after crop</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+<p>Example of use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_layer</span> <span class="o">=</span> <span class="n">Input</span><span class="p">((</span><span class="mi">64</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">),</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span> <span class="c1"># Init an input layer with input shape</span>
+<span class="n">crop_layer</span>  <span class="o">=</span> <span class="n">RandomCrop</span><span class="p">(</span><span class="n">input_layer</span><span class="p">,(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>        <span class="c1"># output of this layer is (64,3,28,28)</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="sknet.layer.RandomCrop.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_size</em>, <em>training=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.layer.RandomAxisReverse">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomAxisReverse</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="sknet.layer.RandomAxisReverse.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.layer.RandomRot90">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomRot90</code><span class="sig-paren">(</span><em>incoming</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="method">
+<dt id="sknet.layer.RandomRot90.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="shape.html" class="btn btn-neutral float-right" title="Shape Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="pool.html" class="btn btn-neutral float-left" title="Pool Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sknet contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

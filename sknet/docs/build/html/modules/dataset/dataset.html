@@ -1,0 +1,484 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dataset &mdash; Sknet alpha.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'alpha.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Preprocessing" href="preprocess.html" />
+    <link rel="prev" title="sknet.dataset" href="../dataset.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Sknet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/model.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="preprocess.html">Preprocessing</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Sknet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a> &raquo;</li>
+        
+      <li>Dataset</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/modules/dataset/dataset.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-sknet.dataset">
+<span id="dataset"></span><h1>Dataset<a class="headerlink" href="#module-sknet.dataset" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sknet.dataset.mnist">
+<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">mnist</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.mnist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grayscale digit classification.
+The <a class="reference external" href="http://yann.lecun.com/exdb/mnist/">MNIST</a> database of handwritten 
+digits, available from this page, has a training set of 60,000 examples, 
+and a test set of 10,000 examples. It is a subset of a larger set available 
+from NIST. The digits have been size-normalized and centered in a 
+fixed-size image. It is a good database for people who want to try learning
+techniques and pattern recognition methods on real-world data while 
+spending minimal efforts on preprocessing and formatting.</p>
+<dl class="method">
+<dt id="sknet.dataset.mnist.load">
+<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.mnist.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the dataset (download if necessary) and adapt
+the class attributes based on the given data format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">None, nothing is returned as the data and specific dataset informations are set as attributes</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">NoneType</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.dataset.fashionmnist">
+<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">fashionmnist</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.fashionmnist" title="Permalink to this definition">¶</a></dt>
+<dd><p>Grayscale <a class="reference external" href="https://jobs.zalando.com/tech/">Zalando</a> ‘s article image classification.
+<a class="reference external" href="https://github.com/zalandoresearch/fashion-mnist">Fashion-MNIST</a> is 
+a dataset of <a class="reference external" href="https://jobs.zalando.com/tech/">Zalando</a> ‘s article 
+images consisting of a training set of 60,000 examples and a test set 
+of 10,000 examples. Each example is a 28x28 grayscale image, associated 
+with a label from 10 classes. We intend Fashion-MNIST to serve as a direct
+drop-in replacement for the original MNIST dataset for benchmarking 
+machine learning algorithms. It shares the same image size and structure 
+of training and testing splits.</p>
+<dl class="method">
+<dt id="sknet.dataset.fashionmnist.load">
+<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.fashionmnist.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the dataset (download if necessary) and adapt
+the class attributes based on the given data format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">return the train and test set, each as a couple (images,labels)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">[(train_images,train_labels),(test_images,test_labels)]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.dataset.svhn">
+<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">svhn</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.svhn" title="Permalink to this definition">¶</a></dt>
+<dd><p>Street number classification.
+The <a class="reference external" href="http://ufldl.stanford.edu/housenumbers/">SVHN</a>
+dataset is a real-world 
+image dataset for developing machine learning and object 
+recognition algorithms with minimal requirement on data 
+preprocessing and formatting. It can be seen as similar in flavor 
+to MNIST (e.g., the images are of small cropped digits), but 
+incorporates an order of magnitude more labeled data (over 600,000 
+digit images) and comes from a significantly harder, unsolved, 
+real world problem (recognizing digits and numbers in natural 
+scene images). SVHN is obtained from house numbers in Google 
+Street View images.</p>
+<dl class="method">
+<dt id="sknet.dataset.svhn.load">
+<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.svhn.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the dataset (download if necessary) and adapt
+the class attributes based on the given data format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">return the train and test set, each as a couple (images,labels)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">[(train_images,train_labels),
+(test_images,test_labels)]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.dataset.cifar10">
+<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">cifar10</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.cifar10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Image classification.
+The <a class="reference external" href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-10</a> dataset 
+was collected by Alex Krizhevsky, Vinod Nair, and Geoffrey 
+Hinton. It consists of 60000 32x32 colour images in 10 classes, with 
+6000 images per class. There are 50000 training images and 10000 test images. 
+The dataset is divided into five training batches and one test batch, 
+each with 10000 images. The test batch contains exactly 1000 randomly
+selected images from each class. The training batches contain the 
+remaining images in random order, but some training batches may 
+contain more images from one class than another. Between them, the 
+training batches contain exactly 5000 images from each class.</p>
+<dl class="method">
+<dt id="sknet.dataset.cifar10.load">
+<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.cifar10.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the dataset (download if necessary) and adapt
+the class attributes based on the given data format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">return the train and test set, each as a couple (images,labels)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">[(train_images,train_labels),
+(test_images,test_labels)]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.dataset.cifar100">
+<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">cifar100</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em>, <em>default_classes='fine_labels'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.cifar100" title="Permalink to this definition">¶</a></dt>
+<dd><p>Image classification.
+The <a class="reference external" href="https://www.cs.toronto.edu/~kriz/cifar.html">CIFAR-100</a> dataset is 
+just like the CIFAR-10, except it has 100 classes containing 600 images 
+each. There are 500 training images and 100 testing images per class. 
+The 100 classes in the CIFAR-100 are grouped into 20 superclasses. Each 
+image comes with a “fine” label (the class to which it belongs) and a 
+“coarse” label (the superclass to which it belongs).</p>
+<dl class="method">
+<dt id="sknet.dataset.cifar100.load">
+<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.cifar100.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the dataset (download if necessary) and adapt
+the class attributes based on the given data format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">return the train and test set, each as a couple (images,labels)</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">[(train_images,train_coarse_labels,train_fine_labels),
+(test_images,test_coarse_labels,test_fine_labels)]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.dataset.stl10">
+<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">stl10</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.stl10" title="Permalink to this definition">¶</a></dt>
+<dd><p>Image classification with extra unlabeled images.
+The <a class="reference external" href="https://cs.stanford.edu/~acoates/stl10/">STL-10</a> dataset is an image 
+recognition dataset for developing unsupervised feature learning, 
+deep learning, self-taught learning algorithms. It is inspired by the 
+CIFAR-10 dataset but with 
+some modifications. In particular, each class has fewer labeled 
+training examples than in CIFAR-10, but a very 
+large set of unlabeled examples is provided to learn image models prior 
+to supervised training. The primary challenge is to make use of the 
+unlabeled data (which comes from a similar but different distribution from 
+the labeled data) to build a useful prior. We also expect that the higher 
+resolution of this dataset (96x96) will make it a challenging benchmark 
+for developing more scalable unsupervised learning methods.</p>
+<dl class="method">
+<dt id="sknet.dataset.stl10.load">
+<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.stl10.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the dataset (download if necessary) and adapt
+the class attributes based on the given data format.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body">return the train and test set, each as a couple (images,labels) 
+and the unlabeled images</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body">[(train_images,train_labels),
+(test_images,test_labels),unlabeled_images]</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.dataset.warblr">
+<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">warblr</code><span class="sig-paren">(</span><em>data_format='NCT'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.warblr" title="Permalink to this definition">¶</a></dt>
+<dd><p>Binary audio classification, presence or absence of a bird.
+<a class="reference external" href="http://machine-listening.eecs.qmul.ac.uk/bird-audio-detection-challenge/#downloads">Warblr</a> 
+comes from a UK bird-sound crowdsourcing 
+research spinout called Warblr. From this initiative we have 
+10,000 ten-second smartphone audio recordings from around the UK. 
+The audio totals around 44 hours duration. The audio will be 
+published by Warblr under a Creative Commons licence. The audio 
+covers a wide distribution of UK locations and environments, and 
+includes weather noise, traffic noise, human speech and even human 
+bird imitations. It is directly representative of the data that is 
+collected from a mobile crowdsourcing initiative.</p>
+<dl class="method">
+<dt id="sknet.dataset.warblr.load">
+<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.warblr.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the dataset (download if necessary)
+:return: return the train as a couple (signals,labels)
+:rtype: (train_images,train_labels)</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.dataset.freefield1010">
+<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">freefield1010</code><span class="sig-paren">(</span><em>data_format='NCT'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.freefield1010" title="Permalink to this definition">¶</a></dt>
+<dd><p>Audio binary classification, presence or absence of bird songs.
+<a class="reference external" href="http://machine-listening.eecs.qmul.ac.uk/bird-audio-detection-challenge/#downloads">freefield1010</a>. 
+is a collection of over 7,000 excerpts from field recordings 
+around the world, gathered by the FreeSound project, and then standardised 
+for research. This collection is very diverse in location and environment, 
+and for the BAD Challenge we have newly annotated it for the 
+presence/absence of birds.</p>
+<dl class="method">
+<dt id="sknet.dataset.freefield1010.load">
+<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.freefield1010.load" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load the dataset (download if necessary)
+:return: return the train as a couple (signals,labels)
+:rtype: [(train_images,train_labels)]</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="preprocess.html" class="btn btn-neutral float-right" title="Preprocessing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../dataset.html" class="btn btn-neutral float-left" title="sknet.dataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sknet contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
