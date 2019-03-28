@@ -1,10 +1,5 @@
-# Highperplane
+Documentation can be found online at:
 
-Documentation available at
-https://lasagne.readthedocs.io/en/latest/
+https://sknet.readthedocs.io/en/latest/
 
-https://packaging.python.org/tutorials/packaging-projects/
-
-generating distirbution archives
-python3 setup.py sdist bdist_wheel
 

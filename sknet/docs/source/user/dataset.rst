@@ -76,31 +76,9 @@ Running the code _quickstart_data_loading.py
 
 will generate the following figure
 
-.. image:: _static/test_loading.png
 
-.. image:: ./_static/test_loading.png
+.. image:: http://i.imgur.com/CVYBCCy.jpg
 
-.. image:: ../_static/test_loading.png
-
-.. image:: ../../_static/test_loading.png
-
-.. image:: test_loading.png
-
-.. image:: ./test_loading.png
-
-.. image:: _static/test_loading.png
-
-.. image:: ./_static/test_loading.png
-
-.. image:: ../_static/test_loading.png
-
-.. image:: test_loading
-
-.. image:: /test_loading.png
-
-.. image:: /_static/test_loading.png
-
-.. image:: https://en.wikipedia.org/wiki/MNIST_database#/media/File:MnistExamples.png
 
 
 
