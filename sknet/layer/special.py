@@ -60,6 +60,57 @@ class Spectrogram(Layer):
 
 
 
+
+
+class ScalarActivation(Layer):
+    """applies an element-wise nonlinearity
+    this layer applies an element-wise nonlinearity to the
+    input based on a given scalar to scalar function.
+    The nonlinearity can of the following form:
+
+      - a scalar to scalar function :math:`\sigma` leading to 
+        the output :math:`\sigma(x)`
+      - a scalar :math:`\alpha` , then the activation is defined as
+        :math:`\max(x,\alpha x)`, which thus becomes ReLU :math:`\alpha=0`,
+        leaky-ReLU :math:`\alpha >0` or absolute value :math:`\alpha=-1`.
+        This corresponds to using a max-affine spline activation function.
+
+    Example of use::
+
+        input_shape = [10,1,32,32]
+        # simple case of renormalization of all the values
+        # by maximum value
+        layer = LambdaFunction(input_shape,func= lambda x:x,sh/tf.reduce_max(x))
+        # more complex case with shape alteration taking only the first
+        # half of the second dimension
+        def my_func(x,x_shape):
+            return x[:,:x_shape[1]//2]
+        def my_shape_func(x_shape):
+            new_shape = x_shape
+            new_shape[1]=new_shape[1]//2
+            return new_shape
+        layer = LambdaFunction(input_shape,func=my_func,
+                            shape_func = my_shape_func)
+
+    :param incoming: input shape of tensor
+    :type incoming: shape or :class:`Layer` instance
+    :param func: function to be applied taking as input the tensor
+    """
+
+    def __init__(self,incoming,func_or_scalar):
+        super().__init__(incoming)
+        self.func_or_scalar = func_or_scalar
+        self.out_shape      = self.in_shape
+        if self.given_input:
+            self.forward(input)
+    def forward(self,input,**kwargs):
+        if np.isscalar(self.func_or_scalar):
+            self.output = tf.maximum(input,self.func_or_scalar*input)
+        else:
+            self.output = self.func_or_scalar(input)
+        return self.output
+
+
 class LambdaFunction(Layer):
     """applies a lambda function onto the layer input
     This layer allows to apply an arbitrary given function onto

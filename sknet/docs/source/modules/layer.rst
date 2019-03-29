@@ -11,6 +11,7 @@
     layer/conv
     layer/pool
     layer/special
+    layer/normalize
     layer/augment
     layer/shape
 
@@ -49,8 +50,10 @@
 .. autosummary::
     :nosignatures:
 
+    ScalarActivation
     Spectrogram
     LambdaFunction
+
 
 .. rubric:: :doc:`layer/augment`
 
