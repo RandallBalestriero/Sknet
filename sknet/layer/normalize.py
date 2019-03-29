@@ -1,8 +1,10 @@
 import tensorflow as tf
 from . import Layer
 
-def batch_normalization_(tensor,axis,training,beta_initializer = tf.zeros, gamma_initializer=tf.ones ,center=True,scale=True,name='batch_normalization_layer',epsilon=1e-6,decay=0.99):
-    input_shape     = tensor.get_shape().as_list()
+def _batch_normalization(tensor,tensor_shape, axis,training,
+                    beta_initializer = tf.zeros, gamma_initializer=tf.ones, 
+                    center=True, scale=True, name='bn_layer', epsilon=1e-6,
+                    decay=0.99):
     shape_          = [s if i not in axis else 1 for i,s in enumerate(input_shape)]
     beta            = tf.Variable(beta_initializer(shape_),trainable=center,name=name+'_beta')
     gamma           = tf.Variable(gamma_initializer(shape_),trainable=scale,name=name+'_gamma')

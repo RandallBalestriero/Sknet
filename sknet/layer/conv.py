@@ -18,7 +18,7 @@ class Conv2D(Layer):
     :type nonlinearity_c: scalar
 
     """
-    def __init__(self,incoming,filters,nonlinearity_c = np.float32(0),
+    def __init__(self,incoming,filters,nonlinearity_c = np.float32(1),
                     training=None, batch_norm = True, 
                     init_W = tfl.xavier_initializer(uniform=True),
                     strides=1,pad='valid',mode='CONSTANT', name=''):
