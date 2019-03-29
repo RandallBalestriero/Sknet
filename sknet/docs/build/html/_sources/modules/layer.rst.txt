@@ -10,6 +10,7 @@
     layer/dense
     layer/conv
     layer/pool
+    layer/special
     layer/augment
     layer/shape
 
@@ -19,7 +20,7 @@
     :nosignatures:
 
     Input
-    Output
+    OutputClassifier
     
 .. rubric:: :doc:`layer/dense`
 
@@ -43,6 +44,14 @@
     Pool
     GlobalSpatialPool
     
+.. rubric:: :doc:`layer/special`
+
+.. autosummary::
+    :nosignatures:
+
+    Spectrogram
+    LambdaFunction
+
 .. rubric:: :doc:`layer/augment`
 
 .. autosummary::

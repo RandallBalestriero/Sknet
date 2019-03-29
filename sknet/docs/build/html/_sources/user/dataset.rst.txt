@@ -96,11 +96,11 @@ will generate the following figure
 
 .. rubric:: warblr
 
-.. image:: https://i.imgur.com/w4HlyjK.png
+.. image:: https://i.imgur.com/LlHsFIZ.png
 
 .. rubric:: freefield1010
 
-.. image:: https://i.imgur.com/w4HlyjK.png
+.. image:: https://i.imgur.com/aleEcQa.png
 
 
 Running for the first time will produce the following output and 

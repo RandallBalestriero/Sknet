@@ -109,6 +109,7 @@
 <li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="special.html">Special Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="augment.html">Augment Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
 </ul>
@@ -185,23 +186,32 @@
 <dl class="class">
 <dt id="sknet.layer.Input">
 <em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Input</code><span class="sig-paren">(</span><em>in_shape</em>, <em>x=None</em>, <em>data_format='NCHW'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Input" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="sknet.layer.Input.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>in_shape</em>, <em>x=None</em>, <em>data_format='NCHW'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Input.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><p>Input layer, first of any model.
+This layer provides the interface between an input shape
+or an input variable and the layer format which can then
+be fed to any following Layer class</p>
+<dl class="method">
+<dt id="sknet.layer.Input.forward">
+<code class="descname">forward</code><span class="sig-paren">(</span><em>input</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Input.forward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform forward pass given an input Tensorflow variable</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>input</strong> (<em>Tensor</em>) – An input variable</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="sknet.layer.Output">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Output</code><span class="sig-paren">(</span><em>incoming</em>, <em>classes</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Output" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="sknet.layer.Output.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>classes</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Output.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
-</dd></dl>
-
+<dt id="sknet.layer.OutputClassifier">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">OutputClassifier</code><span class="sig-paren">(</span><em>incoming</em>, <em>classes</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.OutputClassifier" title="Permalink to this definition">¶</a></dt>
+<dd><p>Output layer for classification tasks.
+This layer implement a linear classifiers. It corresponds to a
+fully connected layer with softmax nonlinearity</p>
 </dd></dl>
 
 </div>

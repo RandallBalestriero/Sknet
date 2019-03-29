@@ -42,13 +42,8 @@ class fashionmnist(dict):
                         "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"]
         super().__init__(dict_init+[('classes',classes)])
     def load(self):
-        """Load the dataset (download if necessary) and adapt
-        the class attributes based on the given data format.
-
-        :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
-        :type data_format: 'NCHW' or 'NHWC'
-        :return: return the train and test set, each as a couple (images,labels)
-        :rtype: [(train_images,train_labels),(test_images,test_labels)]
+        """Load the dataset (download if necessary) and set
+        the class attributes.
         """
         print('Loading fashionmnist')
 

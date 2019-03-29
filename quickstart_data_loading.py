@@ -4,10 +4,10 @@ import pylab as pl
 
 # Put the dataset functions into a list to loop over
 dataset_list = [dataset.mnist(),
-#                dataset.fashionmnist(),
-#                dataset.svhn(),
-#                dataset.cifar10(),
-#                dataset.cifar100(),
+                dataset.fashionmnist(),
+                dataset.svhn(),
+                dataset.cifar10(),
+                dataset.cifar100(),
                 dataset.stl10(),
                 dataset.warblr(),
                 dataset.freefield1010()]

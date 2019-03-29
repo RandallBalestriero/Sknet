@@ -42,10 +42,8 @@ class freefield1010(dict):
 
 
     def load(self):
-        """Load the dataset (download if necessary)
-
-        :return: return the train as a couple (signals,labels)
-        :rtype: [(train_images,train_labels)]
+        """Load the dataset (download if necessary) and set
+        the class attributes.
         """
         print("Loading freefield1010")
         t = time.time()

@@ -8,11 +8,7 @@ Input Output Layer
 
 .. autoclass:: Input
     :members:
-    :private-members:
-    :special-members:
     
-.. autoclass:: Output
+.. autoclass:: OutputClassifier
     :members:
-    :private-members:
-    :special-members:
 

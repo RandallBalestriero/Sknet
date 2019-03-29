@@ -5,10 +5,7 @@ Dense Layer
 
 .. currentmodule:: sknet.layer
 
-
 .. autoclass:: Dense
     :members:
-    :private-members:
-    :special-members:
     
 

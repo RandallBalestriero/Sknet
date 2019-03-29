@@ -24,6 +24,14 @@ class RandomCrop(Layer):
     """
 
     def __init__(self, incoming, crop_size,training=None):
+        """initialize the class
+
+        :param incoming: input shape or layer
+        :type incoming: shape or :class:`Layer` instance
+        :param crop_size: the size of the crop to extract from 
+                          the input spatial shape
+        :type crop_size: couple of int
+        """
         super().__init__(incoming)
         # Set attributes
         if np.isscalar(crop_size):
@@ -82,7 +90,21 @@ class RandomCrop(Layer):
 
 
 class RandomAxisReverse(Layer):
-    def __init__(self, incoming, axis, training):
+    """randomly reverse an axis of the input
+    This layer randomly reverse (or flip) one (or multiple) axis
+    in its input.
+    """
+    def __init__(self, incoming, axis, training=None):
+        """initialize the class
+
+        :param incoming: the input shape or the incoming layer
+        :type incoming: shape or :class:`Layer` instance
+        :param axis: the axis to randomly flip
+        :type axis: list or tuple of ints
+        :param training: a boolean variable describing if the model
+                         is in train or test phase
+        :type training: tf.bool
+        """
         super().__init__(incoming)
         prob = tf.random_uniform((self.in_shape[0],))
         self.to_reverse = tf.less(prob,0.5)
@@ -98,7 +120,20 @@ class RandomAxisReverse(Layer):
 
 
 class RandomRot90(Layer):
-    def __init__(self, incoming, training):
+    """ranodm rotate by 90 degrees the input
+    This layer performs a random rotation of the input to 90 degrees
+    this can be clockwise or counter clockwise with same probability
+    """
+    def __init__(self, incoming, training=None):
+        """initialize the class
+
+        :param incoming: the input shape or the incoming layer
+        :type incoming: shape or instalce of :class:`Layer`
+        :param training: boolean describing if the model is in
+                         trianing or testing mode, should be left
+                         None in most cases
+        :type training: tf.bool
+        """
         super().__init__(incoming)
         prob = tf.random_uniform((self.in_shape[0],),maxval=np.float32(3))
         self.rot_left = tf.less(prob,1)

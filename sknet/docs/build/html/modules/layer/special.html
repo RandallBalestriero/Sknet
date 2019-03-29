@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Pool Layer &mdash; Sknet alpha.1 documentation</title>
+  <title>Special Layer &mdash; Sknet alpha.1 documentation</title>
   
 
   
@@ -45,8 +45,8 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Special Layer" href="special.html" />
-    <link rel="prev" title="Convolutional Layer" href="conv.html" /> 
+    <link rel="next" title="Augment Layer" href="augment.html" />
+    <link rel="prev" title="Pool Layer" href="pool.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -108,8 +108,8 @@
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Pool Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="special.html">Special Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Special Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="augment.html">Augment Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
 </ul>
@@ -162,13 +162,13 @@
         
           <li><a href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> &raquo;</li>
         
-      <li>Pool Layer</li>
+      <li>Special Layer</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/modules/layer/pool.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/modules/layer/special.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -181,30 +181,26 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.layer.pool">
-<span id="pool-layer"></span><h1>Pool Layer<a class="headerlink" href="#module-sknet.layer.pool" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-sknet.layer.special">
+<span id="special-layer"></span><h1>Special Layer<a class="headerlink" href="#module-sknet.layer.special" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="sknet.layer.Pool">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Pool</code><span class="sig-paren">(</span><em>incoming</em>, <em>windows</em>, <em>strides=None</em>, <em>pool_type='MAX'</em>, <em>padding='VALID'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Pool" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pooling layer over spatial and/or channel dimensions.</p>
-<p>Example of use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># (3,3) max pooling with (3,3) strides</span>
-<span class="c1"># All ther below are equivalent</span>
-<span class="n">PoolLayer</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
-<span class="n">PoolLayer</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
-<span class="n">PoolLayer</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
-<span class="n">PoolLayer</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Each output position :math:’[z]_{n,i,j,c}’ results form pooling 
-over the corresponding region in the input</p>
+<dt id="sknet.layer.Spectrogram">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Spectrogram</code><span class="sig-paren">(</span><em>incoming</em>, <em>window</em>, <em>overlapp</em>, <em>window_func=&lt;function Spectrogram.&lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Spectrogram" title="Permalink to this definition">¶</a></dt>
+<dd><p>spectrogram layer (time-frequency representation of a time serie)
+This layer implement a spectrogram computation to allow to include 
+it as part of a model when dealing with time serie data, it is also 
+crucial to allow backpropagation through it in case some previous 
+operation prior to this layer must be differentiated w.r.t. some
+quantities s.a. the loss.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (<em>ranet.layer</em><em> or </em><em>1D-vector of ints</em>) – input layer or input shape</li>
-<li><strong>windows</strong> (<em>1D-vector of ints</em>) – shape of the pooling window</li>
+<li><strong>incoming</strong> (<em>Layer</em>) – incoming layer</li>
+<li><strong>window</strong> (<em>int</em>) – size of the specgram window</li>
+<li><strong>overlapp</strong> (<em>int</em>) – overlapp of the window</li>
+<li><strong>window_func</strong> (<em>func</em>) – apodization function</li>
 </ul>
 </td>
 </tr>
@@ -213,19 +209,40 @@ over the corresponding region in the input</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="sknet.layer.GlobalSpatialPool">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">GlobalSpatialPool</code><span class="sig-paren">(</span><em>incoming</em>, <em>pool_type='AVG'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.GlobalSpatialPool" title="Permalink to this definition">¶</a></dt>
-<dd><p>pool over all spatial dimension
-This layer implements a global spatial pooling removing all spatial
-dimension present in the input.</p>
+<dt id="sknet.layer.LambdaFunction">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">LambdaFunction</code><span class="sig-paren">(</span><em>incoming</em>, <em>func</em>, <em>shape_func=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.LambdaFunction" title="Permalink to this definition">¶</a></dt>
+<dd><p>applies a lambda function onto the layer input
+This layer allows to apply an arbitrary given function onto
+its input tensor allows to implement arbitrary operations.
+The fiven function must allow backpropagation through it
+if leanring with backpropagation is required, the function
+can alter the shape of the input but a func_shape must be provided
+which outputs the new shape given the tensor one.</p>
+<p>Example of use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">]</span>
+<span class="c1"># simple case of renormalization of all the values</span>
+<span class="c1"># by maximum value</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">LambdaFunction</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span><span class="n">func</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">,</span><span class="n">sh</span><span class="o">/</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="c1"># more complex case with shape alteration taking only the first</span>
+<span class="c1"># half of the second dimension</span>
+<span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x_shape</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">[:,:</span><span class="n">x_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">my_shape_func</span><span class="p">(</span><span class="n">x_shape</span><span class="p">):</span>
+    <span class="n">new_shape</span> <span class="o">=</span> <span class="n">x_shape</span>
+    <span class="n">new_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">new_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">new_shape</span>
+
+<span class="n">layer</span> <span class="o">=</span> <span class="n">LambdaFunction</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span><span class="n">func</span><span class="o">=</span><span class="n">my_func</span><span class="p">,</span>
+                    <span class="n">shape_func</span> <span class="o">=</span> <span class="n">my_shape_func</span><span class="p">)</span>
+</pre></div>
+</div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (shape or <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code>) – the input shape or an incoming layer</li>
-<li><strong>pool_type</strong> (<em>str</em>) – the type of pooling to apply, can be either 
-<code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;MAX&quot;</span></code>, or <code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;AVG&quot;</span></code></li>
+<li><strong>incoming</strong> (shape or <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instance) – input shape of tensor</li>
+<li><strong>func</strong> – function to be applied taking as input the tensor</li>
 </ul>
 </td>
 </tr>
@@ -243,10 +260,10 @@ dimension present in the input.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="special.html" class="btn btn-neutral float-right" title="Special Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="augment.html" class="btn btn-neutral float-right" title="Augment Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="conv.html" class="btn btn-neutral float-left" title="Convolutional Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="pool.html" class="btn btn-neutral float-left" title="Pool Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

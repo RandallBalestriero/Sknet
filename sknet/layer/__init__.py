@@ -25,4 +25,5 @@ from .conv import *
 from .dense import *
 from .shape import *
 from .io import *
+from .special import *
 

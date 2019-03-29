@@ -46,7 +46,7 @@
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
     <link rel="next" title="Shape Layer" href="shape.html" />
-    <link rel="prev" title="Pool Layer" href="pool.html" /> 
+    <link rel="prev" title="Special Layer" href="special.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -109,6 +109,7 @@
 <li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="special.html">Special Layer</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Augment Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
 </ul>
@@ -210,29 +211,76 @@ crop_size is used as output.</p>
 <dl class="method">
 <dt id="sknet.layer.RandomCrop.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_size</em>, <em>training=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><p>initialize the class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>incoming</strong> (shape or <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instance) – input shape or layer</li>
+<li><strong>crop_size</strong> (<em>couple of int</em>) – the size of the crop to extract from 
+the input spatial shape</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="sknet.layer.RandomAxisReverse">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomAxisReverse</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomAxisReverse</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>training=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>randomly reverse an axis of the input
+This layer randomly reverse (or flip) one (or multiple) axis
+in its input.</p>
+<dl class="method">
 <dt id="sknet.layer.RandomAxisReverse.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>training=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>initialize the class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>incoming</strong> (shape or <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instance) – the input shape or the incoming layer</li>
+<li><strong>axis</strong> (<em>list</em><em> or </em><em>tuple of ints</em>) – the axis to randomly flip</li>
+<li><strong>training</strong> (<em>tf.bool</em>) – a boolean variable describing if the model
+is in train or test phase</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
 <dt id="sknet.layer.RandomRot90">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomRot90</code><span class="sig-paren">(</span><em>incoming</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomRot90</code><span class="sig-paren">(</span><em>incoming</em>, <em>training=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90" title="Permalink to this definition">¶</a></dt>
+<dd><p>ranodm rotate by 90 degrees the input
+This layer performs a random rotation of the input to 90 degrees
+this can be clockwise or counter clockwise with same probability</p>
+<dl class="method">
 <dt id="sknet.layer.RandomRot90.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>training</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>training=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>initialize the class</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>incoming</strong> (shape or instalce of <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code>) – the input shape or the incoming layer</li>
+<li><strong>training</strong> (<em>tf.bool</em>) – boolean describing if the model is in
+trianing or testing mode, should be left
+None in most cases</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </dd></dl>
@@ -250,7 +298,7 @@ crop_size is used as output.</p>
         <a href="shape.html" class="btn btn-neutral float-right" title="Shape Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="pool.html" class="btn btn-neutral float-left" title="Pool Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="special.html" class="btn btn-neutral float-left" title="Special Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

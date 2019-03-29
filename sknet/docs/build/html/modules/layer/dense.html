@@ -109,6 +109,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Dense Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="special.html">Special Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="augment.html">Augment Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
 </ul>
@@ -185,14 +186,28 @@
 <dl class="class">
 <dt id="sknet.layer.Dense">
 <em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Dense</code><span class="sig-paren">(</span><em>incoming</em>, <em>units</em>, <em>nonlinearity_c=0.0</em>, <em>training=None</em>, <em>batch_norm=False</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Dense" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="sknet.layer.Dense.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>units</em>, <em>nonlinearity_c=0.0</em>, <em>training=None</em>, <em>batch_norm=False</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Dense.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>2D pooling layer
-Performs 2D mean- or max-pooling over the two trailing axes of a 4D input
-tensor. This is an alternative implementation which uses</p>
-</dd></dl>
-
+<dd><p>Dense or fully connected layer.
+This layer implement a fully connected or a dense layer with or without
+nonlinearity, and batch-norm</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>incoming</strong> (<em>tuple of int</em><em> or </em><em>Layer</em>) – input shape or incoming <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instance</li>
+<li><strong>units</strong> (<em>int</em>) – then umber of output units (or neurons)</li>
+<li><strong>nonlinearity_c</strong> (<em>scalar</em>) – the coefficient for the nonlinearity, 
+0 for ReLU, -1 for absolute value, …</li>
+<li><strong>training</strong> (<em>tf.bool</em>) – a dummy Tensorflow boolean stating if it is 
+training time or testing time</li>
+<li><strong>batch_norm</strong> (<em>bool</em>) – using or not the batch-normalization</li>
+<li><strong>init_W</strong> (<em>initializer of tf.tensor</em><em> or </em><em>np.array</em>) – initialization for the W weights</li>
+<li><strong>name</strong> (<em>str</em>) – name for the layer</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>

@@ -1,44 +1,60 @@
 Loading mnist
 Creating mnist Directory
 	Downloading mnist Dataset...
-	Done in 2.25
+	Done in 7.17
 	Opening mnist
-Dataset mnist loaded in 3.00 s.
+Dataset mnist loaded in 7.94 s.
 Loading fashionmnist
 	Creating Directory
 	Downloading fashionmnist Train Images...
-	Done in 13.53 s.
+	Done in 3.09 s.
 	Downloading fashionmnist Train Labels...
-	Done in 0.50 s.
+	Done in 0.46 s.
 	Downloading fashionmnist Test Images...
-	Done in 1.87 s.
+	Done in 2.72 s.
 	Downloading fashionmnist Test Labels...
-	Done in 0.31 s.
+	Done in 0.30 s.
 	Opening fashionmnist
-Dataset fashionmnist loaded in 16.54 s.
+Dataset fashionmnist loaded in 6.92 s.
 Loading svhn
 	Creating svhn Directory
 	Downloading svhn Train Set
-	Done in 6.33 s.
+	Done in 17.37 s.
 	Downloading svhn Test Set
-	Done in 12.99 s.
+	Done in 9.08 s.
 	Opening svhn
-Dataset svhn loaded in 21.43 s.
+Dataset svhn loaded in 28.57 s.
 Loading cifar10
 	Creating Directory
 	Downloading cifar10 Dataset...
-	Done in 49.70 s.
+	Done in 52.74 s.
 	Opening cifar10
-Dataset cifar10 loaded in 56.38 s.
+Dataset cifar10 loaded in 59.50 s.
 Loading cifar100
 	Creating cifar100 Directory
 	Downloading cifar100 Dataset...
-	Done in 13.92
+	Done in 54.91
 	Opening cifar100
-Dataset cifar100 loaded in 16.16 s.
+Dataset cifar100 loaded in 57.15 s.
 Loading stl10
 	Creating stl10 Directory
 	Downloading stl10 Dataset...
-	Done in 64.77 s.
+	Done in 64.72 s.
 	Opening stl10
-Dataset stl10 loaded in 102.04 s.
+Dataset stl10 loaded in 102.51 s.
+Loading warblr
+	Creating Directory
+	Downloading Wav Files
+	Done in 1046.31 s.
+	Downloading Metadata
+	Done in 1.70 s.
+	Opening warblr
+Dataset warblr loaded in 1090.69 s.
+Loading freefield1010
+	Creating Directory
+	Downloading freefield1010 Wav Files
+	Done in 7079.02 s.
+	Downloading freefield1010 Metdata
+	Done in 1.55 s.
+	Opening freefield1010
+Dataset freefield1010 loaded in 7121.41 s.

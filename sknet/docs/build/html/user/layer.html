@@ -178,6 +178,11 @@
             
   <div class="section" id="layer">
 <span id="layer-label"></span><h1>Layer<a class="headerlink" href="#layer" title="Permalink to this headline">¶</a></h1>
+<p>All the layers use the following approach.
+They can be initialized given an input shape or an input layer. Excpet for the
+<a class="reference internal" href="../modules/layer/io.html#sknet.layer.Input" title="sknet.layer.Input"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer.Input</span></code></a> which can take only an input shape or an input shape and
+a tensorflow variable. This flexibility allow anyone to use those object to create
+new models.</p>
 <div class="section" id="special">
 <h2>Special<a class="headerlink" href="#special" title="Permalink to this headline">¶</a></h2>
 <p>Input

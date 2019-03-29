@@ -7,10 +7,6 @@ Pool Layer
 
 .. autoclass:: Pool
     :members:
-    :private-members:
-    :special-members:
 
 .. autoclass:: GlobalSpatialPool
     :members:
-    :private-members:
-    :special-members:

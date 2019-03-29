@@ -9,12 +9,8 @@ from . import Layer
 
 class Pool(Layer):
     """Pooling layer over spatial and/or channel dimensions.
-    Finish
-    """
-    def __init__(self, incoming, windows, strides=None, pool_type='MAX', 
-            padding='VALID'):
-        """
-        Example of use:
+        
+    Example of use::
 
         # (3,3) max pooling with (3,3) strides
         # All ther below are equivalent
@@ -23,15 +19,16 @@ class Pool(Layer):
         PoolLayer(previous_layer, windows=(1,3,3), strides=(1,3,3),data_format='NCHW')
         PoolLayer(previous_layer, windows=(1,3,3),data_format='NCHW')
 
-        Each output position :math:'[z]_{n,i,j,c}' results form pooling 
-        over the corresponding region in the input
+    Each output position :math:'[z]_{n,i,j,c}' results form pooling 
+    over the corresponding region in the input
 
-        :param incoming: input layer or input shape
-        :type incoming: ranet.layer or 1D-vector of ints
-        
-        :param windows: shape of the pooling window
-        :type windows: 1D-vector of ints
-        """
+    :param incoming: input layer or input shape
+    :type incoming: ranet.layer or 1D-vector of ints    
+    :param windows: shape of the pooling window
+    :type windows: 1D-vector of ints
+    """
+    def __init__(self, incoming, windows, strides=None, pool_type='MAX', 
+            padding='VALID'):
         super().__init__(incoming)
         self.pool_type = pool_type
         self.padding = padding
@@ -87,19 +84,17 @@ class Pool(Layer):
 
 
 class GlobalSpatialPool(Layer):
+    """pool over all spatial dimension
+    This layer implements a global spatial pooling removing all spatial
+    dimension present in the input.
+
+    :param incoming: the input shape or an incoming layer
+    :type incoming: shape or :class:`Layer`
+    :param pool_type: the type of pooling to apply, can be either 
+                      :py:data:`"MAX"`, or :py:data:`"AVG"`
+    :type pool_type: str
+    """
     def __init__(self,incoming, pool_type='AVG'):
-        """
-
-        incoming: a ranet.layer
-
-        pool_type: str, 'MAX' or 'AVG'
-
-        data_format: str, 'NCHW' or 'NHWC'
-
-        Pool over all the spatial dimension (according to data_format) and 
-        to the pooling type (from pool_type)
-
-        """
         super().__init__(incoming)
         self.pool_type = pool_type
         if self.data_format=='NCHW':

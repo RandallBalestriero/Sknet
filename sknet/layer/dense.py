@@ -6,14 +6,31 @@ from . import Layer
 
 
 class Dense(Layer):
+    """Dense or fully connected layer.
+    This layer implement a fully connected or a dense layer with or without
+    nonlinearity, and batch-norm
+
+    :param incoming: input shape or incoming :class:`Layer` instance
+    :type incoming: tuple of int or Layer
+    :param units: then umber of output units (or neurons)
+    :type units: int
+    :param nonlinearity_c: the coefficient for the nonlinearity, 
+                           0 for ReLU, -1 for absolute value, ...
+    :type nonlinearity_c: scalar
+    :param training: a dummy Tensorflow boolean stating if it is 
+                     training time or testing time
+    :type training: tf.bool
+    :param batch_norm: using or not the batch-normalization
+    :type batch_norm: bool
+    :param init_W: initialization for the W weights
+    :type init_W: initializer of tf.tensor or np.array
+    :param name: name for the layer
+    :type name: str
+
+    """
     def __init__(self, incoming, units, nonlinearity_c = np.float32(0),
                 training=None, batch_norm = False,
                 init_W = tfl.xavier_initializer(uniform=True), name=''):
-        """
-        2D pooling layer
-        Performs 2D mean- or max-pooling over the two trailing axes of a 4D input
-        tensor. This is an alternative implementation which uses
-        """
         super().__init__(incoming)
         # Set up the input, flatten if needed
         if len(self.in_shape)>2:

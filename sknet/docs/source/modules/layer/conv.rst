@@ -5,9 +5,6 @@ Convolutional Layer
 
 .. currentmodule:: sknet.layer
 
-
 .. autoclass:: Conv2D
     :members:
-    :private-members:
-    :special-members:
 

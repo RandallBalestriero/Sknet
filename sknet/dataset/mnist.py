@@ -38,13 +38,8 @@ class mnist(dict):
                     ('classes',[str(u) for u in range(10)])]
         super().__init__(dict_init)
     def load(self):
-        """Load the dataset (download if necessary) and adapt
-        the class attributes based on the given data format.
-
-        :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
-        :type data_format: 'NCHW' or 'NHWC'
-        :return: None, nothing is returned as the data and specific dataset informations are set as attributes
-        :rtype: NoneType
+        """Load the dataset (download if necessary) and set
+        the class attributes.
         """
         print('Loading mnist')
 

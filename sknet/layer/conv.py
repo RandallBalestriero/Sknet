@@ -5,14 +5,23 @@ import numpy as np
 from . import Layer
 
 class Conv2D(Layer):
+    """2D (spatial) convolutional layer.
+    Layer to perform a 2D convolution onto a 4D input tensor
+
+    :param incoming: input shape of incoming layer
+    :type incoming: Layer or tuple of int
+    :param filters: the shape of the filters in the form 
+                    (#filters, height, width)
+    :type filters: triple of int
+    :param nonlinearity_c: coefficient of the nonlinearity,
+                           0 for ReLU,-1 for absolute value,...
+    :type nonlinearity_c: scalar
+
+    """
     def __init__(self,incoming,filters,nonlinearity_c = np.float32(0),
                     training=None, batch_norm = True, 
                     init_W = tfl.xavier_initializer(uniform=True),
                     strides=1,pad='valid',mode='CONSTANT', name=''):
-        """
-        incoming: a ranet.layer instance
-        filters :  tuple of length 3 with (number_of_filters,filters_height,filters_width)
-        """
         super().__init__(incoming)
         
         # Set attributes
