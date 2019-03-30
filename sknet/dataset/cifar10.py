@@ -4,10 +4,10 @@ import urllib.request
 import numpy as np
 import tarfile
 import time
+from . import Dataset
 
 
-
-class cifar10(dict):
+class cifar10(Dataset):
     """Image classification.
     The `CIFAR-10 <https://www.cs.toronto.edu/~kriz/cifar.html>`_ dataset 
     was collected by Alex Krizhevsky, Vinod Nair, and Geoffrey 

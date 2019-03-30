@@ -44,12 +44,19 @@ pipeline to solve a task. Those blocks are:
     - :ref:`dataloading-label`: any collection of inputs or (input-output) pairs
     - :ref:`preprocess-label` (optional): pre-processing that can be applied onto any
       dataset for increased performances s.a. zca whitening
-    - :ref:`model-label`: a fully describe DNN form input to output, in term of 
-      layers s.a. LeNet5
-    - :ref:`layer-label`: low-level building blocks of any DNN s.a. dense or conv2D
+    - :ref:`network-label`: a fully described network from input to output, in term of 
+      layers s.a. LeNet5. Any network is built by combining any :ref:`layer-label`
+    - :ref:`layer-label`: low-level building blocks of any network. They are
+      grouped per type as
+
+        - dense
+        - convolutional
+        - data augmentation
+        - shape
+
     - optimizer : any updating policy applied onto the learnable weights 
       of a model s.a. adam or sgd
-    - learning rate schedules: combined with a loss function, a model and 
+    - learning rate :ref:`schedule-label`: combined with a loss function, a model and 
       a dataset, the learning rate scheduler plays a crucial role to 
       guarantee best performances s.a. stepwise or adaptive
     - trainer : a higher-level method assembling those independent blocks 
@@ -68,8 +75,9 @@ neural networks, and how to contribute to the library as a developer.
   user/installation
   user/dataset
   user/preprocess
-  user/model
+  user/network
   user/layer
+  user/schedule
 
 API Reference
 -------------
@@ -80,7 +88,7 @@ If you are looking for information on a specific function:
   :maxdepth: 2
 
   modules/dataset
-  modules/model
+  modules/network
   modules/layer
   modules/schedule
 

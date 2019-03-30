@@ -1,11 +1,10 @@
 import tensorflow as tf
-from . import Model
 from .. import layer
-
+from . import Network
 
 #ToDo models : LeNet LeNet5 smallCNN largeCNN allCNN
 
-class base(Model):
+class base(Network):
     def __init__(self,input_shape,classes,data_format,**kwargs):
         """Start the Foo.
 
@@ -17,7 +16,8 @@ class base(Model):
         """
         super().__init__(input_shape,classes,data_format,**kwargs)
         self.name = '-model(cnn.base)'
-    def get_layers(self,input_variable,training):
+        self._init_layers()
+    def _init_layers(self):
         """get layers.
 
         :param qux: The first argument to initialize class.
@@ -26,18 +26,18 @@ class base(Model):
         :type spam: bool
 
         """
-        dnn = [layer.special.input(self.input_shape,input_variable, data_format=self.data_format)]
+        dnn = [layer.special.input(self.input_shape,data_format=self.data_format)]
         #
         dnn.append(layer.transform.Conv2D(dnn[-1],filters=(32,5,5),
-            nonlinearity_c = 0, training=training, batch_norm=True))
+            nonlinearity = 0, training=training, batch_norm=True))
         dnn.append(layer.pool.Pool(dnn[-1],windows=(1,2,2),strides=(1,2,2),pool_type='MAX'))
         #
         dnn.append(layer.transform.Conv2D(dnn[-1],filters=(64,3,3),
-            nonlinearity_c = 0, training=training, batch_norm=True))
+            nonlinearity = 0, training=training, batch_norm=True))
         dnn.append(layer.pool.Pool(dnn[-1],windows=(1,2,2),strides=(1,2,2),pool_type='MAX'))
         dnn.append(layer.transform.Dense(dnn[-1], units=128, training=training, batch_norm=True))
         dnn.append(layer.special.output(dnn[-1],classes=self.classes))
-        return dnn
+        self.layers = dnn
 
 
 

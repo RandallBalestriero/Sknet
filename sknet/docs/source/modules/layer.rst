@@ -12,7 +12,7 @@
     layer/pool
     layer/special
     layer/normalize
-    layer/augment
+    layer/perturb
     layer/shape
 
 .. rubric:: :doc:`layer/io`
@@ -55,11 +55,14 @@
     LambdaFunction
 
 
-.. rubric:: :doc:`layer/augment`
+.. rubric:: :doc:`layer/perturb`
 
 .. autosummary::
     :nosignatures:
 
+    Dropout
+    Gaussian
+    Uniform
     RandomCrop
     RandomRot90
     RandomAxisReverse

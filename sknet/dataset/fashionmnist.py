@@ -3,12 +3,12 @@ import gzip
 import urllib.request
 import numpy as np
 import time
+from . import Dataset
 
 
 
 
-
-class fashionmnist(dict):
+class fashionmnist(Dataset):
     """Grayscale `Zalando <https://jobs.zalando.com/tech/>`_ 's article image classification.
     `Fashion-MNIST <https://github.com/zalandoresearch/fashion-mnist>`_ is 
     a dataset of `Zalando <https://jobs.zalando.com/tech/>`_ 's article 

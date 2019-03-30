@@ -97,12 +97,13 @@
 <li class="toctree-l1"><a class="reference internal" href="user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user/model.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/network.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/layer.html">Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/schedule.html">Schedules</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
 </ul>
@@ -211,20 +212,36 @@ We briefly describe here the fundamentals of the toolbox. The project is on _Git
 multiple blocks which are highly customizable. Those blocks are then combined into a
 pipeline to solve a task. Those blocks are:</p>
 <blockquote>
+<div><ul>
+<li><p class="first"><a class="reference internal" href="user/dataset.html#dataloading-label"><span class="std std-ref">Dataset</span></a>: any collection of inputs or (input-output) pairs</p>
+</li>
+<li><p class="first"><a class="reference internal" href="user/preprocess.html#preprocess-label"><span class="std std-ref">Preprocess</span></a> (optional): pre-processing that can be applied onto any
+dataset for increased performances s.a. zca whitening</p>
+</li>
+<li><p class="first"><a class="reference internal" href="user/network.html#network-label"><span class="std std-ref">Models</span></a>: a fully described network from input to output, in term of
+layers s.a. LeNet5. Any network is built by combining any <a class="reference internal" href="user/layer.html#layer-label"><span class="std std-ref">Layer</span></a></p>
+</li>
+<li><p class="first"><a class="reference internal" href="user/layer.html#layer-label"><span class="std std-ref">Layer</span></a>: low-level building blocks of any network. They are
+grouped per type as</p>
+<blockquote>
 <div><ul class="simple">
-<li><a class="reference internal" href="user/dataset.html#dataloading-label"><span class="std std-ref">Dataset</span></a>: any collection of inputs or (input-output) pairs</li>
-<li><a class="reference internal" href="user/preprocess.html#preprocess-label"><span class="std std-ref">Preprocess</span></a> (optional): pre-processing that can be applied onto any
-dataset for increased performances s.a. zca whitening</li>
-<li><a class="reference internal" href="user/model.html#model-label"><span class="std std-ref">Models</span></a>: a fully describe DNN form input to output, in term of
-layers s.a. LeNet5</li>
-<li><a class="reference internal" href="user/layer.html#layer-label"><span class="std std-ref">Layer</span></a>: low-level building blocks of any DNN s.a. dense or conv2D</li>
-<li>optimizer : any updating policy applied onto the learnable weights
-of a model s.a. adam or sgd</li>
-<li>learning rate schedules: combined with a loss function, a model and
+<li>dense</li>
+<li>convolutional</li>
+<li>data augmentation</li>
+<li>shape</li>
+</ul>
+</div></blockquote>
+</li>
+<li><p class="first">optimizer : any updating policy applied onto the learnable weights
+of a model s.a. adam or sgd</p>
+</li>
+<li><p class="first">learning rate <a class="reference internal" href="user/schedule.html#schedule-label"><span class="std std-ref">Schedules</span></a>: combined with a loss function, a model and
 a dataset, the learning rate scheduler plays a crucial role to
-guarantee best performances s.a. stepwise or adaptive</li>
-<li>trainer : a higher-level method assembling those independent blocks
-into a trainable pipeline, also containing the tensorflow session</li>
+guarantee best performances s.a. stepwise or adaptive</p>
+</li>
+<li><p class="first">trainer : a higher-level method assembling those independent blocks
+into a trainable pipeline, also containing the tensorflow session</p>
+</li>
 </ul>
 </div></blockquote>
 </div>
@@ -248,7 +265,7 @@ neural networks, and how to contribute to the library as a developer.</p>
 <li class="toctree-l2"><a class="reference internal" href="user/preprocess.html#id1">Code Example</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="user/model.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/network.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/layer.html">Layer</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="user/layer.html#special">Special</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user/layer.html#data-augmentation">Data Augmentation</a></li>
@@ -256,6 +273,7 @@ neural networks, and how to contribute to the library as a developer.</p>
 <li class="toctree-l2"><a class="reference internal" href="user/layer.html#pool">Pool</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="user/schedule.html">Schedules</a></li>
 </ul>
 </div>
 </div>
@@ -265,11 +283,7 @@ neural networks, and how to contribute to the library as a developer.</p>
 <div class="toctree-wrapper compound">
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="modules/model.html#sknet-model-cnn"><code class="docutils literal notranslate"><span class="pre">sknet.model.cnn</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="modules/model.html#sknet-model-minimal"><code class="docutils literal notranslate"><span class="pre">sknet.model.minimal</span></code></a></li>
-</ul>
-</li>
+<li class="toctree-l1"><a class="reference internal" href="modules/network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
 </ul>

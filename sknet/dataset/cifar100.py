@@ -5,6 +5,8 @@ import os
 import pickle
 import time
 
+from . import Dataset
+
 labels_list = [
     'apple', 'aquarium_fish', 'baby', 'bear', 'beaver', 'bed', 'bee', 'beetle', 
     'bicycle', 'bottle', 'bowl', 'boy', 'bridge', 'bus', 'butterfly', 'camel', 
@@ -24,7 +26,7 @@ labels_list = [
 ]
 
 
-class cifar100(dict):
+class cifar100(Dataset):
     """Image classification.
     The `CIFAR-100 <https://www.cs.toronto.edu/~kriz/cifar.html>`_ dataset is 
     just like the CIFAR-10, except it has 100 classes containing 600 images 

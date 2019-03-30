@@ -1,7 +1,7 @@
-Augment Layer
+Perturb Layer
 -------------
 
-.. automodule:: sknet.layer.augment
+.. automodule:: sknet.layer.perturb
 
 .. currentmodule:: sknet.layer
 
@@ -19,4 +19,22 @@ Augment Layer
     :members:
     :private-members:
     :special-members:
+
+.. autoclass:: Gaussian
+    :members:
+    :private-members:
+    :special-members:
+
+.. autoclass:: Uniform
+    :members:
+    :private-members:
+    :special-members:
+
+.. autoclass:: Dropout
+    :members:
+    :private-members:
+    :special-members:
+
+
+
     

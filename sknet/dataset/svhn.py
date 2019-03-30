@@ -5,9 +5,9 @@ import urllib.request
 import numpy as np
 import time
 
+from . import Dataset
 
-
-class svhn(dict):
+class svhn(Dataset):
     """Street number classification.
     The `SVHN <http://ufldl.stanford.edu/housenumbers/>`_
     dataset is a real-world 

@@ -6,7 +6,7 @@ __all__ = [
         "dataset",
         "layer",
         "utils",
-        "model",
+        "network",
         "schedule",
         "sampler"]
 

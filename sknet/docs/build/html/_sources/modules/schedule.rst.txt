@@ -8,8 +8,6 @@
 
     schedule/schedule
 
-.. rubric:: :doc:`schedule/schedule`
-
 .. autosummary::
     :nosignatures:
 
@@ -18,4 +16,5 @@
     exponential
     stepwise
     adaptive
+    
  

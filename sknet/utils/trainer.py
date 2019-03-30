@@ -9,7 +9,7 @@ import numpy as np
 
 
 class DummyTrainer(object):
-    def __init__(self, model):
+    def __init__(self, network):
         # Tensorflow Config
         tf.reset_default_graph()
         config                          = tf.ConfigProto()
@@ -17,12 +17,12 @@ class DummyTrainer(object):
         config.log_device_placement     = True
         self.session                    = tf.Session(config=config)
         # Attributes
+        self.network = network
         with tf.device('/device:GPU:0'):
-            self.x             = tf.placeholder(tf.float32, shape=model.input_shape,name='x')
-            self.training      = tf.placeholder(tf.bool,name='phase')
-            self.layers        = model.get_layers(self.x,training=self.training)
+            self.network.initialize_variables()
             self.session.run(tf.global_variables_initializer())
-
+            self.input  = self.network.input
+            self.output = self.network.output 
 
 
 
@@ -43,7 +43,7 @@ class DummyTrainer(object):
 
 
 class Trainer(object):
-    def __init__(self, model, lr_schedule, optimizer = tf.train.AdamOptimizer, regression=False, 
+    def __init__(self, network, lr_schedule, optimizer = tf.train.AdamOptimizer, regression=False, 
             bn_training=True, display_name = ''):
         # Tensorflow Config
         tf.reset_default_graph()
@@ -53,25 +53,25 @@ class Trainer(object):
         self.session                    = tf.Session(config=config)
         # Attributes
         self.display_name = display_name
-        self.classes      = model.classes
-        self.batch_size   = model.input_shape[0]
+        self.classes      = network.classes
+        self.batch_size   = network.input_shape[0]
         self.regression   = regression
         self.bn_training  = bn_training
         self.lr_schedule  = lr_schedule
         with tf.device('/device:GPU:0'):
             self.learning_rate = tf.placeholder(tf.float32,name='learning_rate')
-            self.x             = tf.placeholder(tf.float32, shape=model.input_shape,name='x')
+            self.x             = tf.placeholder(tf.float32, shape=network.input_shape,name='x')
             self.training      = tf.placeholder(tf.bool,name='phase')
-            self.layers        = model.get_layers(self.x,training=self.training)
+            self.layers        = network.get_layers(self.x,training=self.training)
             self.prediction    = self.layers[-1].output
             self.number_of_params = 14#count_number_of_params()
             if(regression):
-                self.y        = tf.placeholder(tf.float32, shape=[model.input_shape[0]],name='y')
+                self.y        = tf.placeholder(tf.float32, shape=[network.input_shape[0]],name='y')
                 self.loss     = tf.reduce_sum(tf.nn.l2_loss(self.prediction-self.y)*2)/input_shape[0]
                 self.accuracy = self.loss
             else:
-                self.y        = tf.placeholder(tf.int32, shape=[model.input_shape[0]],name='y')
-                self.loss     = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.prediction,labels=self.y))/model.input_shape[0]
+                self.y        = tf.placeholder(tf.int32, shape=[network.input_shape[0]],name='y')
+                self.loss     = tf.reduce_sum(tf.nn.sparse_softmax_cross_entropy_with_logits(logits=self.prediction,labels=self.y))/network.input_shape[0]
                 self.accuracy = tf.reduce_mean(tf.cast(tf.equal(tf.cast(tf.argmax(self.prediction,1),tf.int32), self.y),tf.float32))
 #            self.VQ        = [l.VQ for l in self.layers[1:]]
 #            self.distances = tf.stack([get_distance(self.layers[:2+l]) for l in range(len(self.layers)-1)],1)

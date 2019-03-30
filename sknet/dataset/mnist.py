@@ -3,10 +3,10 @@ import pickle,gzip
 import urllib.request
 import numpy as np
 import time
+from . import Dataset
 
 
-
-class mnist(dict):
+class mnist(Dataset):
     """Grayscale digit classification.
     The `MNIST <http://yann.lecun.com/exdb/mnist/>`_ database of handwritten 
     digits, available from this page, has a training set of 60,000 examples, 

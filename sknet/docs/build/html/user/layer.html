@@ -45,8 +45,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sknet.dataset" href="../modules/dataset.html" />
-    <link rel="prev" title="Models" href="model.html" /> 
+    <link rel="next" title="Schedules" href="schedule.html" />
+    <link rel="prev" title="Models" href="network.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -98,7 +98,7 @@
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="model.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="network.html">Models</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Layer</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#special">Special</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-augmentation">Data Augmentation</a></li>
@@ -106,10 +106,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#pool">Pool</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="schedule.html">Schedules</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modules/model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
 </ul>
@@ -199,6 +200,121 @@ ExpandDim</p>
 <li>random crop</li>
 <li>dropout (additive and multiplicative)</li>
 </ul>
+<p>for example, running the following code</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sknet</span>
+<span class="kn">from</span> <span class="nn">sknet</span> <span class="k">import</span> <span class="n">dataset</span>
+<span class="kn">from</span> <span class="nn">sknet.utils</span> <span class="k">import</span> <span class="n">plotting</span>
+<span class="kn">import</span> <span class="nn">pylab</span> <span class="k">as</span> <span class="nn">pl</span>
+<span class="kn">import</span> <span class="nn">os</span>
+
+<span class="c1"># Make Tensorflow quiet.</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TF_CPP_MIN_LOG_LEVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
+
+
+<span class="k">def</span> <span class="nf">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span><span class="n">dataset</span><span class="p">):</span>
+
+    <span class="c1"># create our custom deep net just for data augmentation</span>
+    <span class="c1"># purposes, thus omiting all the following layers</span>
+    <span class="n">layers</span>      <span class="o">=</span> <span class="p">[</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span><span class="n">data_format</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;data_format&quot;</span><span class="p">])]</span>
+    <span class="k">if</span> <span class="n">option</span><span class="o">==</span><span class="s2">&quot;crop&quot;</span><span class="p">:</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">crop_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span><span class="mi">26</span><span class="p">)))</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Crop2626&quot;</span>
+    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;rot&#39;</span><span class="p">:</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">RandomRot90</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Rot90&quot;</span>
+    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;reverse&#39;</span><span class="p">:</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">RandomAxisReverse</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;AxisReverse&quot;</span>
+    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Gaussian&quot;</span>
+    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;uniform&#39;</span><span class="p">:</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Uniform&quot;</span>
+    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;uniformmul&#39;</span><span class="p">:</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">noise_type</span><span class="o">=</span><span class="s1">&#39;multiplicative&#39;</span><span class="p">))</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;UniformMul&quot;</span>
+    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;dropout&#39;</span><span class="p">:</span>
+        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Dropout&quot;</span>
+
+
+
+    <span class="c1"># wrap the layers as a deep net model</span>
+    <span class="n">model</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span><span class="n">layers</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="c1"># set the trainer with this model to create the tensorflow</span>
+    <span class="c1"># working environment and gather all the pieces together</span>
+    <span class="c1"># we use the DummyTrainer to get the minimal function as </span>
+    <span class="c1"># we won&#39;t train etc</span>
+    <span class="n">trainer</span>    <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">DummyTrainer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
+
+    <span class="c1"># get a batch of images, we use the same image for the whole</span>
+    <span class="c1"># batch to show the effect of the data augmentation on the same image</span>
+    <span class="n">image</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_set&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][[</span><span class="mi">0</span><span class="p">]]</span>
+    <span class="n">batch</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">trainer</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span>
+                    <span class="n">trainer</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">deterministic</span><span class="p">:</span><span class="kc">False</span><span class="p">,</span>
+                    <span class="n">trainer</span><span class="o">.</span><span class="n">input</span><span class="p">:</span><span class="n">image</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">)})</span>
+
+    <span class="n">pl</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_set&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">):</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="o">+</span><span class="n">i</span><span class="p">)</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+
+    <span class="c1"># Reduce side margins</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;./sknet/docs/source/_static/augmentation_&#39;</span><span class="o">+</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+
+
+<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
+    <span class="c1"># Load CIFAR10 dataset for demonstration</span>
+    <span class="c1"># by default data_format=&#39;NCHW&#39;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;inin&#39;</span><span class="p">)</span>
+    <span class="n">cifar10</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">cifar10</span><span class="p">()</span>
+
+    <span class="c1"># Import the data</span>
+    <span class="n">cifar10</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="n">cifar10</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Standardize</span><span class="p">)</span>
+
+    <span class="c1"># Set input shape</span>
+    <span class="n">batch_size</span>  <span class="o">=</span> <span class="mi">64</span>
+
+    <span class="n">input_shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">cifar10</span><span class="p">[</span><span class="s2">&quot;datum_shape&quot;</span><span class="p">])</span>
+    
+    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;rot&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
+    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;crop&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
+    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;reverse&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
+    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
+    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
+    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;uniformmul&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
+    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;dropout&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
+    <span class="n">main</span><span class="p">()</span>
+
+</pre></div>
+</div>
+<p class="rubric">Crop 2626</p>
+<img alt="https://i.imgur.com/NQOfAaD.png" src="https://i.imgur.com/NQOfAaD.png" />
+<p class="rubric">axis reverse (width)</p>
+<img alt="https://i.imgur.com/wXeqh9q.png" src="https://i.imgur.com/wXeqh9q.png" />
+<p class="rubric">Uniform (0,1) additive</p>
+<img alt="https://i.imgur.com/dffPCZs.png" src="https://i.imgur.com/dffPCZs.png" />
+<p class="rubric">Dropout (0.5)</p>
+<img alt="https://i.imgur.com/ED5KQLy.png" src="https://i.imgur.com/ED5KQLy.png" />
+<p class="rubric">Gaussian Additive (0,1)</p>
+<img alt="https://i.imgur.com/53pBlq0.png" src="https://i.imgur.com/53pBlq0.png" />
+<p class="rubric">Rotation 90</p>
+<img alt="https://i.imgur.com/CtEnVya.png" src="https://i.imgur.com/CtEnVya.png" />
+<p class="rubric">Uniform Multiplicative</p>
+<img alt="https://i.imgur.com/UwRlhvo.png" src="https://i.imgur.com/UwRlhvo.png" />
 </div>
 <div class="section" id="transform">
 <h2>Transform<a class="headerlink" href="#transform" title="Permalink to this headline">¶</a></h2>
@@ -216,10 +332,10 @@ ExpandDim</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../modules/dataset.html" class="btn btn-neutral float-right" title="sknet.dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="schedule.html" class="btn btn-neutral float-right" title="Schedules" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="model.html" class="btn btn-neutral float-left" title="Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="network.html" class="btn btn-neutral float-left" title="Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

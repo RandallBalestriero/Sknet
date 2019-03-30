@@ -1,0 +1,5 @@
+.. _schedule-label:
+
+Schedules
+=========
+

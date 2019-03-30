@@ -24,9 +24,10 @@ class Reshape(Layer):
         self.reshape   = lambda x:tf.reshape(x,new_shape)
         if self.given_input:
             self.forward(incoming.output)
-    def forward(self,input,**kwargs):
+    def forward(self,input=None, training=None, **kwargs):
+        if input is None:
+            input = self.incoming.forward(training=training)
         self.output = self.reshape(input)
-        self.VQ = None
         return self.output
 
 
@@ -48,7 +49,9 @@ class Stack(Layer):
         self.stack     = lambda xs:tf.stack(xs,axis)
         if self.given_input:
             self.forward([incoming.output for incoming in incomings])
-    def forward(self,input,**kwargs):
+    def forward(self,input=None, training=None, **kwargs):
+        if input is None:
+            input = self.incoming.forward(training=training)
         self.output = self.stack(input)
         self.VQ     = None
         return self.output
@@ -69,15 +72,18 @@ class Concat(Layer):
     """
     def __init__(self,incomings,axis,**kwargs):
         super().__init__(incomings[0])
-        N = len(incomings)
+        N              = len(incomings)
+        self.incomings = incomings
         self.out_shape = [s if i not in axis else N*s for i,s in enumerate(self.in_shape)]
         self.axis      = axis
         self.concat    = lambda xs:tf.concat(xs,axis)
         if self.given_input:
             self.forward([incoming.output for incoming in incomings])
-    def forward(self,inputs,**kwargs):
+    def forward(self,inputs=None, training=None, **kwargs):
+        if inputs is None:
+            inputs = [incoming.forward(training=training) 
+                            for incoming in self.incomings]
         self.output = self.concat(inputs)
-        self.VQ     = None
         return self.output
 
 
@@ -111,12 +117,16 @@ class Merge(Layer):
     """
     def __init__(self,incomings,func,**kwargs):
         super().__init__(incomings[0])
+        self.incomings = incomings
         self.N         = np.float32(len(incomings))
         self.out_shape = self.in_shape
         self.func      = func
         if self.given_input:
             self.forward([incoming.output for incoming in incomings])
-    def forward(self,inputs,**kwargs):
+    def forward(self,inputs=None, training=None, **kwargs):
+        if inputs is None:
+            inputs = [incoming.forward(training=training) 
+                            for incoming in self.incomings]
         if type(self.func)==str:
             if self.func=='SUM':
                 self.output = tf.add_n(inputs)
@@ -158,11 +168,10 @@ class ExpandDim(Layer):
         self.out_shape = self.in_shape.insert(1,axis)
         self.axis      = axis
         self.expand_dim= lambda x:tf.expand_dims(x,axis)
-        if self.given_input:
-            self.forward(incoming.output)
-    def forward(self,input,**kwargs):
+    def forward(self,input, training=None, **kwargs):
+        if input is None:
+            input = self.incoming.foward(training=training)
         self.output = self.expand_dim(input)
-        self.VQ     = None
         return self.output
 
 

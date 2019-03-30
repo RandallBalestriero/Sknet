@@ -97,12 +97,13 @@
 <li class="toctree-l1"><a class="reference internal" href="user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user/model.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/network.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/layer.html">Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/schedule.html">Schedules</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
 </ul>
@@ -183,6 +184,7 @@
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
+ | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
@@ -226,17 +228,19 @@
 </li>
         <li><a href="modules/dataset/dataset.html#sknet.dataset.warblr.__init__">(sknet.dataset.warblr method)</a>
 </li>
-        <li><a href="modules/layer/augment.html#sknet.layer.RandomAxisReverse.__init__">(sknet.layer.RandomAxisReverse method)</a>
+        <li><a href="modules/layer/perturb.html#sknet.layer.Dropout.__init__">(sknet.layer.Dropout method)</a>
 </li>
-        <li><a href="modules/layer/augment.html#sknet.layer.RandomCrop.__init__">(sknet.layer.RandomCrop method)</a>
+        <li><a href="modules/layer/perturb.html#sknet.layer.Gaussian.__init__">(sknet.layer.Gaussian method)</a>
 </li>
-        <li><a href="modules/layer/augment.html#sknet.layer.RandomRot90.__init__">(sknet.layer.RandomRot90 method)</a>
+        <li><a href="modules/layer/perturb.html#sknet.layer.RandomAxisReverse.__init__">(sknet.layer.RandomAxisReverse method)</a>
 </li>
-        <li><a href="modules/model.html#sknet.model.Model.__init__">(sknet.model.Model method)</a>
+        <li><a href="modules/layer/perturb.html#sknet.layer.RandomCrop.__init__">(sknet.layer.RandomCrop method)</a>
 </li>
-        <li><a href="modules/model.html#sknet.model.cnn.base.__init__">(sknet.model.cnn.base method)</a>
+        <li><a href="modules/layer/perturb.html#sknet.layer.RandomRot90.__init__">(sknet.layer.RandomRot90 method)</a>
 </li>
-        <li><a href="modules/model.html#sknet.model.minimal.augmentation.__init__">(sknet.model.minimal.augmentation method)</a>
+        <li><a href="modules/layer/perturb.html#sknet.layer.Uniform.__init__">(sknet.layer.Uniform method)</a>
+</li>
+        <li><a href="modules/network.html#sknet.network.Network.__init__">(sknet.network.Network method)</a>
 </li>
         <li><a href="modules/schedule/schedule.html#sknet.schedule.constant.__init__">(sknet.schedule.constant method)</a>
 </li>
@@ -250,7 +254,7 @@
 </li>
         <li><a href="modules/dataset/preprocess.html#sknet.dataset.ZCAWhitening.__weakref__">(sknet.dataset.ZCAWhitening attribute)</a>
 </li>
-        <li><a href="modules/model.html#sknet.model.Model.__weakref__">(sknet.model.Model attribute)</a>
+        <li><a href="modules/network.html#sknet.network.Network.__weakref__">(sknet.network.Network attribute)</a>
 </li>
         <li><a href="modules/schedule/schedule.html#sknet.schedule.constant.__weakref__">(sknet.schedule.constant attribute)</a>
 </li>
@@ -264,16 +268,12 @@
       <li><a href="modules/schedule/schedule.html#sknet.schedule.adaptive">adaptive (class in sknet.schedule)</a>
 </li>
   </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/model.html#sknet.model.minimal.augmentation">augmentation (class in sknet.model.minimal)</a>
-</li>
-  </ul></td>
 </tr></table>
 
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/model.html#sknet.model.cnn.base">base (class in sknet.model.cnn)</a>
+      <li><a href="modules/layer/normalize.html#sknet.layer.BatchNormalization">BatchNormalization (class in sknet.layer)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -305,6 +305,8 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/layer/dense.html#sknet.layer.Dense">Dense (class in sknet.layer)</a>
 </li>
+      <li><a href="modules/layer/perturb.html#sknet.layer.Dropout">Dropout (class in sknet.layer)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -334,10 +336,14 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/dataset/dataset.html#sknet.dataset.fashionmnist">fashionmnist (class in sknet.dataset)</a>
 </li>
+      <li><a href="modules/layer/io.html#sknet.layer.Input.forward">forward() (sknet.layer.Input method)</a>
+
+      <ul>
+        <li><a href="modules/layer/io.html#sknet.layer.OutputClassifier.forward">(sknet.layer.OutputClassifier method)</a>
+</li>
+      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/layer/io.html#sknet.layer.Input.forward">forward() (sknet.layer.Input method)</a>
-</li>
       <li><a href="modules/dataset/dataset.html#sknet.dataset.freefield1010">freefield1010 (class in sknet.dataset)</a>
 </li>
   </ul></td>
@@ -346,14 +352,8 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/model.html#sknet.model.cnn.base.get_layers">get_layers() (sknet.model.cnn.base method)</a>
-
-      <ul>
-        <li><a href="modules/model.html#sknet.model.Model.get_layers">(sknet.model.Model method)</a>
+      <li><a href="modules/layer/perturb.html#sknet.layer.Gaussian">Gaussian (class in sknet.layer)</a>
 </li>
-        <li><a href="modules/model.html#sknet.model.minimal.augmentation.get_layers">(sknet.model.minimal.augmentation method)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/layer/pool.html#sknet.layer.GlobalSpatialPool">GlobalSpatialPool (class in sknet.layer)</a>
@@ -410,7 +410,13 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/dataset/dataset.html#sknet.dataset.mnist">mnist (class in sknet.dataset)</a>
 </li>
-      <li><a href="modules/model.html#sknet.model.Model">Model (class in sknet.model)</a>
+  </ul></td>
+</tr></table>
+
+<h2 id="N">N</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/network.html#sknet.network.Network">Network (class in sknet.network)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -434,11 +440,11 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/layer/augment.html#sknet.layer.RandomAxisReverse">RandomAxisReverse (class in sknet.layer)</a>
+      <li><a href="modules/layer/perturb.html#sknet.layer.RandomAxisReverse">RandomAxisReverse (class in sknet.layer)</a>
 </li>
-      <li><a href="modules/layer/augment.html#sknet.layer.RandomCrop">RandomCrop (class in sknet.layer)</a>
+      <li><a href="modules/layer/perturb.html#sknet.layer.RandomCrop">RandomCrop (class in sknet.layer)</a>
 </li>
-      <li><a href="modules/layer/augment.html#sknet.layer.RandomRot90">RandomRot90 (class in sknet.layer)</a>
+      <li><a href="modules/layer/perturb.html#sknet.layer.RandomRot90">RandomRot90 (class in sknet.layer)</a>
 </li>
       <li><a href="modules/schedule/schedule.html#sknet.schedule.adaptive.reset">reset() (sknet.schedule.adaptive method)</a>
 
@@ -462,13 +468,13 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/layer/special.html#sknet.layer.ScalarActivation">ScalarActivation (class in sknet.layer)</a>
+</li>
       <li><a href="modules/dataset.html#module-sknet.dataset">sknet.dataset (module)</a>, <a href="modules/dataset/dataset.html#module-sknet.dataset">[1]</a>
 </li>
       <li><a href="modules/dataset/preprocess.html#module-sknet.dataset.preprocess">sknet.dataset.preprocess (module)</a>
 </li>
       <li><a href="modules/layer.html#module-sknet.layer">sknet.layer (module)</a>
-</li>
-      <li><a href="modules/layer/augment.html#module-sknet.layer.augment">sknet.layer.augment (module)</a>
 </li>
       <li><a href="modules/layer/conv.html#module-sknet.layer.conv">sknet.layer.conv (module)</a>
 </li>
@@ -476,12 +482,16 @@
 </li>
       <li><a href="modules/layer/io.html#module-sknet.layer.io">sknet.layer.io (module)</a>
 </li>
-      <li><a href="modules/layer/pool.html#module-sknet.layer.pool">sknet.layer.pool (module)</a>
+      <li><a href="modules/layer/normalize.html#module-sknet.layer.normalize">sknet.layer.normalize (module)</a>
 </li>
-      <li><a href="modules/layer/shape.html#module-sknet.layer.shape">sknet.layer.shape (module)</a>
+      <li><a href="modules/layer/perturb.html#module-sknet.layer.perturb">sknet.layer.perturb (module)</a>
+</li>
+      <li><a href="modules/layer/pool.html#module-sknet.layer.pool">sknet.layer.pool (module)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/layer/shape.html#module-sknet.layer.shape">sknet.layer.shape (module)</a>
+</li>
       <li><a href="modules/layer/special.html#module-sknet.layer.special">sknet.layer.special (module)</a>
 </li>
       <li><a href="modules/schedule.html#module-sknet.schedule">sknet.schedule (module)</a>
@@ -505,6 +515,10 @@
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/layer/perturb.html#sknet.layer.Uniform">Uniform (class in sknet.layer)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/schedule/schedule.html#sknet.schedule.constant.update">update() (sknet.schedule.constant method)</a>
 </li>

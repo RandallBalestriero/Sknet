@@ -5,8 +5,9 @@ import os, sys, tarfile, io
 import numpy as np
 import matplotlib.pyplot as plt
     
+from . import Dataset
 
-class stl10(dict):
+class stl10(Dataset):
     """ Image classification with extra unlabeled images.
     The `STL-10 <https://cs.stanford.edu/~acoates/stl10/>`_ dataset is an image 
     recognition dataset for developing unsupervised feature learning, 

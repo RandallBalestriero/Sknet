@@ -31,6 +31,41 @@ We provide some simple data augmentation tools that can be combined, they are co
 - dropout (additive and multiplicative)
 
 
+for example, running the following code
+
+.. literalinclude:: ../../../../quickstart_augment.py
+
+
+.. rubric:: Crop 2626
+
+.. image:: https://i.imgur.com/NQOfAaD.png
+
+.. rubric:: axis reverse (width)
+
+.. image:: https://i.imgur.com/wXeqh9q.png
+
+.. rubric:: Uniform (0,1) additive
+
+.. image:: https://i.imgur.com/dffPCZs.png
+
+.. rubric:: Dropout (0.5)
+  
+.. image:: https://i.imgur.com/ED5KQLy.png
+
+.. rubric:: Gaussian Additive (0,1)
+
+.. image:: https://i.imgur.com/53pBlq0.png
+
+.. rubric:: Rotation 90
+
+.. image:: https://i.imgur.com/CtEnVya.png
+
+.. rubric:: Uniform Multiplicative
+
+.. image:: https://i.imgur.com/UwRlhvo.png
+
+
+
 Transform
 ---------
 

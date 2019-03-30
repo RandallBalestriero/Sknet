@@ -34,30 +34,6 @@ Running the code _quickstart_data_loading.py
 will generate the following figure
 
 
-.. figure:: ../_static/augmentation_RandomCrop(26,26).png
-    :scale: 50 %
-    :alt: dataset figure
-
-    Preloaded dataset from sknet.
-
-.. figure:: ../_static/augmentation_RandomLeftRight.png
-    :scale: 50 %
-    :alt: dataset figure
-
-    Preloaded dataset from sknet.
-
-.. figure:: ../_static/augmentation_RandomRot90.png
-    :scale: 50 %
-    :alt: dataset figure
-
-    Preloaded dataset from sknet.
-
-.. figure:: ../_static/augmentation_RandomUpDown.png
-    :scale: 50 %
-    :alt: dataset figure
-
-    Preloaded dataset from sknet.
-
 
 
 

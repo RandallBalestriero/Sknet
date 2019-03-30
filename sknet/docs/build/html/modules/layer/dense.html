@@ -98,19 +98,21 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/model.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Dense Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="special.html">Special Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="augment.html">Augment Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normalize.html">Normalization Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perturb.html">Perturb Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
 </ul>
 </li>
@@ -185,7 +187,7 @@
 <span id="dense-layer"></span><h1>Dense Layer<a class="headerlink" href="#module-sknet.layer.dense" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="sknet.layer.Dense">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Dense</code><span class="sig-paren">(</span><em>incoming</em>, <em>units</em>, <em>nonlinearity_c=0.0</em>, <em>training=None</em>, <em>batch_norm=False</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Dense" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Dense</code><span class="sig-paren">(</span><em>incoming</em>, <em>units</em>, <em>nonlinearity=1.0</em>, <em>training=None</em>, <em>batch_norm=False</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>init_b=&lt;function zeros&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Dense" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dense or fully connected layer.
 This layer implement a fully connected or a dense layer with or without
 nonlinearity, and batch-norm</p>
@@ -202,6 +204,7 @@ nonlinearity, and batch-norm</p>
 training time or testing time</li>
 <li><strong>batch_norm</strong> (<em>bool</em>) – using or not the batch-normalization</li>
 <li><strong>init_W</strong> (<em>initializer of tf.tensor</em><em> or </em><em>np.array</em>) – initialization for the W weights</li>
+<li><strong>init_b</strong> (<em>initializer of tf.tensor</em><em> or </em><em>np.array</em>) – initialization for the b weights</li>
 <li><strong>name</strong> (<em>str</em>) – name for the layer</li>
 </ul>
 </td>

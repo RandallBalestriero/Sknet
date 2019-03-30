@@ -1,6 +1,6 @@
 import tensorflow as tf
 import tensorflow.contrib.layers as tfl
-from .normalize import batchnormalization as bn
+from .normalize import BatchNormalization as bn
 import numpy as np
 from . import Layer
 

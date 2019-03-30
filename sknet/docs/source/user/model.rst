@@ -1,7 +1,0 @@
-.. _model-label:
-
-Models
-======
-
-
-

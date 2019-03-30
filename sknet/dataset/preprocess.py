@@ -17,14 +17,15 @@ class Identity:
 
 
 class Standardize:
-    def __init__(self,eps=0.0001):
+    def __init__(self,eps=0.0001, axis=[0]):
         self.name = '-preprocessing(standardize,eps='+str(eps)+')'
         self.eps = eps
-    def fit(self,x,axis=[0],**kwargs):
+        self.axis = axis
+    def fit(self,x,**kwargs):
         print("Fitting standardize preprocessing")
         t=time.time()
-        self.mean = x.mean(axis=tuple(axis),keepdims=True)
-        self.std  = x.std(axis=tuple(axis),keepdims=True)+self.eps
+        self.mean = x.mean(axis=tuple(self.axis),keepdims=True)
+        self.std  = x.std(axis=tuple(self.axis),keepdims=True)+self.eps
         print("Fitting standardize preprocessing done in {0:.2f} s.".format(time.time()-t))
     def transform(self,x,**kwargs):
         return (x-self.mean)/self.std

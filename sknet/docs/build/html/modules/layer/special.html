@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Augment Layer" href="augment.html" />
+    <link rel="next" title="Normalization Layer" href="normalize.html" />
     <link rel="prev" title="Pool Layer" href="pool.html" /> 
 </head>
 
@@ -98,19 +98,21 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/model.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Models</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../model.html"><code class="docutils literal notranslate"><span class="pre">sknet.model</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Special Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="augment.html">Augment Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normalize.html">Normalization Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perturb.html">Perturb Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
 </ul>
 </li>
@@ -184,6 +186,57 @@
   <div class="section" id="module-sknet.layer.special">
 <span id="special-layer"></span><h1>Special Layer<a class="headerlink" href="#module-sknet.layer.special" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
+<dt id="sknet.layer.ScalarActivation">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">ScalarActivation</code><span class="sig-paren">(</span><em>incoming</em>, <em>func_or_scalar</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.ScalarActivation" title="Permalink to this definition">¶</a></dt>
+<dd><p>applies an element-wise nonlinearity
+this layer applies an element-wise nonlinearity to the
+input based on a given scalar to scalar function.
+The nonlinearity can of the following form:</p>
+<blockquote>
+<div><ul class="simple">
+<li>a scalar to scalar function <span class="math notranslate nohighlight">\(\sigma\)</span> leading to 
+the output <span class="math notranslate nohighlight">\(\sigma(x)\)</span></li>
+<li>a scalar <span class="math notranslate nohighlight">\(\alpha\)</span> , then the activation is defined as
+<span class="math notranslate nohighlight">\(\max(x,\alpha x)\)</span>, which thus becomes ReLU <span class="math notranslate nohighlight">\(\alpha=0\)</span>,
+leaky-ReLU <span class="math notranslate nohighlight">\(\alpha &gt;0\)</span> or absolute value <span class="math notranslate nohighlight">\(\alpha=-1\)</span>,
+This corresponds to using a max-affine spline activation function.</li>
+</ul>
+</div></blockquote>
+<p>For linear you can use lambda x:x or tf.identity or with <span class="math notranslate nohighlight">\(\alpha=1\)</span>.
+We recommand user either one of the last two options for optimize the
+computations.</p>
+<p>Example of use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">]</span>
+<span class="c1"># simple case of renormalization of all the values</span>
+<span class="c1"># by maximum value</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">LambdaFunction</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span><span class="n">func</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">,</span><span class="n">sh</span><span class="o">/</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="c1"># more complex case with shape alteration taking only the first</span>
+<span class="c1"># half of the second dimension</span>
+<span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x_shape</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="p">[:,:</span><span class="n">x_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span>
+<span class="k">def</span> <span class="nf">my_shape_func</span><span class="p">(</span><span class="n">x_shape</span><span class="p">):</span>
+    <span class="n">new_shape</span> <span class="o">=</span> <span class="n">x_shape</span>
+    <span class="n">new_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">new_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
+    <span class="k">return</span> <span class="n">new_shape</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">LambdaFunction</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span><span class="n">func</span><span class="o">=</span><span class="n">my_func</span><span class="p">,</span>
+                    <span class="n">shape_func</span> <span class="o">=</span> <span class="n">my_shape_func</span><span class="p">)</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>incoming</strong> (shape or <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instance) – input shape of tensor</li>
+<li><strong>func</strong> (<em>func</em>) – function to be applied taking as input the tensor</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
 <dt id="sknet.layer.Spectrogram">
 <em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Spectrogram</code><span class="sig-paren">(</span><em>incoming</em>, <em>window</em>, <em>overlapp</em>, <em>window_func=&lt;function Spectrogram.&lt;lambda&gt;&gt;</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Spectrogram" title="Permalink to this definition">¶</a></dt>
 <dd><p>spectrogram layer (time-frequency representation of a time serie)
@@ -210,7 +263,7 @@ quantities s.a. the loss.</p>
 
 <dl class="class">
 <dt id="sknet.layer.LambdaFunction">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">LambdaFunction</code><span class="sig-paren">(</span><em>incoming</em>, <em>func</em>, <em>shape_func=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.LambdaFunction" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">LambdaFunction</code><span class="sig-paren">(</span><em>incoming</em>, <em>func</em>, <em>shape_func=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.LambdaFunction" title="Permalink to this definition">¶</a></dt>
 <dd><p>applies a lambda function onto the layer input
 This layer allows to apply an arbitrary given function onto
 its input tensor allows to implement arbitrary operations.
@@ -222,10 +275,12 @@ which outputs the new shape given the tensor one.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">]</span>
 <span class="c1"># simple case of renormalization of all the values</span>
 <span class="c1"># by maximum value</span>
-<span class="n">layer</span> <span class="o">=</span> <span class="n">LambdaFunction</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span><span class="n">func</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">,</span><span class="n">sh</span><span class="o">/</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+<span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
+    <span class="k">return</span> <span class="n">x</span><span class="o">/</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">LambdaFunction</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="n">func</span><span class="o">=</span><span class="n">my_func</span><span class="p">,</span> <span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
 <span class="c1"># more complex case with shape alteration taking only the first</span>
 <span class="c1"># half of the second dimension</span>
-<span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x_shape</span><span class="p">):</span>
+<span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">):</span>
     <span class="k">return</span> <span class="n">x</span><span class="p">[:,:</span><span class="n">x_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span>
 <span class="k">def</span> <span class="nf">my_shape_func</span><span class="p">(</span><span class="n">x_shape</span><span class="p">):</span>
     <span class="n">new_shape</span> <span class="o">=</span> <span class="n">x_shape</span>
@@ -233,7 +288,7 @@ which outputs the new shape given the tensor one.</p>
     <span class="k">return</span> <span class="n">new_shape</span>
 
 <span class="n">layer</span> <span class="o">=</span> <span class="n">LambdaFunction</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span><span class="n">func</span><span class="o">=</span><span class="n">my_func</span><span class="p">,</span>
-                    <span class="n">shape_func</span> <span class="o">=</span> <span class="n">my_shape_func</span><span class="p">)</span>
+                    <span class="n">shape_func</span> <span class="o">=</span> <span class="n">my_shape_func</span><span class="p">,</span> <span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
 </pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
@@ -242,7 +297,11 @@ which outputs the new shape given the tensor one.</p>
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>incoming</strong> (shape or <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instance) – input shape of tensor</li>
-<li><strong>func</strong> – function to be applied taking as input the tensor</li>
+<li><strong>func</strong> (<em>func</em>) – function to be applied taking as input the tensor</li>
+<li><strong>shape_func</strong> (<em>func</em>) – (optional) the function to provide if func 
+alters the shape of its input. This function
+takes as input the input shape and outputs the new
+shape as a list or tuple of ints</li>
 </ul>
 </td>
 </tr>
@@ -260,7 +319,7 @@ which outputs the new shape given the tensor one.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="augment.html" class="btn btn-neutral float-right" title="Augment Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="normalize.html" class="btn btn-neutral float-right" title="Normalization Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="pool.html" class="btn btn-neutral float-left" title="Pool Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

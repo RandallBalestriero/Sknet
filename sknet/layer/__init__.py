@@ -4,22 +4,30 @@
 
 class Layer:
     def __init__(self,incoming,**kwargs):
-        # By default, assumes no input was given
+        # Case where incoming is a layer
         if isinstance(incoming,Layer):
-            self.in_shape    = incoming.out_shape
-            self.given_input = incoming.given_input
+            self.input_shape = incoming.output_shape
             self.data_format = incoming.data_format
+            self.known_input = True
+            self.incoming    = incoming
+            self.given_input = incoming.given_input
         else:
-            self.in_shape    = incoming
+            self.input_shape = incoming
+            self.known_input = False
+            self.data_format = kwargs["data_format"]
             self.given_input = False
+    def initialize_variables(self):
+        pass
     def forward(self,input,training=None):
         pass
     def backward(self,output):
         pass
 
 
+
+
 from .pool import *
-from .augment import *
+from .perturb import *
 from .normalize import *
 from .conv import *
 from .dense import *
