@@ -4,8 +4,21 @@ from . import Network
 
 #ToDo models : LeNet LeNet5 smallCNN largeCNN allCNN
 
-class base(Network):
-    def __init__(self,input_shape,classes,data_format,**kwargs):
+
+def base(input_shape,n_classes,data_format,input=None):
+    # Create the layers
+    layers = [layer.Input(input_shape=input_shape,data_format=data_format,input=input)]
+    layers.append(layer.Dense(layers[-1],units=512))
+    layers.append(layer.Activation(layers[-1],tf.nn.relu))
+    layers.append(layer.Dense(layers[-1],units=128))
+    layers.append(layer.Activation(layers[-1],tf.nn.relu))
+    layers.append(layer.Dense(layers[-1],units=n_classes,observed=True))
+    return Network(layers,name='-model(cnn.base)')
+
+
+
+class base123(Network):
+    def __init__(self,input_shape,n_classes,data_format,input=None, **kwargs):
         """Start the Foo.
 
         :param qux: The first argument to initialize class.
@@ -14,10 +27,10 @@ class base(Network):
         :type spam: bool
 
         """
-        super().__init__(input_shape,classes,data_format,**kwargs)
-        self.name = '-model(cnn.base)'
-        self._init_layers()
-    def _init_layers(self):
+        super().__init__(self.layers,**kwargs)
+        self._init_layers(input=input)
+        super().__init__(self.layers,name='-model(cnn.base)',**kwargs)
+    def _init_layers(self,input=None):
         """get layers.
 
         :param qux: The first argument to initialize class.
@@ -26,8 +39,11 @@ class base(Network):
         :type spam: bool
 
         """
-        dnn = [layer.special.input(self.input_shape,data_format=self.data_format)]
+        dnn = [layer.Input(input_shape=self.input_shape,data_format=self.data_format,input=input)]
         #
+        dnn.append(layer.Dense(dnn[-1],units=self.n_classes))
+        self.layers = dnn
+        return
         dnn.append(layer.transform.Conv2D(dnn[-1],filters=(32,5,5),
             nonlinearity = 0, training=training, batch_norm=True))
         dnn.append(layer.pool.Pool(dnn[-1],windows=(1,2,2),strides=(1,2,2),pool_type='MAX'))

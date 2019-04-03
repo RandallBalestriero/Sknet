@@ -4,10 +4,6 @@ from . import Layer
 
 
 
-
-
-
-
 class Dropout(Layer):
     """Randomly mask values of the input
 
@@ -25,6 +21,7 @@ class Dropout(Layer):
 
     p : scalar :math:`0\leq p \leq 1`
         the probability to keep the input values
+
     """
     def __init__(self, incoming, p=0.5, deterministic=None, **kwargs):
         super().__init__(incoming, **kwargs)
@@ -69,7 +66,9 @@ class Uniform(Layer):
 
     upper : Tensor or Array
         the upper bound of the Uniform distribution
+
     """
+
     def __init__(self, incoming, noise_type="additive", lower = np.float32(0), 
             upper = np.float32(1), deterministic=None, **kwargs):
         super().__init__(incoming, **kwargs)
@@ -121,6 +120,7 @@ class Gaussian(Layer):
 
     sigma : Tensor or Array
         the standard deviation of the Gaussian distribution
+        
     """
     def __init__(self, incoming, noise_type="additive", mu = np.float32(0), 
             sigma = np.float32(1), deterministic=None, **kwargs):
@@ -158,11 +158,6 @@ class RandomCrop(Layer):
     crop_shape is used as output. Apply the same perturbation
     to all the channels of the input.
 
-    :param incoming: The input to the layer
-    :type incoming: tuple of positive int or :class:`Layer` instance
-    :param crop_shape: Shape of the image after crop 
-    :type spam: couple of positive int
-
     Example of use::
     
         input_shape = (64,3,32,32)
@@ -184,7 +179,6 @@ class RandomCrop(Layer):
 
     def __init__(self, incoming, crop_shape, deterministic=None, **kwargs):
         super().__init__(incoming, **kwargs)
-
         # Set attributes
         if np.isscalar(crop_shape):
             self.crop_shape = [crop_shape,crop_shape]

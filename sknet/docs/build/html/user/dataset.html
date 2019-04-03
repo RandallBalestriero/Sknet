@@ -100,19 +100,21 @@
 <li class="toctree-l2"><a class="reference internal" href="#dataset-format">Dataset format</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pre-loaded-datasets">Pre-loaded Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#open-a-pre-loaded-dataset">Open a pre-loaded dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#adding-a-dataset">Adding a dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#custom-dataset">Custom dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataset-split">Dataset split</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modules/schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
             
@@ -181,45 +183,69 @@
 <span id="dataloading-label"></span><h1>Dataset<a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h1>
 <div class="section" id="dataset-format">
 <h2>Dataset format<a class="headerlink" href="#dataset-format" title="Permalink to this headline">¶</a></h2>
-<p>Each dataset has its own attiributes and specificities. To allow such
+<p>Each dataset has its own attributes and specificities. To allow such
 flexibility in Python we represent each dataset in a class inheriting from
 a <code class="xref py py-mod docutils literal notranslate"><span class="pre">dict</span></code> object. That is, each dataset is a Python dictionnary with
-some key attributes s.a. “train_set” or “n_classes”.
-We refer to the last section for details and how to create its own dataset.</p>
+some key attributes s.a. <code class="xref py py-data docutils literal notranslate"><span class="pre">datum_shape</span></code> or <code class="xref py py-data docutils literal notranslate"><span class="pre">n_classes</span></code>.
+We provide a simple example using the MNIST dataset:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">###############</span>
+<span class="c1"># sknet.dataset</span>
+<span class="c1">###############</span>
+
+
+<span class="n">mnist</span> <span class="o">=</span> <span class="n">sk</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">load_mnist</span><span class="p">()</span>
+<span class="c1"># will print:</span>
+<span class="c1"># Loading mnist</span>
+<span class="c1"># Dataset mnist loaded in 0.73 s</span>
+
+<span class="c1">## bunch of attributes:</span>
+
+<span class="n">mnist</span><span class="o">.</span><span class="n">data_format</span>
+<span class="c1"># &#39;NCHW&#39; (as left by default in load_mnist</span>
+<span class="n">mnist</span><span class="o">.</span><span class="n">datum_shape</span>
+<span class="c1"># (1,28,28)</span>
+<span class="n">mnist</span><span class="o">.</span><span class="n">n_channels</span>
+<span class="c1"># 1</span>
+
+<span class="c1">## bunch of variables with names &#39;images&#39; and &#39;labels as given by</span>
+<span class="c1">## the attribute</span>
+
+<span class="n">mnist</span><span class="o">.</span><span class="n">variables</span>
+<span class="c1"># [&#39;images&#39;,&#39;labels&#39;]</span>
+
+<span class="c1"># each variable is further split into at least </span>
+<span class="c1"># a train_set, and possibly more s.a.</span>
+<span class="c1"># train_set, valid_set, test_set,sunlabeled_set, ...</span>
+<span class="c1"># but for each variables the sets are the same</span>
+
+<span class="c1">#similar to mnist[var].sets for any var in mnist.variables</span>
+<span class="n">mnist</span><span class="o">.</span><span class="n">sets</span>
+<span class="c1"># [&#39;train_set&#39;,&#39;valid_set&#39;,&#39;test_set&#39;]</span>
+<span class="c1"># for the case of MNIST, the data comes already formatted in 3 sets</span>
+
+</pre></div>
+</div>
+<p>We refer to the last section for details and how to create its own dataset.</p>
 </div>
 <div class="section" id="pre-loaded-datasets">
 <h2>Pre-loaded Datasets<a class="headerlink" href="#pre-loaded-datasets" title="Permalink to this headline">¶</a></h2>
 <p>Sknet provides comon dataset out-of-the-box in the <a class="reference internal" href="../modules/dataset/dataset.html#module-sknet.dataset" title="sknet.dataset"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a> module as</p>
 <ul class="simple">
-<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.mnist" title="sknet.dataset.mnist"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.mnist</span></code></a></li>
-<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.fashionmnist" title="sknet.dataset.fashionmnist"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.fashionmnist</span></code></a></li>
-<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.svhn" title="sknet.dataset.svhn"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.svhn</span></code></a></li>
-<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.cifar10" title="sknet.dataset.cifar10"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.cifar10</span></code></a></li>
-<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.cifar100" title="sknet.dataset.cifar100"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.cifar100</span></code></a></li>
-<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.stl10" title="sknet.dataset.stl10"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.stl10</span></code></a></li>
-<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.warblr" title="sknet.dataset.warblr"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.warblr</span></code></a></li>
-<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.freefield1010" title="sknet.dataset.freefield1010"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.freefield1010</span></code></a></li>
+<li><a class="reference internal" href="../modules/dataset/dataset.html#sknet.dataset.load_mnist" title="sknet.dataset.load_mnist"><code class="xref py py-meth docutils literal notranslate"><span class="pre">sknet.dataset.load_mnist()</span></code></a></li>
+<li><code class="xref py py-meth docutils literal notranslate"><span class="pre">sknet.dataset.load_fashionmnist()</span></code></li>
+<li><code class="xref py py-meth docutils literal notranslate"><span class="pre">sknet.dataset.load_svhn()</span></code></li>
+<li><code class="xref py py-meth docutils literal notranslate"><span class="pre">sknet.dataset.load_cifar10()</span></code></li>
+<li><code class="xref py py-meth docutils literal notranslate"><span class="pre">sknet.dataset.load_cifar100()</span></code></li>
+<li><code class="xref py py-meth docutils literal notranslate"><span class="pre">sknet.dataset.load_stl10()</span></code></li>
+<li><code class="xref py py-meth docutils literal notranslate"><span class="pre">sknet.dataset.load_warblr()</span></code></li>
+<li><code class="xref py py-meth docutils literal notranslate"><span class="pre">sknet.dataset.load_freefield1010()</span></code></li>
 </ul>
-<p>In order to work with a dataset one simply initializes the
-dataset class (we leave the constructor parameters as default):</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">cifar10</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">cifar10</span><span class="p">()</span>
-</pre></div>
-</div>
-<p>the variable cifar10 is of DictType with all the dataset details as keys. For example, to lad the train and test set:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">train_x</span><span class="p">,</span><span class="n">train_y</span> <span class="o">=</span> <span class="n">cifar10</span><span class="p">[</span><span class="s2">&quot;train_set&quot;</span><span class="p">]</span>
-<span class="n">test_x</span><span class="p">,</span><span class="n">test_y</span>   <span class="o">=</span> <span class="n">cifar10</span><span class="p">[</span><span class="s2">&quot;test_set&quot;</span><span class="p">]</span>
-</pre></div>
-</div>
-<p>Since cifar10 does not impose a valid set, <code class="xref py py-data docutils literal notranslate"><span class="pre">cifar10[&quot;valid_set&quot;]</span></code> will return an error as “valid_set” is not a key of cifar10 by default.
-To access the image shape, the data format or additional dataset
-specific attributes simply do:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">data_format</span> <span class="o">=</span> <span class="n">cifar10</span><span class="p">[</span><span class="s2">&quot;data_format&quot;</span><span class="p">]</span> <span class="c1"># &#39;NCHW&#39;</span>
-<span class="n">datum_shape</span> <span class="o">=</span> <span class="n">cifar10</span><span class="p">[</span><span class="s2">&quot;datum_shape&quot;</span><span class="p">]</span> <span class="c1"># (3,32,32)</span>
-</pre></div>
-</div>
-<p>Accessing all the dataset attributes are obtained from <code class="xref py py-func docutils literal notranslate"><span class="pre">cifar10.keys()</span></code> as with a standard dictionnary.</p>
+<p>In order to work with a dataset one simply calls the
+dataset loading function and retreives the dataset as output
+with any pre-imposed data splitting already applied.</p>
 <p>All the pre-coded dataset will be loaded from the path given by the
-environment variable <span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DATASET_PATH</span></code>, or an alternative path given at initialization of the dataset class. If needs be, the dataset will
+environment variable <span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">DATASET_PATH</span></code>, or an alternative path given at
+the function call. If needs be, the dataset will
 be downloaded into this path, prior loading (at first utilisation of
 sknet for example). The saved dataset are in compressed format.</p>
 </div>
@@ -391,41 +417,84 @@ Dataset freefield1010 loaded in 42.16 s.
 
 </pre>
 </div>
-<div class="section" id="adding-a-dataset">
-<h2>Adding a dataset<a class="headerlink" href="#adding-a-dataset" title="Permalink to this headline">¶</a></h2>
-<p>You can simply use the <code class="xref py py-mod docutils literal notranslate"><span class="pre">dataset.custom</span></code> and give (at least) the
-training set as well as the data_format and the number of classes.
-We provide in the following minimal example using a random dataset
-highlighting the key features:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sknet</span> <span class="kn">import</span> <span class="n">dataset</span>
-<span class="kn">from</span> <span class="nn">sknet.utils</span> <span class="kn">import</span> <span class="n">plotting</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="kn">as</span> <span class="nn">np</span>
+<div class="section" id="custom-dataset">
+<h2>Custom dataset<a class="headerlink" href="#custom-dataset" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.Dataset</span></code> class is general and can be used with
+any user’s own dataset. In fact, the dataset loading function simply
+automate the data loading process and then set them as a dataset.
+Here is an example assuming the user has already loaded its dataset
+into the working python script</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#95-129</span>
+<span class="c1">####################</span>
+<span class="c1"># Create own dataset</span>
+<span class="c1">####################</span>
 
-<span class="c1"># Load the custom dataset with any preferred method</span>
-<span class="c1"># ...</span>
-<span class="c1"># ...</span>
-<span class="c1"># leading to (at least) the following loaded variables</span>
-<span class="c1"># train_set, n_classes and data_format</span>
+<span class="c1"># suppose we have a bunch of images, labels and an extra variable </span>
+<span class="c1"># s.a. noise_level, and we have given a train and test set </span>
 
-<span class="n">train_set</span>   <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">),</span>
-        <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">10000</span><span class="p">)]</span>
-<span class="n">n_classes</span>   <span class="o">=</span> <span class="mi">2</span>
-<span class="n">data_format</span> <span class="o">=</span> <span class="s1">&#39;NCHW&#39;</span>
+<span class="n">train_images</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">train_labels</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2000</span><span class="p">)</span>
+<span class="n">train_noise_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="c1"># any additional kwarg of the dataset should also be included</span>
-<span class="c1"># create some random extra dataset features</span>
+<span class="n">test_images</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">test_labels</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">1000</span><span class="p">)</span>
+<span class="n">test_noise_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">1000</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="n">noise_levels</span>   <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">10000</span><span class="p">)</span>
-<span class="n">missing_values</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">10000</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">0</span>
+<span class="c1"># first initialize the dataset with some attributes (or none)</span>
+<span class="n">my_dataset</span> <span class="o">=</span> <span class="n">sk</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;personnal&#39;</span><span class="p">,</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">,</span>
+                <span class="n">datum_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span><span class="n">n_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
 
-<span class="n">my_dataset</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">custom</span><span class="p">(</span><span class="n">train_set</span><span class="o">=</span><span class="n">train_set</span><span class="p">,</span><span class="n">n_classes</span><span class="o">=</span><span class="n">n_classes</span><span class="p">,</span>
-                    <span class="n">data_format</span><span class="o">=</span><span class="n">data_format</span><span class="p">,</span><span class="n">noise_lebels</span><span class="o">=</span><span class="n">noise_levels</span><span class="p">,</span>
-                    <span class="n">missing_values</span><span class="o">=</span><span class="n">missing_values</span><span class="p">)</span>
+<span class="c1"># then add the variables, the variables always are added as</span>
+<span class="c1"># a dictionnary with key being their name used in the API</span>
+<span class="n">my_dataset</span><span class="o">.</span><span class="n">add_variable</span><span class="p">({</span><span class="s1">&#39;images&#39;</span><span class="p">:{</span><span class="s1">&#39;train_set&#39;</span><span class="p">:</span><span class="n">train_images</span><span class="p">,</span>
+                                    <span class="s1">&#39;test_set&#39;</span><span class="p">:</span><span class="n">test_images</span><span class="p">},</span>
+                        <span class="s1">&#39;labels&#39;</span><span class="p">:{</span><span class="s1">&#39;train_set&#39;</span><span class="p">:</span><span class="n">train_labels</span><span class="p">,</span>
+                                    <span class="s1">&#39;test_set&#39;</span><span class="p">:</span><span class="n">test_labels</span><span class="p">},</span>
+                        <span class="s1">&#39;noise_l&#39;</span><span class="p">:{</span><span class="s1">&#39;train_set&#39;</span><span class="p">:</span><span class="n">train_noise_l</span><span class="p">,</span>
+                                    <span class="s1">&#39;test_set&#39;</span><span class="p">:</span><span class="n">test_noise_l</span><span class="p">}})</span>
+<span class="n">my_dataset</span><span class="o">.</span><span class="n">variables</span>
+<span class="c1">#[&#39;images,&#39;labels&#39;,&#39;noise_l&#39;]</span>
+<span class="n">my_dataset</span><span class="o">.</span><span class="n">sets</span>
+<span class="c1">#[&#39;train_set&#39;,&#39;test_set&#39;]</span>
+<span class="n">my_dataset</span><span class="o">.</span><span class="n">n_train_set</span>
+<span class="c1"># 2000</span>
 
-<span class="c1"># it is also possible to add other keys after the initialization</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="dataset-split">
+<h2>Dataset split<a class="headerlink" href="#dataset-split" title="Permalink to this headline">¶</a></h2>
+<p>A <code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.dataset.Dataset</span></code> object provides many convenient methods s.a.
+data splitting as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">###################</span>
+<span class="c1"># Dataset splitting</span>
+<span class="c1">###################</span>
 
-<span class="n">classes</span>               <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;name0&quot;</span><span class="p">,</span><span class="s2">&quot;name1&quot;</span><span class="p">]</span>
-<span class="n">my_dataset</span><span class="p">[</span><span class="s2">&quot;classes&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">classes</span>
+<span class="c1"># Suppose wejust have some training data, we first cast it</span>
+<span class="c1"># into a Dataset object</span>
+<span class="n">train_images</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randn</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">train_labels</span>  <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">randint</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">2000</span><span class="p">)</span>
+<span class="n">train_noise_l</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">2000</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># first initialize the dataset with some attributes (or none)</span>
+<span class="n">my_dataset</span> <span class="o">=</span> <span class="n">sk</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Dataset</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s1">&#39;personnal&#39;</span><span class="p">,</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">,</span>
+                <span class="n">datum_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">,</span><span class="mi">5</span><span class="p">),</span><span class="n">n_classes</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+<span class="c1"># then add the training variables</span>
+<span class="n">my_dataset</span><span class="o">.</span><span class="n">add_variable</span><span class="p">({</span><span class="s1">&#39;images&#39;</span><span class="p">:{</span><span class="s1">&#39;train_set&#39;</span><span class="p">:</span><span class="n">train_images</span><span class="p">},</span>
+                        <span class="s1">&#39;labels&#39;</span><span class="p">:{</span><span class="s1">&#39;train_set&#39;</span><span class="p">:</span><span class="n">train_labels</span><span class="p">},</span>
+                        <span class="s1">&#39;noise_l&#39;</span><span class="p">:{</span><span class="s1">&#39;train_set&#39;</span><span class="p">:</span><span class="n">train_noise_l</span><span class="p">}})</span>
+
+<span class="c1"># then create first a test set then a valid set</span>
+<span class="n">my_dataset</span><span class="o">.</span><span class="n">split_set</span><span class="p">(</span><span class="s2">&quot;train_set&quot;</span><span class="p">,</span><span class="s2">&quot;test_set&quot;</span><span class="p">,</span><span class="mf">0.25</span><span class="p">)</span>
+<span class="n">my_dataset</span><span class="o">.</span><span class="n">split_set</span><span class="p">(</span><span class="s2">&quot;train_set&quot;</span><span class="p">,</span><span class="s2">&quot;valid_set&quot;</span><span class="p">,</span><span class="mf">0.2</span><span class="p">)</span>
+
+<span class="n">my_dataset</span><span class="o">.</span><span class="n">n_train_set</span>
+<span class="c1">#1200</span>
+<span class="n">my_dataset</span><span class="o">.</span><span class="n">n_valid_set</span>
+<span class="c1">#300</span>
+<span class="n">my_dataset</span><span class="o">.</span><span class="n">n_test_set</span>
+<span class="c1">#500</span>
 
 </pre></div>
 </div>

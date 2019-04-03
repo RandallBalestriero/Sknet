@@ -98,9 +98,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a><ul class="current">
@@ -110,7 +111,7 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
             
@@ -179,9 +180,9 @@
             
   <div class="section" id="module-sknet.dataset">
 <span id="dataset"></span><h1>Dataset<a class="headerlink" href="#module-sknet.dataset" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="sknet.dataset.mnist">
-<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">mnist</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.mnist" title="Permalink to this definition">¶</a></dt>
+<dl class="function">
+<dt id="sknet.dataset.load_mnist">
+<code class="descclassname">sknet.dataset.</code><code class="descname">load_mnist</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>PATH=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.load_mnist" title="Permalink to this definition">¶</a></dt>
 <dd><p>Grayscale digit classification.
 The <a class="reference external" href="http://yann.lecun.com/exdb/mnist/">MNIST</a> database of handwritten 
 digits, available from this page, has a training set of 60,000 examples, 
@@ -190,32 +191,19 @@ from NIST. The digits have been size-normalized and centered in a
 fixed-size image. It is a good database for people who want to try learning
 techniques and pattern recognition methods on real-world data while 
 spending minimal efforts on preprocessing and formatting.</p>
-<dl class="method">
-<dt id="sknet.dataset.mnist.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>data_format='NCHW'</em>, <em>path=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.mnist.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Set up the configuration for data loading and data format</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
 <li><strong>data_format</strong> (<em>'NCHW'</em><em> or </em><em>'NHWC'</em>) – (optional, default ‘NCHW’), if different than default, adapts <code class="xref py py-mod docutils literal notranslate"><span class="pre">data_format</span></code> and <code class="xref py py-mod docutils literal notranslate"><span class="pre">datum_shape</span></code></li>
-<li><strong>path</strong> (<em>str</em>) – (optional, default $DATASET_PATH), the path to look for the data and 
+<li><strong>path</strong> (<em>str</em>) – (optional, default $DATASET_PATH), the path to look for the data and
 where the data will be downloaded if not present</li>
 </ul>
 </td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
-<dl class="method">
-<dt id="sknet.dataset.mnist.load">
-<code class="descname">load</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.mnist.load" title="Permalink to this definition">¶</a></dt>
-<dd><p>Load the dataset (download if necessary) and set
-the class attributes.</p>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">

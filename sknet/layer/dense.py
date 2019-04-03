@@ -1,7 +1,7 @@
 import tensorflow as tf
 import tensorflow.contrib.layers as tfl
 from .normalize import BatchNormalization as bn
-from .special import ScalarActivation as sa
+from .special import Activation as sa
 from .special import Identity
 import numpy as np
 from . import Layer
@@ -20,9 +20,9 @@ class Dense(Layer):
     :param nonlinearity_c: the coefficient for the nonlinearity, 
                            0 for ReLU, -1 for absolute value, ...
     :type nonlinearity_c: scalar
-    :param training: a dummy Tensorflow boolean stating if it is 
-                     training time or testing time
-    :type training: tf.bool
+    :param deterministic: a dummy Tensorflow boolean stating if it is 
+                     deterministic time or testing time
+    :type deterministic: tf.bool
     :param batch_norm: using or not the batch-normalization
     :type batch_norm: bool
     :param init_W: initialization for the W weights
@@ -34,94 +34,47 @@ class Dense(Layer):
 
     """
     def __init__(self, incoming, units, nonlinearity = np.float32(1),
-                training=None, batch_norm = False,
+                deterministic=None, batch_norm = False,
                 init_W = tfl.xavier_initializer(uniform=True), 
-                init_b = tf.zeros, name=''):
-        super().__init__(incoming)
-        self.init_W = init_W
-        self.init_b = init_b
-        self.initialized = False
+                init_b = tf.zeros, observed=False,observation=None,name='',
+                teacher_forcing=None):
+
         # Set up the input, flatten if needed
-        if len(self.input_shape)>2:
-            self.flatten_input = True
-            flat_dim           = np.prod(self.input_shape[1:])
+        if len(incoming.shape.as_list())>2:
+            self._flatten_input = True
+            flat_dim  = np.prod(incoming.shape.as_list()[1:])
         else:
-            self.flatten_input = False
-            flat_dim           = self.input_shape[1]
+            self._flatten_input = False
+            flat_dim  = incoming.shape.as_list()[1]
 
-        # Set-up Output Shape
-        self.output_shape = (self.input_shape[0],units)
-
-        # Set up the nonlinearity layer
-        self.nonlinearity = ScalarActivation(self.input_shape,nonlinearity)
-
-        # Set-up batch norm layer
-        if batch_norm: 
-            self.batch_norm = bn(self.input_shape,axis=0,gamma=False)
-        else:
-            self.batch_norm = Identity(self.input_shape)
-        if self.given_input:
-            self.initialize_variables()
-
-    def initialize_variables(self):
-        if not self.initialized:
-        # Initialize Layer Parameters
-            self.W = init_var(init_W,(flat_dim,units),
+        # Initialize the layer variables
+        self._W = init_var(init_W,(flat_dim,units),
                             name='denselayer_W_'+name,
                             trainable=True)
-            self.b = init_var(init_b,(1,units),
-                            trainable=True, 
+        self._b = init_var(init_b,(1,units),
+                            trainable=True,
                             name='denselayer_b_'+name)
 
-            self.nonlinearity.initialize_variables()
-            self.batch_norm.initialize_variables()
-            self.initialized = True
-    def forward(self, input=None, training=None, **kwargs):
-        if input is None:
-            input = self.incoming.forward(training=training)
-        if self.flatten_input:
-            input = tf.layers.flatten(input)
-        Wx = tf.matmul(input,self.W)
-        self.output = self.nonlinearity.forward(
-                        self.batch_norm.forward(Wx,training=training),
-                        training=training)
-        return self.output
-        if self.batch_norm:
-            Wx       = tf.matmul(input,self.W)
-            self.scaling,self.bias = self.bn.get_A_b(Wx,training=training)
-        else:            
-            self.scaling = 1
-            self.bias    = self.b
-        self.S  = self.scaling*Wx+self.bias
-        if self.nonlinearity_c==1:
-            self.VQ     = None
-            self.output = self.S 
-        else:
-            self.VQ     = tf.greater(self.S,0)
-            VQ          = tf.cast(self.VQ,tf.float32)
-            self.mask   = VQ+(1-VQ)*self.nonlinearity_c
-            self.output = tf.nn.leaky_relu(self.S,alpha=self.nonlinearity_c)
-        return self.output
-#    def backward(self,output):
-#        """output is of shape (batch,n_output)
-#        return of this function is of shape [(batch,in_dim),(batch,1)]"""
-#        # use tf.nn.conv2d_backprop_input for conv2D
-#        A = tf.reshape(tf.matmul(output*self.mask*scaling,self.W,transpose_b=True),incoming.output_shape)
-#        B = tf.matmul(output*self.mask,self.b,transpose_b=True)
-#        return A,B
+        super().__init__(incoming, deterministic=deterministic, 
+                        observed=observed, observation=observation, 
+                        teacher_forcing=teacher_forcing)
 
+    def forward(self, input, deterministic=None, **kwargs):
+        if self._flatten_input:
+            input = tf.layers.flatten(input)
+        return tf.matmul(input,self._W)+self._b
 
 
 
 
 class ConstraintDenseLayer:
-    def __init__(self,incoming,n_output,constraint='none',training=None):
+    def __init__(self,incoming,n_output,constraint='none',deterministic=None):
         # bias_option : {unconstrained,constrained,zero}
         if(len(incoming.output_shape)>2): reshape_input = tf.layers.flatten(incoming.output)
         else:                             reshape_input = incoming.output
         in_dim      = prod(incoming.output_shape[1:])
         self.gamma  = tf.Variable(ones(1,float32),trainable=False)
-        gamma_update= tf.assign(self.gamma,tf.clip_by_value(tf.cond(training,lambda :self.gamma*1.005,lambda :self.gamma),0,60000))
+        gamma_update= tf.assign(self.gamma,tf.clip_by_value(tf.cond(deterministic,lambda :self.gamma*1.005,lambda :self.gamma),0,60000))
         tf.add_to_collection(tf.GraphKeys.UPDATE_OPS,gamma_update)
         init_W      = tf.contrib.layers.xavier_initializer(uniform=True)
         if(constraint=='none'):

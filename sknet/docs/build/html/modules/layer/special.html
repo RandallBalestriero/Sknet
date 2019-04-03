@@ -98,9 +98,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
@@ -116,7 +117,7 @@
 <li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
             
@@ -186,10 +187,10 @@
   <div class="section" id="module-sknet.layer.special">
 <span id="special-layer"></span><h1>Special Layer<a class="headerlink" href="#module-sknet.layer.special" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="sknet.layer.ScalarActivation">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">ScalarActivation</code><span class="sig-paren">(</span><em>incoming</em>, <em>func_or_scalar</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.ScalarActivation" title="Permalink to this definition">¶</a></dt>
-<dd><p>applies an element-wise nonlinearity
-this layer applies an element-wise nonlinearity to the
+<dt id="sknet.layer.Activation">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Activation</code><span class="sig-paren">(</span><em>incoming</em>, <em>func_or_scalar</em>, <em>deterministic=None</em>, <em>batch_norm=False</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>init_b=&lt;function zeros&gt;</em>, <em>observed=False</em>, <em>observation=None</em>, <em>name=''</em>, <em>teacher_forcing=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Activation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply nonlinearity.</p>
+<p>this layer applies an element-wise nonlinearity to the
 input based on a given scalar to scalar function.
 The nonlinearity can of the following form:</p>
 <blockquote>
@@ -264,8 +265,8 @@ quantities s.a. the loss.</p>
 <dl class="class">
 <dt id="sknet.layer.LambdaFunction">
 <em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">LambdaFunction</code><span class="sig-paren">(</span><em>incoming</em>, <em>func</em>, <em>shape_func=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.LambdaFunction" title="Permalink to this definition">¶</a></dt>
-<dd><p>applies a lambda function onto the layer input
-This layer allows to apply an arbitrary given function onto
+<dd><p>Apply a lambda function onto the input</p>
+<p>This layer allows to apply an arbitrary given function onto
 its input tensor allows to implement arbitrary operations.
 The fiven function must allow backpropagation through it
 if leanring with backpropagation is required, the function

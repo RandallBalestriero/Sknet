@@ -84,7 +84,8 @@ class Pool(Layer):
 
 
 class GlobalSpatialPool(Layer):
-    """pool over all spatial dimension
+    """Pooling over all spatial dimension.
+
     This layer implements a global spatial pooling removing all spatial
     dimension present in the input.
 

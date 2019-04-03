@@ -6,10 +6,18 @@ Dataset
 Dataset format
 --------------
 
-Each dataset has its own attiributes and specificities. To allow such
+Each dataset has its own attributes and specificities. To allow such
 flexibility in Python we represent each dataset in a class inheriting from
 a :mod:`dict` object. That is, each dataset is a Python dictionnary with
-some key attributes s.a. "train_set" or "n_classes".
+some key attributes s.a. :py:data:`datum_shape` or :py:data:`n_classes`.
+We provide a simple example using the MNIST dataset:
+
+.. literalinclude:: ../../../../quickstart_base.py
+   :lines: 60-94
+
+
+
+
 We refer to the last section for details and how to create its own dataset.
 
 Pre-loaded Datasets
@@ -17,43 +25,30 @@ Pre-loaded Datasets
 
 Sknet provides comon dataset out-of-the-box in the :mod:`sknet.dataset` module as
 
-- :class:`sknet.dataset.mnist`
+- :py:meth:`sknet.dataset.load_mnist`
 
-- :class:`sknet.dataset.fashionmnist`
+- :py:meth:`sknet.dataset.load_fashionmnist`
 
-- :class:`sknet.dataset.svhn`
+- :py:meth:`sknet.dataset.load_svhn`
 
-- :class:`sknet.dataset.cifar10`
+- :py:meth:`sknet.dataset.load_cifar10`
 
-- :class:`sknet.dataset.cifar100`
+- :py:meth:`sknet.dataset.load_cifar100`
 
-- :class:`sknet.dataset.stl10`
+- :py:meth:`sknet.dataset.load_stl10`
 
-- :class:`sknet.dataset.warblr`
+- :py:meth:`sknet.dataset.load_warblr`
 
-- :class:`sknet.dataset.freefield1010`
+- :py:meth:`sknet.dataset.load_freefield1010`
 
-In order to work with a dataset one simply initializes the 
-dataset class (we leave the constructor parameters as default)::
+In order to work with a dataset one simply calls the 
+dataset loading function and retreives the dataset as output
+with any pre-imposed data splitting already applied.
 
-	cifar10 = sknet.dataset.cifar10()
-	
-the variable cifar10 is of DictType with all the dataset details as keys. For example, to lad the train and test set::
-
-	train_x,train_y = cifar10["train_set"]
-	test_x,test_y   = cifar10["test_set"]
-
-Since cifar10 does not impose a valid set, :py:data:`cifar10["valid_set"]` will return an error as "valid_set" is not a key of cifar10 by default.
-To access the image shape, the data format or additional dataset 
-specific attributes simply do::
-
-        data_format = cifar10["data_format"] # 'NCHW'
-        datum_shape = cifar10["datum_shape"] # (3,32,32)
-
-Accessing all the dataset attributes are obtained from :py:func:`cifar10.keys()` as with a standard dictionnary. 
 
 All the pre-coded dataset will be loaded from the path given by the 
-environment variable :envvar:`DATASET_PATH`, or an alternative path given at initialization of the dataset class. If needs be, the dataset will
+environment variable :envvar:`DATASET_PATH`, or an alternative path given at 
+the function call. If needs be, the dataset will
 be downloaded into this path, prior loading (at first utilisation of
 sknet for example). The saved dataset are in compressed format.
 
@@ -116,17 +111,26 @@ running for the next times will produce:
    :literal:
 
 
-Adding a dataset
-----------------
+Custom dataset
+--------------
 
-You can simply use the :mod:`dataset.custom` and give (at least) the 
-training set as well as the data_format and the number of classes.
-We provide in the following minimal example using a random dataset 
-highlighting the key features:
+The :class:`sknet.dataset.Dataset` class is general and can be used with 
+any user's own dataset. In fact, the dataset loading function simply 
+automate the data loading process and then set them as a dataset.
+Here is an example assuming the user has already loaded its dataset
+into the working python script
 
-.. literalinclude:: ../../../../quickstart_custom_dataset.py
-    :encoding: latin-1
-    :language: python
+.. literalinclude:: ../../../../quickstart_base.py
+   :lines: 95-129
 
-.. _quickstart_data_loading.py: https://github.org/RandallBalestriero/sknet/quickstart_data_loading.py
-.. _sknet.dataset: https://github.org/RandallBalestriero/sknet/sknet/dataset
+Dataset split
+-------------
+
+A :class:`sknet.dataset.Dataset` object provides many convenient methods s.a.
+data splitting as
+
+.. literalinclude:: ../../../../quickstart_base.py
+   :lines: 131-160
+
+
+

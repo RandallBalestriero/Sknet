@@ -14,7 +14,7 @@
 .. autosummary::
     :nosignatures:
 
-    mnist
+    load_mnist
     fashionmnist
     svhn
     cifar10

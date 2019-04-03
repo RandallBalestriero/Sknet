@@ -5,7 +5,7 @@ Special Layer
 
 .. currentmodule:: sknet.layer
 
-.. autoclass:: ScalarActivation
+.. autoclass:: Activation
     :members:
 
 .. autoclass:: Spectrogram

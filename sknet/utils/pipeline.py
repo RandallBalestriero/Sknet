@@ -18,11 +18,179 @@ class DummyTrainer(object):
         self.session                    = tf.Session(config=config)
         # Attributes
         self.network = network
-        with tf.device('/device:GPU:0'):
-            self.network.initialize_variables()
-            self.session.run(tf.global_variables_initializer())
-            self.input  = self.network.input
-            self.output = self.network.output 
+#        with tf.device('/device:GPU:0'):
+        self.session.run(tf.global_variables_initializer())
+        self.input  = self.network.input
+        self.output = self.network.output 
+
+
+class Pipeline(object):
+    def __init__(self, network, dataset=None, loss=None, lr_schedule=None, 
+                                optimizer=None, test_loss=None):
+        # Tensorflow Config
+#        tf.reset_default_graph()
+        config                          = tf.ConfigProto()
+        config.gpu_options.allow_growth = True
+        config.log_device_placement     = True
+        self.session                    = tf.Session(config=config)
+        # Attributes
+        self.network  = network
+        self.loss     = loss
+        self.test_loss= test_loss
+        self.dataset  = dataset
+        self.lr_schedule = lr_schedule
+        self.optimizer = optimizer
+        self.batch_size = self.network[0].shape.as_list()[0]
+
+        # set up the network input-output shortcut
+        self.input  = self.network.input
+        self.output = self.network.output
+        self.infered_observed = self.network.infered_observed
+
+        # Get the train op
+        self.update_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+        with tf.control_dependencies(self.update_op):
+            self.train_op = self.optimizer.minimize(loss)
+
+        # initialize the variables
+        self.session.run(tf.global_variables_initializer())
+
+    def _epoch_fit_passive(self,items):
+        """This method allows to run in training mode the network
+        without updating the network according to self.train_op,
+        this is to study the passive update rules
+        """
+        perm = np.random.permutation(len(items[0][1]))
+        n = len(items[0][1])//self.batch_size
+        self.network.set_deterministic(False,self.session)
+        for i in range(n):
+            here      = perm[i*self.batch_size:(i+1)*self.batch_size]
+            if self.dataset is None:
+                feed_dict = [(key,self.dataset["train_set"][value][here]) for key,value in items]
+            else:
+                feed_dict = [(key,value[here]) for key,value in items]
+            self.session.run(self.update_op,feed_dict=dict(feed_dict))
+    def _epoch_train(self,items=None,update_time=50,set_="train_set"):
+        loss = []
+        if items is not None:
+            n = len(items[0][1])
+        else:
+            if self.items[0][1] is not None:
+                n = len(self.dataset[self.items[0][1]][set_])
+        perm = np.random.permutation(n)
+        self.network.set_deterministic(False,self.session)
+        for i in range(n//self.batch_size):
+            here = perm[i*self.batch_size:(i+1)*self.batch_size]
+            if items is None:
+                feed_dict = [(key,self.dataset[value][set_][here]) for key,value in self.items]
+            else:
+                feed_dict = [(key,value[here]) for key,value in items]
+            lr_dict   = [self.optimizer.learning_rate,np.float32(self.lr_schedule.lrs[-1])]
+            self.session.run(self.train_op,feed_dict=dict(feed_dict+[lr_dict]))
+            if(i%update_time==0):
+                self.network.set_deterministic(True,self.session)
+                loss.append(self.session.run(self.loss,feed_dict=dict(feed_dict)))
+                self.network.set_deterministic(False,self.session)
+                print('\t\t{0:.1f}%'.format(100*i/(n//self.batch_size)),loss[-1])
+        return loss
+    def _epoch_test(self,items=None, set_="test_set"):
+        acc = 0.0
+        self.network.set_deterministic(True,self.session)
+        if items is not None:
+            n = len(items[0][1])
+        else:
+            if self.items[0][1] is not None:
+                n = len(self.dataset[self.items[0][1]][set_])
+        for i in range(n//self.batch_size):
+            here = range(i*self.batch_size,(i+1)*self.batch_size)
+            if items is None:
+                feed_dict = [(key,self.dataset[value][set_][here]) for key,value in self.items]
+            else:
+                feed_dict = [(key,value[i*self.batch_size:(i+1)*self.batch_size]) for key,value in items]
+            acc += self.session.run(self.test_loss,feed_dict=dict(feed_dict))
+        return acc/(n//self.batch_size)
+    def link(self,items):
+        """items is a list of tuples of the form
+        (bn_layer,value,teacher_forcing_value) but it can be
+        (bn_layer,value) no teacher forcing, false by default
+        (bn_layer,None,teacher_forcing_value) is this layer.observation is not a placeholder
+        """
+        if self.dataset is None:
+            print(error)
+            exit()
+        else:
+            self.items = items
+    def fit(self, items=None, update_time = 50, n_epochs=5, passive_epochs=0):
+        # Init list
+        train_loss = []
+        valid_loss = []
+        test_loss  = []
+        # Perform training of batch-norm (optional, should be 0 in general)
+        for i in range(passive_epochs):
+            self._epoch_fit_passive(items=items)
+        for epoch in range(n_epochs):
+            print("\tEpoch",epoch)
+            train_loss.append(self._epoch_train(items=items, update_time=update_time))
+            # NOW COMPUTE VALID SET ACCURACY
+            valid_loss.append(self._epoch_test(items=items,set_='valid_set'))
+            # NOW COMPUTE TEST SET ACCURACY
+            test_loss.append(self._epoch_test(items=items,set_='test_set'))
+            self.lr_schedule.update(epoch=epoch,valid_accu=valid_loss)
+            print('\tValid:',valid_loss[-1])
+        return train_loss,valid_accu,test_accu,self.lr_schedule.lrs
+    def predict(self,X):
+        """
+        Given an array return the prediction
+        """
+        n = X.shape[0]//self.batch_size
+        preds = []
+        for j in range(n):
+            preds.append(self.session.run(self.prediction,
+                feed_dict={self.x:X[self.batch_size*j:self.batch_size*(j+1)],self.training:False}))
+        return concatenate(preds,axis=0)
+    def get_continuous_VQ(self,X):
+        """
+        given a collection of observations X, return the VQ for each of the layers
+        in the form of a real value vector and a dictionnary mapping each real value to a VQ"""
+        n            = X.shape[0]//self.batch_size
+        VQs          = [[] for i in range(len(self.layers)-1)]
+        dict_VQ2real = [dict() for i in range(len(self.layers)-1)]
+        for j in range(n):
+            vqs = self.session.run(self.VQ,feed_dict={self.x:X[self.batch_size*j:self.batch_size*(j+1)],self.training:False})
+            for l,vq in enumerate(vqs):
+                values,dict_VQ2real[l]=states2values(vq,dict_VQ2real[l])
+                VQs[l].append(values)
+        VQs = stack([concatenate(VQ,0) for VQ in VQs],1)
+        return VQs
+    def get_VQ(self,X):
+        """
+        given a collection of observations X, return the VQ (binary) of each layer"""
+        n      = X.shape[0]//self.batch_size
+        VQs    = []
+        for j in range(n):
+            VQs.append(self.session.run(self.VQ,feed_dict={self.x:X[self.batch_size*j:self.batch_size*(j+1)],self.training:False}))
+        return VQs
+    def get_radius(self,X):
+        """
+        given a collection of observations X, return the VQ (binary) of each layer"""
+        n      = X.shape[0]//self.batch_size
+        positive_radius = []
+        negative_radius = []
+        for j in range(n):
+            a = self.session.run(self.distances,feed_dict={self.x:X[self.batch_size*j:self.batch_size*(j+1)],self.training:False})
+            positive_radius.append(a)
+            negative_radius.append(a)
+        return concatenate(positive_radius,0),concatenate(negative_radius,0)
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -192,7 +360,7 @@ class Trainer(object):
         return concatenate(positive_radius,0),concatenate(negative_radius,0)
 
 
- 
+
 
 
 

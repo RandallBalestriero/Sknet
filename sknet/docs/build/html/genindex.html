@@ -97,15 +97,16 @@
 <li class="toctree-l1"><a class="reference internal" href="user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
             
@@ -185,7 +186,6 @@
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
- | <a href="#O"><strong>O</strong></a>
  | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
@@ -220,8 +220,6 @@
 </li>
         <li><a href="modules/dataset/dataset.html#sknet.dataset.freefield1010.__init__">(sknet.dataset.freefield1010 method)</a>
 </li>
-        <li><a href="modules/dataset/dataset.html#sknet.dataset.mnist.__init__">(sknet.dataset.mnist method)</a>
-</li>
         <li><a href="modules/dataset/dataset.html#sknet.dataset.stl10.__init__">(sknet.dataset.stl10 method)</a>
 </li>
         <li><a href="modules/dataset/dataset.html#sknet.dataset.svhn.__init__">(sknet.dataset.svhn method)</a>
@@ -242,7 +240,9 @@
 </li>
         <li><a href="modules/network.html#sknet.network.Network.__init__">(sknet.network.Network method)</a>
 </li>
-        <li><a href="modules/schedule/schedule.html#sknet.schedule.constant.__init__">(sknet.schedule.constant method)</a>
+        <li><a href="modules/optimize/optimizer.html#sknet.optimize.optimizer.Adam.__init__">(sknet.optimize.optimizer.Adam method)</a>
+</li>
+        <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.constant.__init__">(sknet.optimize.schedule.constant method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -256,7 +256,9 @@
 </li>
         <li><a href="modules/network.html#sknet.network.Network.__weakref__">(sknet.network.Network attribute)</a>
 </li>
-        <li><a href="modules/schedule/schedule.html#sknet.schedule.constant.__weakref__">(sknet.schedule.constant attribute)</a>
+        <li><a href="modules/optimize/optimizer.html#sknet.optimize.optimizer.Adam.__weakref__">(sknet.optimize.optimizer.Adam attribute)</a>
+</li>
+        <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.constant.__weakref__">(sknet.optimize.schedule.constant attribute)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -265,7 +267,15 @@
 <h2 id="A">A</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/schedule/schedule.html#sknet.schedule.adaptive">adaptive (class in sknet.schedule)</a>
+      <li><a href="modules/optimize/loss.html#sknet.optimize.loss.accuracy">accuracy() (in module sknet.optimize.loss)</a>
+</li>
+      <li><a href="modules/layer/special.html#sknet.layer.Activation">Activation (class in sknet.layer)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/optimize/optimizer.html#sknet.optimize.optimizer.Adam">Adam (class in sknet.optimize.optimizer)</a>
+</li>
+      <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.adaptive">adaptive (class in sknet.optimize.schedule)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -285,11 +295,13 @@
 </li>
       <li><a href="modules/dataset/dataset.html#sknet.dataset.cifar100">cifar100 (class in sknet.dataset)</a>
 </li>
+      <li><a href="modules/optimize/loss.html#sknet.optimize.loss.classification">classification() (in module sknet.optimize.loss)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/layer/shape.html#sknet.layer.Concat">Concat (class in sknet.layer)</a>
 </li>
-      <li><a href="modules/schedule/schedule.html#sknet.schedule.constant">constant (class in sknet.schedule)</a>
+      <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.constant">constant (class in sknet.optimize.schedule)</a>
 </li>
       <li><a href="modules/layer/conv.html#sknet.layer.Conv2D">Conv2D (class in sknet.layer)</a>
 </li>
@@ -326,7 +338,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/layer/shape.html#sknet.layer.ExpandDim">ExpandDim (class in sknet.layer)</a>
 </li>
-      <li><a href="modules/schedule/schedule.html#sknet.schedule.exponential">exponential (class in sknet.schedule)</a>
+      <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.exponential">exponential (class in sknet.optimize.schedule)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -336,14 +348,10 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/dataset/dataset.html#sknet.dataset.fashionmnist">fashionmnist (class in sknet.dataset)</a>
 </li>
-      <li><a href="modules/layer/io.html#sknet.layer.Input.forward">forward() (sknet.layer.Input method)</a>
-
-      <ul>
-        <li><a href="modules/layer/io.html#sknet.layer.OutputClassifier.forward">(sknet.layer.OutputClassifier method)</a>
-</li>
-      </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/layer/io.html#sknet.layer.Input.forward">forward() (sknet.layer.Input method)</a>
+</li>
       <li><a href="modules/dataset/dataset.html#sknet.dataset.freefield1010">freefield1010 (class in sknet.dataset)</a>
 </li>
   </ul></td>
@@ -356,6 +364,8 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/network.html#sknet.network.Network.get_layers">get_layers() (sknet.network.Network method)</a>
+</li>
       <li><a href="modules/layer/pool.html#sknet.layer.GlobalSpatialPool">GlobalSpatialPool (class in sknet.layer)</a>
 </li>
   </ul></td>
@@ -378,7 +388,7 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/layer/special.html#sknet.layer.LambdaFunction">LambdaFunction (class in sknet.layer)</a>
 </li>
-      <li><a href="modules/schedule/schedule.html#sknet.schedule.linear">linear (class in sknet.schedule)</a>
+      <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.linear">linear (class in sknet.optimize.schedule)</a>
 </li>
       <li><a href="modules/dataset/dataset.html#sknet.dataset.cifar10.load">load() (sknet.dataset.cifar10 method)</a>
 
@@ -389,8 +399,6 @@
 </li>
         <li><a href="modules/dataset/dataset.html#sknet.dataset.freefield1010.load">(sknet.dataset.freefield1010 method)</a>
 </li>
-        <li><a href="modules/dataset/dataset.html#sknet.dataset.mnist.load">(sknet.dataset.mnist method)</a>
-</li>
         <li><a href="modules/dataset/dataset.html#sknet.dataset.stl10.load">(sknet.dataset.stl10 method)</a>
 </li>
         <li><a href="modules/dataset/dataset.html#sknet.dataset.svhn.load">(sknet.dataset.svhn method)</a>
@@ -398,6 +406,10 @@
         <li><a href="modules/dataset/dataset.html#sknet.dataset.warblr.load">(sknet.dataset.warblr method)</a>
 </li>
       </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="modules/dataset/dataset.html#sknet.dataset.load_mnist">load_mnist() (in module sknet.dataset)</a>
+</li>
   </ul></td>
 </tr></table>
 
@@ -407,24 +419,12 @@
       <li><a href="modules/layer/shape.html#sknet.layer.Merge">Merge (class in sknet.layer)</a>
 </li>
   </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/dataset/dataset.html#sknet.dataset.mnist">mnist (class in sknet.dataset)</a>
-</li>
-  </ul></td>
 </tr></table>
 
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/network.html#sknet.network.Network">Network (class in sknet.network)</a>
-</li>
-  </ul></td>
-</tr></table>
-
-<h2 id="O">O</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/layer/io.html#sknet.layer.OutputClassifier">OutputClassifier (class in sknet.layer)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -446,16 +446,16 @@
 </li>
       <li><a href="modules/layer/perturb.html#sknet.layer.RandomRot90">RandomRot90 (class in sknet.layer)</a>
 </li>
-      <li><a href="modules/schedule/schedule.html#sknet.schedule.adaptive.reset">reset() (sknet.schedule.adaptive method)</a>
+      <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.adaptive.reset">reset() (sknet.optimize.schedule.adaptive method)</a>
 
       <ul>
-        <li><a href="modules/schedule/schedule.html#sknet.schedule.constant.reset">(sknet.schedule.constant method)</a>
+        <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.constant.reset">(sknet.optimize.schedule.constant method)</a>
 </li>
-        <li><a href="modules/schedule/schedule.html#sknet.schedule.exponential.reset">(sknet.schedule.exponential method)</a>
+        <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.exponential.reset">(sknet.optimize.schedule.exponential method)</a>
 </li>
-        <li><a href="modules/schedule/schedule.html#sknet.schedule.linear.reset">(sknet.schedule.linear method)</a>
+        <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.linear.reset">(sknet.optimize.schedule.linear method)</a>
 </li>
-        <li><a href="modules/schedule/schedule.html#sknet.schedule.stepwise.reset">(sknet.schedule.stepwise method)</a>
+        <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.stepwise.reset">(sknet.optimize.schedule.stepwise method)</a>
 </li>
       </ul></li>
   </ul></td>
@@ -468,8 +468,6 @@
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/layer/special.html#sknet.layer.ScalarActivation">ScalarActivation (class in sknet.layer)</a>
-</li>
       <li><a href="modules/dataset.html#module-sknet.dataset">sknet.dataset (module)</a>, <a href="modules/dataset/dataset.html#module-sknet.dataset">[1]</a>
 </li>
       <li><a href="modules/dataset/preprocess.html#module-sknet.dataset.preprocess">sknet.dataset.preprocess (module)</a>
@@ -488,15 +486,17 @@
 </li>
       <li><a href="modules/layer/pool.html#module-sknet.layer.pool">sknet.layer.pool (module)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/layer/shape.html#module-sknet.layer.shape">sknet.layer.shape (module)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="modules/layer/special.html#module-sknet.layer.special">sknet.layer.special (module)</a>
 </li>
-      <li><a href="modules/schedule.html#module-sknet.schedule">sknet.schedule (module)</a>
+      <li><a href="modules/optimize.html#module-sknet.optimize.loss">sknet.optimize.loss (module)</a>, <a href="modules/optimize/loss.html#module-sknet.optimize.loss">[1]</a>
 </li>
-      <li><a href="modules/schedule/schedule.html#module-sknet.schedule.schedule">sknet.schedule.schedule (module)</a>
+      <li><a href="modules/optimize.html#module-sknet.optimize.optimizer">sknet.optimize.optimizer (module)</a>, <a href="modules/optimize/optimizer.html#module-sknet.optimize.optimizer">[1]</a>
+</li>
+      <li><a href="modules/optimize.html#module-sknet.optimize.schedule">sknet.optimize.schedule (module)</a>, <a href="modules/optimize/schedule.html#module-sknet.optimize.schedule">[1]</a>
 </li>
       <li><a href="modules/layer/special.html#sknet.layer.Spectrogram">Spectrogram (class in sknet.layer)</a>
 </li>
@@ -504,7 +504,7 @@
 </li>
       <li><a href="modules/dataset/preprocess.html#sknet.dataset.Standardize">Standardize (class in sknet.dataset)</a>
 </li>
-      <li><a href="modules/schedule/schedule.html#sknet.schedule.stepwise">stepwise (class in sknet.schedule)</a>
+      <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.stepwise">stepwise (class in sknet.optimize.schedule)</a>
 </li>
       <li><a href="modules/dataset/dataset.html#sknet.dataset.stl10">stl10 (class in sknet.dataset)</a>
 </li>
@@ -520,7 +520,7 @@
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="modules/schedule/schedule.html#sknet.schedule.constant.update">update() (sknet.schedule.constant method)</a>
+      <li><a href="modules/optimize/schedule.html#sknet.optimize.schedule.constant.update">update() (sknet.optimize.schedule.constant method)</a>
 </li>
   </ul></td>
 </tr></table>

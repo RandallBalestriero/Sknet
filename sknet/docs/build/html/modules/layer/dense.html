@@ -98,9 +98,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
@@ -116,7 +117,7 @@
 <li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
             
@@ -187,7 +188,7 @@
 <span id="dense-layer"></span><h1>Dense Layer<a class="headerlink" href="#module-sknet.layer.dense" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="sknet.layer.Dense">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Dense</code><span class="sig-paren">(</span><em>incoming</em>, <em>units</em>, <em>nonlinearity=1.0</em>, <em>training=None</em>, <em>batch_norm=False</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>init_b=&lt;function zeros&gt;</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Dense" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Dense</code><span class="sig-paren">(</span><em>incoming</em>, <em>units</em>, <em>nonlinearity=1.0</em>, <em>deterministic=None</em>, <em>batch_norm=False</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>init_b=&lt;function zeros&gt;</em>, <em>observed=False</em>, <em>observation=None</em>, <em>name=''</em>, <em>teacher_forcing=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Dense" title="Permalink to this definition">¶</a></dt>
 <dd><p>Dense or fully connected layer.
 This layer implement a fully connected or a dense layer with or without
 nonlinearity, and batch-norm</p>
@@ -200,8 +201,8 @@ nonlinearity, and batch-norm</p>
 <li><strong>units</strong> (<em>int</em>) – then umber of output units (or neurons)</li>
 <li><strong>nonlinearity_c</strong> (<em>scalar</em>) – the coefficient for the nonlinearity, 
 0 for ReLU, -1 for absolute value, …</li>
-<li><strong>training</strong> (<em>tf.bool</em>) – a dummy Tensorflow boolean stating if it is 
-training time or testing time</li>
+<li><strong>deterministic</strong> (<em>tf.bool</em>) – a dummy Tensorflow boolean stating if it is 
+deterministic time or testing time</li>
 <li><strong>batch_norm</strong> (<em>bool</em>) – using or not the batch-normalization</li>
 <li><strong>init_W</strong> (<em>initializer of tf.tensor</em><em> or </em><em>np.array</em>) – initialization for the W weights</li>
 <li><strong>init_b</strong> (<em>initializer of tf.tensor</em><em> or </em><em>np.array</em>) – initialization for the b weights</li>

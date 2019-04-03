@@ -97,15 +97,16 @@
 <li class="toctree-l1"><a class="reference internal" href="user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
             
@@ -218,7 +219,7 @@ pipeline to solve a task. Those blocks are:</p>
 <li><p class="first"><a class="reference internal" href="user/preprocess.html#preprocess-label"><span class="std std-ref">Preprocess</span></a> (optional): pre-processing that can be applied onto any
 dataset for increased performances s.a. zca whitening</p>
 </li>
-<li><p class="first"><a class="reference internal" href="user/network.html#network-label"><span class="std std-ref">Models</span></a>: a fully described network from input to output, in term of
+<li><p class="first"><a class="reference internal" href="user/network.html#network-label"><span class="std std-ref">Networks</span></a>: a fully described network from input to output, in term of
 layers s.a. LeNet5. Any network is built by combining any <a class="reference internal" href="user/layer.html#layer-label"><span class="std std-ref">Layer</span></a></p>
 </li>
 <li><p class="first"><a class="reference internal" href="user/layer.html#layer-label"><span class="std std-ref">Layer</span></a>: low-level building blocks of any network. They are
@@ -239,7 +240,7 @@ of a model s.a. adam or sgd</p>
 a dataset, the learning rate scheduler plays a crucial role to
 guarantee best performances s.a. stepwise or adaptive</p>
 </li>
-<li><p class="first">trainer : a higher-level method assembling those independent blocks
+<li><p class="first"><a class="reference internal" href="user/pipeline.html#pipeline-label"><span class="std std-ref">Pipeline</span></a> : a higher-level method assembling those independent blocks
 into a trainable pipeline, also containing the tensorflow session</p>
 </li>
 </ul>
@@ -256,7 +257,8 @@ neural networks, and how to contribute to the library as a developer.</p>
 <li class="toctree-l2"><a class="reference internal" href="user/dataset.html#dataset-format">Dataset format</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user/dataset.html#pre-loaded-datasets">Pre-loaded Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user/dataset.html#open-a-pre-loaded-dataset">Open a pre-loaded dataset</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user/dataset.html#adding-a-dataset">Adding a dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user/dataset.html#custom-dataset">Custom dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="user/dataset.html#dataset-split">Dataset split</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user/preprocess.html">Preprocess</a><ul>
@@ -265,7 +267,7 @@ neural networks, and how to contribute to the library as a developer.</p>
 <li class="toctree-l2"><a class="reference internal" href="user/preprocess.html#id1">Code Example</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="user/layer.html">Layer</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="user/layer.html#special">Special</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user/layer.html#data-augmentation">Data Augmentation</a></li>
@@ -274,6 +276,7 @@ neural networks, and how to contribute to the library as a developer.</p>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="user/pipeline.html">Pipeline</a></li>
 </ul>
 </div>
 </div>
@@ -285,7 +288,7 @@ neural networks, and how to contribute to the library as a developer.</p>
 <li class="toctree-l1"><a class="reference internal" href="modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="modules/schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="modules/optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 </div>
 </div>

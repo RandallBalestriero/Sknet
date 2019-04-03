@@ -144,7 +144,8 @@ class Merge(Layer):
 
 
 class ExpandDim(Layer):
-    """add an extra dimension in the input
+    """add an extra dimension in the input.
+
     This layer allows to add an extra dimension in the input specified
     by :py:data:`axis`
 

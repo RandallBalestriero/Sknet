@@ -6,8 +6,8 @@ import time
 
 
 class Identity:
-    def __init__(self,eps=0.0001):
-        self.name = '-preprocessing(identity)'
+    def __init__(self,eps=0.0001, name=''):
+        self.name = name+'preprocessing(identity)'
     def fit(self,x,axis=[0],**kwargs):
         pass
     def fit_transform(self,x,**kwargs):
@@ -17,16 +17,16 @@ class Identity:
 
 
 class Standardize:
-    def __init__(self,eps=0.0001, axis=[0]):
-        self.name = '-preprocessing(standardize,eps='+str(eps)+')'
+    def __init__(self,eps=0.0001, axis=[0], name=''):
+        self.name = name+'preprocessing(standardize,eps='+str(eps)+')'
         self.eps = eps
         self.axis = axis
     def fit(self,x,**kwargs):
-        print("Fitting standardize preprocessing")
+        print(self.name+" fitting...")
         t=time.time()
         self.mean = x.mean(axis=tuple(self.axis),keepdims=True)
         self.std  = x.std(axis=tuple(self.axis),keepdims=True)+self.eps
-        print("Fitting standardize preprocessing done in {0:.2f} s.".format(time.time()-t))
+        print(self.name+" done in {0:.2f} s.".format(time.time()-t))
     def transform(self,x,**kwargs):
         return (x-self.mean)/self.std
     def fit_transform(self,x,**kwargs):
@@ -39,16 +39,16 @@ class Standardize:
 
 
 class ZCAWhitening:
-    def __init__(self,eps = 0.0001):
-        self.name = '-preprocessing(zcawhitening,eps='+str(eps)+')'
+    def __init__(self,eps = 0.0001, name=''):
+        self.name = name+'preprocessing(zcawhitening,eps='+str(eps)+')'
         self.eps = eps
     def fit(self,x):
-        print("Fitting zca_whitening preprocessing")
+        print(self.name+" fitting ...")
         t=time.time()
         flatx         = np.reshape(x, (x.shape[0], -1))
         self.mean     = flatx.mean(0,keepdims=True)
         self.S,self.U = _spectral_decomposition(flatx-self.mean,self.eps)
-        print("Fitting zca_whitening preprocessing done in {0:.2f} s.".format(time.time()-t))
+        print(self.name+" done in {0:.2f} s.".format(time.time()-t))
         return _zca_whitening(flatx,self.U,self.S).reshape(x.shape)
     def transform(self,x):
         flatx         = np.reshape(x, (x.shape[0], -1))-self.mean

@@ -59,7 +59,7 @@ pipeline to solve a task. Those blocks are:
     - learning rate :ref:`schedule-label`: combined with a loss function, a model and 
       a dataset, the learning rate scheduler plays a crucial role to 
       guarantee best performances s.a. stepwise or adaptive
-    - trainer : a higher-level method assembling those independent blocks 
+    - :ref:`pipeline-label` : a higher-level method assembling those independent blocks 
       into a trainable pipeline, also containing the tensorflow session
 
   
@@ -78,6 +78,7 @@ neural networks, and how to contribute to the library as a developer.
   user/network
   user/layer
   user/schedule
+  user/pipeline
 
 API Reference
 -------------
@@ -90,7 +91,7 @@ If you are looking for information on a specific function:
   modules/dataset
   modules/network
   modules/layer
-  modules/schedule
+  modules/optimize
 
 Quickstart
 ==========

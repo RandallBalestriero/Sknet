@@ -106,7 +106,8 @@ class stepwise:
                   rate change -> new learning rate
         :type lr: dict
         """
-        self.lr   = lr
+        self.lr   = dict_lr
+        self.reset()
         self.name = '-schedule(stepwise,dict='+str(dict_lr).replace(' ','')+')'
     def reset(self):
         """Reset the class
@@ -115,7 +116,7 @@ class stepwise:
     def update(self,**kwargs):
         if kwargs['epoch']==0:
             self.reset()
-        if epoch in self.lr.keys():
+        if 'epoch' in self.lr.keys():
             self.lrs.append(self.lr[epoch])
         else:
             self.lrs.append(self.lrs[-1])

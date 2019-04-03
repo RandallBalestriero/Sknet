@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Models" href="network.html" />
+    <link rel="next" title="Networks" href="network.html" />
     <link rel="prev" title="Dataset" href="dataset.html" /> 
 </head>
 
@@ -103,15 +103,16 @@
 <li class="toctree-l2"><a class="reference internal" href="#id1">Code Example</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modules/schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
             
@@ -195,107 +196,96 @@ We provide the following basic pre-processing steps:</p>
 <div class="section" id="id1">
 <h2>Code Example<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
 <p>Running the code _quickstart_data_loading.py</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sknet</span>
-<span class="kn">from</span> <span class="nn">sknet</span> <span class="kn">import</span> <span class="n">dataset</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sknet.dataset</span> <span class="kn">import</span> <span class="n">mnist</span><span class="p">,</span><span class="n">svhn</span><span class="p">,</span><span class="n">cifar10</span><span class="p">,</span><span class="n">fashionmnist</span><span class="p">,</span><span class="n">cifar100</span><span class="p">,</span> <span class="n">stl10</span>
+<span class="kn">from</span> <span class="nn">sknet.dataset</span> <span class="kn">import</span> <span class="n">preprocess</span>
 <span class="kn">from</span> <span class="nn">sknet.utils</span> <span class="kn">import</span> <span class="n">plotting</span>
+
 <span class="kn">import</span> <span class="nn">pylab</span> <span class="kn">as</span> <span class="nn">pl</span>
 <span class="kn">import</span> <span class="nn">os</span>
-
 <span class="c1"># Make Tensorflow quiet.</span>
-<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TF_CPP_MIN_LOG_LEVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TF_CPP_MIN_LOG_LEVEL&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;1&#39;</span>
 
 
-<span class="k">def</span> <span class="nf">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="n">option</span><span class="p">,</span><span class="n">dataset</span><span class="p">):</span>
+<span class="c1"># Put the preprocessing function into a list</span>
+<span class="n">preprocessing_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">preprocess</span><span class="o">.</span><span class="n">Standardize</span><span class="p">,</span>
+                        <span class="n">preprocess</span><span class="o">.</span><span class="n">ZCAWhitening</span><span class="p">]</span>
 
-    <span class="c1"># create our custom deep net just for data augmentation</span>
-    <span class="c1"># purposes, thus omiting all the following layers</span>
-    <span class="n">layers</span>      <span class="o">=</span> <span class="p">[</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Input</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span><span class="n">data_format</span><span class="o">=</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;data_format&quot;</span><span class="p">])]</span>
-    <span class="k">if</span> <span class="n">option</span><span class="o">==</span><span class="s2">&quot;crop&quot;</span><span class="p">:</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">RandomCrop</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">crop_shape</span><span class="o">=</span><span class="p">(</span><span class="mi">26</span><span class="p">,</span><span class="mi">26</span><span class="p">)))</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Crop2626&quot;</span>
-    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;rot&#39;</span><span class="p">:</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">RandomRot90</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Rot90&quot;</span>
-    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;reverse&#39;</span><span class="p">:</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">RandomAxisReverse</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">axis</span><span class="o">=</span><span class="mi">3</span><span class="p">))</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;AxisReverse&quot;</span>
-    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;gaussian&#39;</span><span class="p">:</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Gaussian</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Gaussian&quot;</span>
-    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;uniform&#39;</span><span class="p">:</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Uniform&quot;</span>
-    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;uniformmul&#39;</span><span class="p">:</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Uniform</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">],</span><span class="n">noise_type</span><span class="o">=</span><span class="s1">&#39;multiplicative&#39;</span><span class="p">))</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;UniformMul&quot;</span>
-    <span class="k">elif</span> <span class="n">option</span><span class="o">==</span><span class="s1">&#39;dropout&#39;</span><span class="p">:</span>
-        <span class="n">layers</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dropout</span><span class="p">(</span><span class="n">layers</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
-        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;Dropout&quot;</span>
+<span class="c1"># Save number of preprocessing</span>
+<span class="n">n_preprocessing</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">preprocessing_list</span><span class="p">)</span>
 
+<span class="c1"># Put the dataset functions into a list s.t. dataset_list[0].load() </span>
+<span class="c1"># loads the dataset 0</span>
+<span class="n">dataset_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">mnist</span><span class="p">(),</span><span class="n">fashionmnist</span><span class="p">(),</span><span class="n">svhn</span><span class="p">(),</span><span class="n">cifar10</span><span class="p">(),</span><span class="n">cifar100</span><span class="p">(),</span><span class="n">stl10</span><span class="p">()]</span>
+<span class="n">dataset_name</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;mnist&#39;</span><span class="p">,</span><span class="s1">&#39;fashionmnist&#39;</span><span class="p">,</span><span class="s1">&#39;svhn&#39;</span><span class="p">,</span><span class="s1">&#39;cifar10&#39;</span><span class="p">,</span><span class="s1">&#39;cifar100&#39;</span><span class="p">,</span><span class="s1">&#39;stl10&#39;</span><span class="p">]</span>
 
+<span class="c1"># Save number of dataset</span>
+<span class="n">n_dataset</span>    <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">)</span>
 
-    <span class="c1"># wrap the layers as a deep net model</span>
-    <span class="n">model</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">Network</span><span class="p">(</span><span class="n">layers</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-
-    <span class="c1"># set the trainer with this model to create the tensorflow</span>
-    <span class="c1"># working environment and gather all the pieces together</span>
-    <span class="c1"># we use the DummyTrainer to get the minimal function as </span>
-    <span class="c1"># we won&#39;t train etc</span>
-    <span class="n">trainer</span>    <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">utils</span><span class="o">.</span><span class="n">trainer</span><span class="o">.</span><span class="n">DummyTrainer</span><span class="p">(</span><span class="n">model</span><span class="p">)</span>
-
-    <span class="c1"># get a batch of images, we use the same image for the whole</span>
-    <span class="c1"># batch to show the effect of the data augmentation on the same image</span>
-    <span class="n">image</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_set&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][[</span><span class="mi">0</span><span class="p">]]</span>
-    <span class="n">batch</span> <span class="o">=</span> <span class="n">trainer</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">trainer</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="n">feed_dict</span><span class="o">=</span><span class="p">{</span>
-                    <span class="n">trainer</span><span class="o">.</span><span class="n">network</span><span class="o">.</span><span class="n">deterministic</span><span class="p">:</span><span class="bp">False</span><span class="p">,</span>
-                    <span class="n">trainer</span><span class="o">.</span><span class="n">input</span><span class="p">:</span><span class="n">image</span><span class="o">.</span><span class="n">repeat</span><span class="p">(</span><span class="n">input_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span><span class="mi">0</span><span class="p">)})</span>
-
-    <span class="n">pl</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="mi">2</span><span class="p">))</span>
-    <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
-    <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_set&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">9</span><span class="p">):</span>
-        <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">2</span><span class="o">+</span><span class="n">i</span><span class="p">)</span>
-        <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">batch</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
-
-    <span class="c1"># Reduce side margins</span>
+<span class="k">for</span> <span class="n">dataset</span><span class="p">,</span><span class="n">dataset_n</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">dataset_list</span><span class="p">,</span><span class="n">dataset_name</span><span class="p">):</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span> <span class="o">=</span> <span class="p">(</span><span class="mi">20</span><span class="p">,</span><span class="n">n_preprocessing</span><span class="o">*</span><span class="mi">2</span><span class="p">))</span>
+    <span class="n">dataset</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
+    <span class="c1"># Initialize the counter for subplot</span>
+    <span class="n">cpt</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">im</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_set&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][:</span><span class="mi">10</span><span class="p">]):</span>
+        <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">n_preprocessing</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">cpt</span><span class="p">)</span>
+        <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+        <span class="n">cpt</span><span class="o">+=</span><span class="mi">1</span>
+        <span class="k">if</span><span class="p">(</span><span class="n">i</span><span class="o">==</span><span class="mi">4</span><span class="p">):</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">&#39;Original Data&#39;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">preprocessing</span> <span class="ow">in</span> <span class="n">preprocessing_list</span><span class="p">:</span>
+        <span class="n">dataset</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">preprocessing</span><span class="p">,</span><span class="n">fit</span><span class="o">=</span><span class="s2">&quot;train_set&quot;</span><span class="p">,</span>
+                <span class="n">transform</span><span class="o">=</span><span class="s2">&quot;train_set&quot;</span><span class="p">,</span><span class="n">inplace</span><span class="o">=</span><span class="bp">False</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\t</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">images</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;train_set&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][:</span><span class="mi">10</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span><span class="n">im</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">images</span><span class="p">):</span>
+            <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="n">n_preprocessing</span><span class="o">+</span><span class="mi">1</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">cpt</span><span class="p">)</span>
+            <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+            <span class="n">cpt</span><span class="o">+=</span><span class="mi">1</span>
+            <span class="k">if</span><span class="p">(</span><span class="n">i</span><span class="o">==</span><span class="mi">4</span><span class="p">):</span>
+                <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="n">dataset</span><span class="o">.</span><span class="n">preprocessing</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
     <span class="n">pl</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-    <span class="n">pl</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-    <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;./sknet/docs/source/_static/augmentation_&#39;</span><span class="o">+</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">)</span>
-    <span class="n">pl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
-
-
-<span class="k">def</span> <span class="nf">main</span><span class="p">():</span>
-    <span class="c1"># Load CIFAR10 dataset for demonstration</span>
-    <span class="c1"># by default data_format=&#39;NCHW&#39;</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;inin&#39;</span><span class="p">)</span>
-    <span class="n">cifar10</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">cifar10</span><span class="p">()</span>
-
-    <span class="c1"># Import the data</span>
-    <span class="n">cifar10</span><span class="o">.</span><span class="n">load</span><span class="p">()</span>
-    <span class="n">cifar10</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">dataset</span><span class="o">.</span><span class="n">Standardize</span><span class="p">)</span>
-
-    <span class="c1"># Set input shape</span>
-    <span class="n">batch_size</span>  <span class="o">=</span> <span class="mi">64</span>
-
-    <span class="n">input_shape</span> <span class="o">=</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">]</span><span class="o">+</span><span class="nb">list</span><span class="p">(</span><span class="n">cifar10</span><span class="p">[</span><span class="s2">&quot;datum_shape&quot;</span><span class="p">])</span>
-    
-    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;rot&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
-    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;crop&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
-    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;reverse&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
-    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;gaussian&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
-    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;uniform&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
-    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;uniformmul&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
-    <span class="n">build_and_plot</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span> <span class="s1">&#39;dropout&#39;</span><span class="p">,</span> <span class="n">cifar10</span><span class="p">)</span>
-
-
-<span class="k">if</span> <span class="vm">__name__</span><span class="o">==</span><span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
-    <span class="k">print</span><span class="p">(</span><span class="s1">&#39;in&#39;</span><span class="p">)</span>
-    <span class="n">main</span><span class="p">()</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;test_preprocessing_&#39;</span><span class="o">+</span><span class="n">dataset_n</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span><span class="p">)</span>
 
 </pre></div>
 </div>
 <p>will generate the following figure</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Loading</span> <span class="n">mnist</span>
+<span class="n">Dataset</span> <span class="n">mnist</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">0.72</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span><span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">0.14</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span> <span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">1.92</span> <span class="n">s</span><span class="o">.</span>
+<span class="n">Loading</span> <span class="n">fashionmnist</span>
+<span class="n">Dataset</span> <span class="n">fashionmnist</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">0.30</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span><span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">0.29</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span> <span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">2.03</span> <span class="n">s</span><span class="o">.</span>
+<span class="n">Loading</span> <span class="n">svhn</span>
+<span class="n">Dataset</span> <span class="n">svhn</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">2.02</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span><span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">0.73</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span> <span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">31.69</span> <span class="n">s</span><span class="o">.</span>
+<span class="n">Loading</span> <span class="n">cifar10</span>
+<span class="n">Dataset</span> <span class="n">cifar10</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">6.58</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span><span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">0.92</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span> <span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">20.69</span> <span class="n">s</span><span class="o">.</span>
+<span class="n">Loading</span> <span class="n">cifar100</span>
+<span class="n">Dataset</span> <span class="n">cifar100</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">2.19</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span><span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">0.92</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span> <span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">20.70</span> <span class="n">s</span><span class="o">.</span>
+<span class="n">Loading</span> <span class="n">stl10</span>
+<span class="n">Dataset</span> <span class="n">stl10</span> <span class="n">loaded</span> <span class="ow">in</span> <span class="mf">37.09</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span><span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">standardize</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">0.82</span> <span class="n">s</span><span class="o">.</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">fitting</span> <span class="o">...</span>
+	<span class="n">preprocessing</span><span class="p">(</span><span class="n">zcawhitening</span><span class="p">,</span><span class="n">eps</span><span class="o">=</span><span class="mf">0.0001</span><span class="p">)</span> <span class="n">done</span> <span class="ow">in</span> <span class="mf">43.74</span> <span class="n">s</span><span class="o">.</span>
+</pre></div>
+</div>
 <p>Directive for displayed math (math that takes the whole line for itself).</p>
 <p>The directive supports multiple equations, which should be separated by a
 blank line:</p>
@@ -317,7 +307,7 @@ blank line:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="network.html" class="btn btn-neutral float-right" title="Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="network.html" class="btn btn-neutral float-right" title="Networks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="dataset.html" class="btn btn-neutral float-left" title="Dataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

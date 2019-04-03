@@ -1,9 +1,8 @@
 Schedule
 --------
+.. automodule:: sknet.optimize.schedule
 
-.. automodule:: sknet.schedule.schedule
-
-.. currentmodule:: sknet.schedule
+.. currentmodule:: sknet.optimize.schedule
 
 .. autoclass:: constant
     :members:

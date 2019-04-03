@@ -98,9 +98,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
@@ -116,7 +117,7 @@
 <li class="toctree-l2"><a class="reference internal" href="layer/shape.html">Shape Layer</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
             
@@ -195,9 +196,6 @@
 <tr class="row-odd"><td><a class="reference internal" href="layer/io.html#sknet.layer.Input" title="sknet.layer.Input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Input</span></code></a></td>
 <td>Input layer, first of any model.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="layer/io.html#sknet.layer.OutputClassifier" title="sknet.layer.OutputClassifier"><code class="xref py py-obj docutils literal notranslate"><span class="pre">OutputClassifier</span></code></a></td>
-<td>Output layer for classification tasks.</td>
-</tr>
 </tbody>
 </table>
 <p class="rubric"><a class="reference internal" href="layer/dense.html"><span class="doc">Dense Layer</span></a></p>
@@ -219,11 +217,12 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/conv.html#sknet.layer.Conv2D" title="sknet.layer.Conv2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv2D</span></code></a>(incoming,&nbsp;filters[,&nbsp;nonlinearity,&nbsp;…])</td>
+<tr class="row-odd"><td><a class="reference internal" href="layer/conv.html#sknet.layer.Conv2D" title="sknet.layer.Conv2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv2D</span></code></a></td>
 <td>2D (spatial) convolutional layer.</td>
 </tr>
 </tbody>
 </table>
+<p class="rubric"><a class="reference internal" href="layer/pool.html"><span class="doc">Pool Layer</span></a></p>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
@@ -234,7 +233,7 @@
 <td>Pooling layer over spatial and/or channel dimensions.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="layer/pool.html#sknet.layer.GlobalSpatialPool" title="sknet.layer.GlobalSpatialPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GlobalSpatialPool</span></code></a></td>
-<td>pool over all spatial dimension This layer implements a global spatial pooling removing all spatial dimension present in the input.</td>
+<td>Pooling over all spatial dimension.</td>
 </tr>
 </tbody>
 </table>
@@ -245,14 +244,14 @@
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/special.html#sknet.layer.ScalarActivation" title="sknet.layer.ScalarActivation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ScalarActivation</span></code></a></td>
-<td>applies an element-wise nonlinearity this layer applies an element-wise nonlinearity to the input based on a given scalar to scalar function.</td>
+<tr class="row-odd"><td><a class="reference internal" href="layer/special.html#sknet.layer.Activation" title="sknet.layer.Activation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Activation</span></code></a></td>
+<td>Apply nonlinearity.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="layer/special.html#sknet.layer.Spectrogram" title="sknet.layer.Spectrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Spectrogram</span></code></a></td>
 <td>spectrogram layer (time-frequency representation of a time serie) This layer implement a spectrogram computation to allow to include  it as part of a model when dealing with time serie data, it is also  crucial to allow backpropagation through it in case some previous  operation prior to this layer must be differentiated w.r.t.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="layer/special.html#sknet.layer.LambdaFunction" title="sknet.layer.LambdaFunction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LambdaFunction</span></code></a></td>
-<td>applies a lambda function onto the layer input This layer allows to apply an arbitrary given function onto its input tensor allows to implement arbitrary operations.</td>
+<td>Apply a lambda function onto the input</td>
 </tr>
 </tbody>
 </table>
@@ -276,10 +275,10 @@
 <td>Random cropping of input images</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="layer/perturb.html#sknet.layer.RandomRot90" title="sknet.layer.RandomRot90"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomRot90</span></code></a></td>
-<td>ranodm rotate by 90 degrees the input This layer performs a random rotation of the input to 90 degrees this can be clockwise or counter clockwise with same probability.</td>
+<td>randomly rotate by 90 degrees the input</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="layer/perturb.html#sknet.layer.RandomAxisReverse" title="sknet.layer.RandomAxisReverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomAxisReverse</span></code></a></td>
-<td>randomly reverse axis of the input This layer randomly reverse (or flip) one (or multiple) axis in its input.</td>
+<td>randomly reverse axis of the input</td>
 </tr>
 </tbody>
 </table>
@@ -300,7 +299,7 @@
 <td>concatenate multiple inputs into one according to a given axis.</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="layer/shape.html#sknet.layer.ExpandDim" title="sknet.layer.ExpandDim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExpandDim</span></code></a></td>
-<td>add an extra dimension in the input This layer allows to add an extra dimension in the input specified by <code class="xref py py-data docutils literal notranslate"><span class="pre">axis</span></code></td>
+<td>add an extra dimension in the input.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="layer/shape.html#sknet.layer.Merge" title="sknet.layer.Merge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Merge</span></code></a></td>
 <td>merge multiple inputs into one according to some function.</td>

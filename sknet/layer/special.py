@@ -1,4 +1,5 @@
 import tensorflow as tf
+import tensorflow.contrib.layers as tfl
 import numpy as np
 from . import Layer
 
@@ -62,8 +63,9 @@ class Spectrogram(Layer):
 
 
 
-class ScalarActivation(Layer):
-    """applies an element-wise nonlinearity
+class Activation(Layer):
+    """Apply nonlinearity.
+
     this layer applies an element-wise nonlinearity to the
     input based on a given scalar to scalar function.
     The nonlinearity can of the following form:
@@ -102,29 +104,35 @@ class ScalarActivation(Layer):
     :type func: func
     """
 
-    def __init__(self,incoming,func_or_scalar):
-        super().__init__(incoming)
-        self.func_or_scalar = func_or_scalar
-        self.output_shape      = self.input_shape
-        if self.given_input:
-            self.forward(input)
-    def forward(self,input,**kwargs):
-        if np.isscalar(self.func_or_scalar):
-            if self.func_or_scalar==1:
-                self.output = input
+    def __init__(self,incoming,func_or_scalar,
+                deterministic=None, batch_norm = False,
+                init_W = tfl.xavier_initializer(uniform=True),
+                init_b = tf.zeros, observed=False,observation=None,name='',
+                teacher_forcing=None):
+
+        self._func_or_scalar = func_or_scalar
+        super().__init__(incoming, deterministic=deterministic, 
+                        observed=observed, observation=observation, 
+                        teacher_forcing=teacher_forcing)
+
+    def forward(self,input,deterministic=None,**kwargs):
+        if np.isscalar(self._func_or_scalar):
+            if self._func_or_scalar==1:
+                output = input
             else:
-                self.output = tf.maximum(input,self.func_or_scalar*input)
+                output = tf.maximum(input,self._func_or_scalar*input)
         else:
-            if self.func_or_scalar is tf.identity:
-                self.output = input
+            if self._func_or_scalar is tf.identity:
+                output = input
             else:
-                self.output = self.func_or_scalar(input)
-        return self.output
+                output = self._func_or_scalar(input)
+        return output
 
 
 
 class Identity(Layer):
-    """idneitty layer leaving its input the same
+    """identity layer leaving its input intact
+
     This layer is implemented for ocnvenience to allow identity
     transformation
 
@@ -143,7 +151,8 @@ class Identity(Layer):
 
 
 class LambdaFunction(Layer):
-    """applies a lambda function onto the layer input
+    """Apply a lambda function onto the input
+
     This layer allows to apply an arbitrary given function onto
     its input tensor allows to implement arbitrary operations.
     The fiven function must allow backpropagation through it

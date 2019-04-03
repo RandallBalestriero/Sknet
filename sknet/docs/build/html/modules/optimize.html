@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>sknet.schedule &mdash; Sknet alpha.1 documentation</title>
+  <title>sknet.optimize &mdash; Sknet alpha.1 documentation</title>
   
 
   
@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Schedule" href="schedule/schedule.html" />
+    <link rel="next" title="Schedule" href="optimize/schedule.html" />
     <link rel="prev" title="Shape Layer" href="layer/shape.html" /> 
 </head>
 
@@ -98,16 +98,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="schedule/schedule.html">Schedule</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="optimize/schedule.html">Schedule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimize/optimizer.html">Optimizers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimize/loss.html">Loss</a></li>
 </ul>
 </li>
 </ul>
@@ -155,13 +158,13 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></li>
+      <li><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/modules/schedule.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/modules/optimize.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -174,30 +177,58 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.schedule">
-<span id="sknet-schedule"></span><h1><a class="reference internal" href="#module-sknet.schedule" title="sknet.schedule"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a><a class="headerlink" href="#module-sknet.schedule" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-sknet.optimize.schedule">
+<span id="sknet-optimize"></span><h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.optimize</span></code><a class="headerlink" href="#module-sknet.optimize.schedule" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<p class="rubric"><a class="reference internal" href="optimize/schedule.html"><span class="doc">Schedule</span></a></p>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="schedule/schedule.html#sknet.schedule.constant" title="sknet.schedule.constant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">constant</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="optimize/schedule.html#sknet.optimize.schedule.constant" title="sknet.optimize.schedule.constant"><code class="xref py py-obj docutils literal notranslate"><span class="pre">constant</span></code></a></td>
 <td>constant learning rate.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="schedule/schedule.html#sknet.schedule.linear" title="sknet.schedule.linear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linear</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="optimize/schedule.html#sknet.optimize.schedule.linear" title="sknet.optimize.schedule.linear"><code class="xref py py-obj docutils literal notranslate"><span class="pre">linear</span></code></a></td>
 <td>Linearly changing learning rate.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="schedule/schedule.html#sknet.schedule.exponential" title="sknet.schedule.exponential"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exponential</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="optimize/schedule.html#sknet.optimize.schedule.exponential" title="sknet.optimize.schedule.exponential"><code class="xref py py-obj docutils literal notranslate"><span class="pre">exponential</span></code></a></td>
 <td>exponential decay of the learning rate.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="schedule/schedule.html#sknet.schedule.stepwise" title="sknet.schedule.stepwise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stepwise</span></code></a></td>
+<tr class="row-even"><td><a class="reference internal" href="optimize/schedule.html#sknet.optimize.schedule.stepwise" title="sknet.optimize.schedule.stepwise"><code class="xref py py-obj docutils literal notranslate"><span class="pre">stepwise</span></code></a></td>
 <td>stepwise learning rate strategy.</td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="schedule/schedule.html#sknet.schedule.adaptive" title="sknet.schedule.adaptive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adaptive</span></code></a></td>
+<tr class="row-odd"><td><a class="reference internal" href="optimize/schedule.html#sknet.optimize.schedule.adaptive" title="sknet.optimize.schedule.adaptive"><code class="xref py py-obj docutils literal notranslate"><span class="pre">adaptive</span></code></a></td>
 <td>adaptive learning rate strategy.</td>
+</tr>
+</tbody>
+</table>
+<span class="target" id="module-sknet.optimize.optimizer"></span><p class="rubric"><a class="reference internal" href="optimize/optimizer.html"><span class="doc">Optimizers</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="optimize/optimizer.html#sknet.optimize.optimizer.Adam" title="sknet.optimize.optimizer.Adam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Adam</span></code></a></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<span class="target" id="module-sknet.optimize.loss"></span><p class="rubric"><a class="reference internal" href="optimize/loss.html"><span class="doc">Loss</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="optimize/loss.html#sknet.optimize.loss.accuracy" title="sknet.optimize.loss.accuracy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accuracy</span></code></a></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="optimize/loss.html#sknet.optimize.loss.classification" title="sknet.optimize.loss.classification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">classification</span></code></a></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -211,7 +242,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="schedule/schedule.html" class="btn btn-neutral float-right" title="Schedule" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="optimize/schedule.html" class="btn btn-neutral float-right" title="Schedule" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="layer/shape.html" class="btn btn-neutral float-left" title="Shape Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

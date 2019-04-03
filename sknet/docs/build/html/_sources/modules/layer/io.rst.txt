@@ -9,6 +9,4 @@ Input Output Layer
 .. autoclass:: Input
     :members:
     
-.. autoclass:: OutputClassifier
-    :members:
 

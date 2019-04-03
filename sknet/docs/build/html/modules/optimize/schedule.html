@@ -45,7 +45,8 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="prev" title="sknet.schedule" href="../schedule.html" /> 
+    <link rel="next" title="Optimizers" href="optimizer.html" />
+    <link rel="prev" title="sknet.optimize" href="../optimize.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -97,16 +98,19 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a><ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a><ul class="current">
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Schedule</a></li>
+<li class="toctree-l2"><a class="reference internal" href="optimizer.html">Optimizers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="loss.html">Loss</a></li>
 </ul>
 </li>
 </ul>
@@ -154,7 +158,7 @@
     
       <li><a href="../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a> &raquo;</li>
+          <li><a href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a> &raquo;</li>
         
       <li>Schedule</li>
     
@@ -162,7 +166,7 @@
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../../_sources/modules/schedule/schedule.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../../_sources/modules/optimize/schedule.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -175,11 +179,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.schedule.schedule">
-<span id="schedule"></span><h1>Schedule<a class="headerlink" href="#module-sknet.schedule.schedule" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="module-sknet.optimize.schedule">
+<span id="schedule"></span><h1>Schedule<a class="headerlink" href="#module-sknet.optimize.schedule" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="sknet.schedule.constant">
-<em class="property">class </em><code class="descclassname">sknet.schedule.</code><code class="descname">constant</code><span class="sig-paren">(</span><em>lr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.constant" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.constant">
+<em class="property">class </em><code class="descclassname">sknet.optimize.schedule.</code><code class="descname">constant</code><span class="sig-paren">(</span><em>lr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.constant" title="Permalink to this definition">¶</a></dt>
 <dd><p>constant learning rate.
 This case is the most basic learning rate update policy
 agnostic of the current epoch and the current performances.
@@ -188,8 +192,8 @@ such as Adam, a constant learning is in general sub-optimal.
 For convex optimization problems, convergence is only guaranteed
 with a decaying learning rate.</p>
 <dl class="method">
-<dt id="sknet.schedule.constant.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>lr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.constant.__init__" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.constant.__init__">
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>lr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.constant.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize the class with a learning rate</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -202,20 +206,20 @@ with a decaying learning rate.</p>
 </dd></dl>
 
 <dl class="attribute">
-<dt id="sknet.schedule.constant.__weakref__">
-<code class="descname">__weakref__</code><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.constant.__weakref__" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.constant.__weakref__">
+<code class="descname">__weakref__</code><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.constant.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="sknet.schedule.constant.reset">
-<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.constant.reset" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.constant.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.constant.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset the list of learning rates</p>
 </dd></dl>
 
 <dl class="method">
-<dt id="sknet.schedule.constant.update">
-<code class="descname">update</code><span class="sig-paren">(</span><em>valid_accu</em>, <em>epoch</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.constant.update" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.constant.update">
+<code class="descname">update</code><span class="sig-paren">(</span><em>valid_accu</em>, <em>epoch</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.constant.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Update the value of the learning rate, in this case, 
 stay the same</p>
 </dd></dl>
@@ -223,8 +227,8 @@ stay the same</p>
 </dd></dl>
 
 <dl class="class">
-<dt id="sknet.schedule.linear">
-<em class="property">class </em><code class="descclassname">sknet.schedule.</code><code class="descname">linear</code><span class="sig-paren">(</span><em>lr</em>, <em>step</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.linear" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.linear">
+<em class="property">class </em><code class="descclassname">sknet.optimize.schedule.</code><code class="descname">linear</code><span class="sig-paren">(</span><em>lr</em>, <em>step</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.linear" title="Permalink to this definition">¶</a></dt>
 <dd><p>Linearly changing learning rate.
 This method allows to linearly change the learning rate
 initialized as <span class="math notranslate nohighlight">\(lr\)</span>.
@@ -233,16 +237,16 @@ It is done by using a given scalar <span class="math notranslate nohighlight">\(
 to be <span class="math notranslate nohighlight">\(lr-s*\kappa\)</span> with <span class="math notranslate nohighlight">\(\kappa\)</span> a step given
 at initialization.</p>
 <dl class="method">
-<dt id="sknet.schedule.linear.reset">
-<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.linear.reset" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.linear.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.linear.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset the class</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="sknet.schedule.exponential">
-<em class="property">class </em><code class="descclassname">sknet.schedule.</code><code class="descname">exponential</code><span class="sig-paren">(</span><em>init_lr</em>, <em>step</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.exponential" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.exponential">
+<em class="property">class </em><code class="descclassname">sknet.optimize.schedule.</code><code class="descname">exponential</code><span class="sig-paren">(</span><em>init_lr</em>, <em>step</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.exponential" title="Permalink to this definition">¶</a></dt>
 <dd><p>exponential decay of the learning rate.
 This method allows to exponentially change the learning rate
 initialized as <span class="math notranslate nohighlight">\(lr\)</span>.
@@ -251,16 +255,16 @@ It is done by using a given scalar <span class="math notranslate nohighlight">\(
 to be <span class="math notranslate nohighlight">\(lr-\kappa^s\)</span> with <span class="math notranslate nohighlight">\(\kappa\)</span> a step given
 at initialization.</p>
 <dl class="method">
-<dt id="sknet.schedule.exponential.reset">
-<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.exponential.reset" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.exponential.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.exponential.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>reset the class</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="sknet.schedule.stepwise">
-<em class="property">class </em><code class="descclassname">sknet.schedule.</code><code class="descname">stepwise</code><span class="sig-paren">(</span><em>dict_lr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.stepwise" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.stepwise">
+<em class="property">class </em><code class="descclassname">sknet.optimize.schedule.</code><code class="descname">stepwise</code><span class="sig-paren">(</span><em>dict_lr</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.stepwise" title="Permalink to this definition">¶</a></dt>
 <dd><p>stepwise learning rate strategy.
 This method allows to have stepwise learning rate
 It is done by using a given dictionnary containing the epochs
@@ -270,16 +274,16 @@ at which the learning rate changes (starting at 0).</p>
 </pre></div>
 </div>
 <dl class="method">
-<dt id="sknet.schedule.stepwise.reset">
-<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.stepwise.reset" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.stepwise.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.stepwise.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset the class</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="class">
-<dt id="sknet.schedule.adaptive">
-<em class="property">class </em><code class="descclassname">sknet.schedule.</code><code class="descname">adaptive</code><span class="sig-paren">(</span><em>lr</em>, <em>step</em>, <em>decay_type='exponential'</em>, <em>patience=5</em>, <em>metric_name='valid_accuracy'</em>, <em>lookback=10</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.adaptive" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.adaptive">
+<em class="property">class </em><code class="descclassname">sknet.optimize.schedule.</code><code class="descname">adaptive</code><span class="sig-paren">(</span><em>lr</em>, <em>step</em>, <em>decay_type='exponential'</em>, <em>patience=5</em>, <em>metric_name='valid_accuracy'</em>, <em>lookback=10</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.adaptive" title="Permalink to this definition">¶</a></dt>
 <dd><p>adaptive learning rate strategy.
 This method allows to have an adaptive learning rate
 with behavior depending on a given metric performance.
@@ -287,8 +291,8 @@ if the performance stagnates from more than patience iterations
 then the learning rate is transformed (linearly or exponentiall)
 by mean of a step parameter</p>
 <dl class="method">
-<dt id="sknet.schedule.adaptive.reset">
-<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.schedule.adaptive.reset" title="Permalink to this definition">¶</a></dt>
+<dt id="sknet.optimize.schedule.adaptive.reset">
+<code class="descname">reset</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/schedule.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.schedule.adaptive.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset the class</p>
 </dd></dl>
 
@@ -304,8 +308,10 @@ by mean of a step parameter</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
+        <a href="optimizer.html" class="btn btn-neutral float-right" title="Optimizers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-        <a href="../schedule.html" class="btn btn-neutral float-left" title="sknet.schedule" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+        <a href="../optimize.html" class="btn btn-neutral float-left" title="sknet.optimize" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

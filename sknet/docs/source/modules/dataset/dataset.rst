@@ -5,11 +5,7 @@ Dataset
 
 .. currentmodule:: sknet.dataset
 
-
-.. autoclass:: mnist
-    :members:
-    :special-members:
-    :exclude-members: __weakref__
+.. autofunction:: load_mnist
  
 .. autoclass:: fashionmnist
     :members:

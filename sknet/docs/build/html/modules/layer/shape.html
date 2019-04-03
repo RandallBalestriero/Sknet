@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="sknet.schedule" href="../schedule.html" />
+    <link rel="next" title="sknet.optimize" href="../optimize.html" />
     <link rel="prev" title="Perturb Layer" href="perturb.html" /> 
 </head>
 
@@ -98,9 +98,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
@@ -116,7 +117,7 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Shape Layer</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
             
@@ -265,8 +266,8 @@ a specified axis.</p>
 <dl class="class">
 <dt id="sknet.layer.ExpandDim">
 <em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">ExpandDim</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.ExpandDim" title="Permalink to this definition">¶</a></dt>
-<dd><p>add an extra dimension in the input
-This layer allows to add an extra dimension in the input specified
+<dd><p>add an extra dimension in the input.</p>
+<p>This layer allows to add an extra dimension in the input specified
 by <code class="xref py py-data docutils literal notranslate"><span class="pre">axis</span></code></p>
 <p>example of use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">]</span>
@@ -321,7 +322,7 @@ to be concatenated</li>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../schedule.html" class="btn btn-neutral float-right" title="sknet.schedule" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../optimize.html" class="btn btn-neutral float-right" title="sknet.optimize" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="perturb.html" class="btn btn-neutral float-left" title="Perturb Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

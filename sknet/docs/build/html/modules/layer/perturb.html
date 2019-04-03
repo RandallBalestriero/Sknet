@@ -98,9 +98,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
@@ -116,7 +117,7 @@
 <li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../schedule.html"><code class="docutils literal notranslate"><span class="pre">sknet.schedule</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
             
@@ -194,18 +195,6 @@ of shape crop_shape is extracted and used as layer output.
 During testing, the center part of the image of shape
 crop_shape is used as output. Apply the same perturbation
 to all the channels of the input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (tuple of positive int or <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instance) – The input to the layer</li>
-<li><strong>crop_shape</strong> – Shape of the image after crop</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
 <p>Example of use:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span>
 <span class="c1"># Init an input layer with input shape</span>
@@ -234,7 +223,18 @@ cropped</p>
 <dl class="method">
 <dt id="sknet.layer.RandomCrop.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_shape</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><p>Creates a new <cite>Tensor</cite>.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
+value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
+<blockquote>
+<div>this tensor.</div></blockquote>
+<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
+</dd>
+<dt>Raises:</dt>
+<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -242,8 +242,8 @@ cropped</p>
 <dl class="class">
 <dt id="sknet.layer.RandomAxisReverse">
 <em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomAxisReverse</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse" title="Permalink to this definition">¶</a></dt>
-<dd><p>randomly reverse axis of the input
-This layer randomly reverse (or flip) one (or multiple) axis
+<dd><p>randomly reverse axis of the input</p>
+<p>This layer randomly reverse (or flip) one (or multiple) axis
 in its input. It will either apply all the axis or none.
 Apply the same perturbation to all the channels of the input</p>
 <p>Example of use:</p>
@@ -281,7 +281,18 @@ its output with the constructor</p>
 <dl class="method">
 <dt id="sknet.layer.RandomAxisReverse.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><p>Creates a new <cite>Tensor</cite>.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
+value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
+<blockquote>
+<div>this tensor.</div></blockquote>
+<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
+</dd>
+<dt>Raises:</dt>
+<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -289,8 +300,8 @@ its output with the constructor</p>
 <dl class="class">
 <dt id="sknet.layer.RandomRot90">
 <em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomRot90</code><span class="sig-paren">(</span><em>incoming</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90" title="Permalink to this definition">¶</a></dt>
-<dd><p>ranodm rotate by 90 degrees the input
-This layer performs a random rotation of the input to 90 degrees
+<dd><p>randomly rotate by 90 degrees the input</p>
+<p>This layer performs a random rotation of the input to 90 degrees
 this can be clockwise or counter clockwise with same probability.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
@@ -309,7 +320,18 @@ None in most cases</li>
 <dl class="method">
 <dt id="sknet.layer.RandomRot90.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><p>Creates a new <cite>Tensor</cite>.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
+value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
+<blockquote>
+<div>this tensor.</div></blockquote>
+<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
+</dd>
+<dt>Raises:</dt>
+<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -350,7 +372,18 @@ there shape must be broadcastable to match the input shape.</p>
 <dl class="method">
 <dt id="sknet.layer.Gaussian.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>noise_type='additive'</em>, <em>mu=0.0</em>, <em>sigma=1.0</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Gaussian.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><p>Creates a new <cite>Tensor</cite>.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
+value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
+<blockquote>
+<div>this tensor.</div></blockquote>
+<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
+</dd>
+<dt>Raises:</dt>
+<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -391,7 +424,18 @@ there shape must be broadcastable to match the input shape.</p>
 <dl class="method">
 <dt id="sknet.layer.Uniform.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>noise_type='additive'</em>, <em>lower=0.0</em>, <em>upper=1.0</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Uniform.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><p>Creates a new <cite>Tensor</cite>.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
+value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
+<blockquote>
+<div>this tensor.</div></blockquote>
+<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
+</dd>
+<dt>Raises:</dt>
+<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>
@@ -424,7 +468,18 @@ probability to have a <span class="math notranslate nohighlight">\(1\)</span>.</
 <dl class="method">
 <dt id="sknet.layer.Dropout.__init__">
 <code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>p=0.5</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Dropout.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dd><p>Creates a new <cite>Tensor</cite>.</p>
+<dl class="docutils">
+<dt>Args:</dt>
+<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
+value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
+<blockquote>
+<div>this tensor.</div></blockquote>
+<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
+</dd>
+<dt>Raises:</dt>
+<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

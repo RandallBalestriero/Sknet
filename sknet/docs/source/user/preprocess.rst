@@ -27,14 +27,14 @@ Code Example
 Running the code _quickstart_data_loading.py
 
 
-.. literalinclude:: ../../../../quickstart_augment.py
+.. literalinclude:: ../../../../quickstart_preprocess.py
     :encoding: latin-1
     :language: python
 
 will generate the following figure
 
 
-
+.. literalinclude:: ../_static/quickstart_preprocess_output.txt
 
 
 

@@ -21,7 +21,6 @@
     :nosignatures:
 
     Input
-    OutputClassifier
     
 .. rubric:: :doc:`layer/dense`
 
@@ -37,7 +36,7 @@
 
     Conv2D
  
- .. rubric:: :doc:`layer/pool`
+.. rubric:: :doc:`layer/pool`
 
 .. autosummary::
     :nosignatures:
@@ -50,7 +49,7 @@
 .. autosummary::
     :nosignatures:
 
-    ScalarActivation
+    Activation
     Spectrogram
     LambdaFunction
 
