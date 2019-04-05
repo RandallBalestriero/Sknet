@@ -13,7 +13,7 @@ class Network:
         else:
             self.layers = layers
         self.name     = name
-        self.init_values()
+#        self.init_values()
 #        self.reset_op = tf.group([layer.reset_op for layer in self.layers])
     def __getitem__(self,key):
         return self.layers[key]
@@ -24,9 +24,17 @@ class Network:
         that has to be passed to the network
         """
         pass
+    @property
+    def loss(self):
+        layer_losses = list()
+        for layer in self.layers:
+            if hasattr(layer,'losses'):
+                layer_losses+=layer.losses
+        return tf.add_n([layer_loss.loss for layer_loss in layer_losses])
     def set_deterministic(self,value,session=None):
         for layer in self:
-            layer.set_deterministic(value,session)
+            if hasattr(layer,'set_deterministic'):
+                layer.set_deterministic(value,session)
     def init_values(self):
         inputs   = list()
         infered_observed = list()

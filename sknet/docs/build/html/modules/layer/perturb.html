@@ -104,9 +104,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">Base Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
@@ -189,7 +191,7 @@
 <dl class="class">
 <dt id="sknet.layer.RandomCrop">
 <em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">RandomCrop</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_shape</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop" title="Permalink to this definition">¶</a></dt>
-<dd><p>Random cropping of input images</p>
+<dd><p>Random cropping of input images.</p>
 <p>During deterministic, a random continuous part of the image
 of shape crop_shape is extracted and used as layer output.
 During testing, the center part of the image of shape
@@ -208,7 +210,7 @@ to all the channels of the input.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> or shape</span></dt>
+<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> or shape</span></dt>
 <dd><p class="first last">the incoming layer or input shape</p>
 </dd>
 <dt><strong>crop_shape</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or couple of int</span></dt>
@@ -220,23 +222,6 @@ cropped</p>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="sknet.layer.RandomCrop.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>crop_shape</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomCrop.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new <cite>Tensor</cite>.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
-value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
-<blockquote>
-<div>this tensor.</div></blockquote>
-<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
-</dd>
-<dt>Raises:</dt>
-<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -278,23 +263,6 @@ its output with the constructor</p>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="sknet.layer.RandomAxisReverse.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomAxisReverse.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new <cite>Tensor</cite>.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
-value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
-<blockquote>
-<div>this tensor.</div></blockquote>
-<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
-</dd>
-<dt>Raises:</dt>
-<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -308,7 +276,7 @@ this can be clockwise or counter clockwise with same probability.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (shape or instalce of <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code>) – the input shape or the incoming layer</li>
+<li><strong>incoming</strong> (shape or instalce of <a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a>) – the input shape or the incoming layer</li>
 <li><strong>deterministic</strong> (<em>tf.bool</em>) – boolean describing if the model is in
 trianing or testing mode, should be left
 None in most cases</li>
@@ -317,23 +285,6 @@ None in most cases</li>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="sknet.layer.RandomRot90.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.RandomRot90.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new <cite>Tensor</cite>.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
-value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
-<blockquote>
-<div>this tensor.</div></blockquote>
-<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
-</dd>
-<dt>Raises:</dt>
-<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -352,7 +303,7 @@ there shape must be broadcastable to match the input shape.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> or shape</span></dt>
+<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> or shape</span></dt>
 <dd><p class="first last">the incoming layer or input shape</p>
 </dd>
 <dt><strong>noise_type</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, <code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;additive&quot;</span></code> or <code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;multiplicative&quot;</span></code></span></dt>
@@ -369,23 +320,6 @@ there shape must be broadcastable to match the input shape.</p>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="sknet.layer.Gaussian.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>noise_type='additive'</em>, <em>mu=0.0</em>, <em>sigma=1.0</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Gaussian.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new <cite>Tensor</cite>.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
-value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
-<blockquote>
-<div>this tensor.</div></blockquote>
-<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
-</dd>
-<dt>Raises:</dt>
-<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -404,7 +338,7 @@ there shape must be broadcastable to match the input shape.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> or shape</span></dt>
+<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> or shape</span></dt>
 <dd><p class="first last">the incoming layer or input shape</p>
 </dd>
 <dt><strong>noise_type</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str, <code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;additive&quot;</span></code> or <code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;multiplicative&quot;</span></code></span></dt>
@@ -421,23 +355,6 @@ there shape must be broadcastable to match the input shape.</p>
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="sknet.layer.Uniform.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>noise_type='additive'</em>, <em>lower=0.0</em>, <em>upper=1.0</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Uniform.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new <cite>Tensor</cite>.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
-value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
-<blockquote>
-<div>this tensor.</div></blockquote>
-<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
-</dd>
-<dt>Raises:</dt>
-<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 <dl class="class">
@@ -454,7 +371,7 @@ probability to have a <span class="math notranslate nohighlight">\(1\)</span>.</
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> or shape</span></dt>
+<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> or shape</span></dt>
 <dd><p class="first last">the incoming layer or input shape</p>
 </dd>
 <dt><strong>p</strong> <span class="classifier-delimiter">:</span> <span class="classifier">scalar <span class="math notranslate nohighlight">\(0\leq p \leq 1\)</span></span></dt>
@@ -465,23 +382,6 @@ probability to have a <span class="math notranslate nohighlight">\(1\)</span>.</
 </tr>
 </tbody>
 </table>
-<dl class="method">
-<dt id="sknet.layer.Dropout.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>incoming</em>, <em>p=0.5</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Dropout.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Creates a new <cite>Tensor</cite>.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">op: An <cite>Operation</cite>. <cite>Operation</cite> that computes this tensor.
-value_index: An <cite>int</cite>. Index of the operation’s endpoint that produces</p>
-<blockquote>
-<div>this tensor.</div></blockquote>
-<p class="last">dtype: A <cite>DType</cite>. Type of elements stored in this tensor.</p>
-</dd>
-<dt>Raises:</dt>
-<dd>TypeError: If the op is not an <cite>Operation</cite>.</dd>
-</dl>
-</dd></dl>
-
 </dd></dl>
 
 </div>

@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Input Output Layer" href="layer/io.html" />
+    <link rel="next" title="Base Layer" href="layer/base.html" />
     <link rel="prev" title="sknet.network" href="network.html" /> 
 </head>
 
@@ -104,9 +104,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="layer/base.html">Base Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="layer/io.html">Input Output Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="layer/dense.html">Dense Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="layer/conv.html">Convolutional Layer</a></li>
@@ -183,9 +185,22 @@
            <div itemprop="articleBody">
             
   <div class="section" id="module-sknet.layer">
-<span id="sknet-layer"></span><h1><a class="reference internal" href="#module-sknet.layer" title="sknet.layer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><a class="headerlink" href="#module-sknet.layer" title="Permalink to this headline">¶</a></h1>
+<span id="sknet-layer"></span><h1><a class="reference internal" href="layer/base.html#module-sknet.layer" title="sknet.layer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><a class="headerlink" href="#module-sknet.layer" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
+<p>All the <a class="reference internal" href="layer/base.html#module-sknet.layer" title="sknet.layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> inherit from this base class. Its documentation
+presents all the details about thegeneral behaviors of the layers.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="layer/base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Layer</span></code></a></td>
+<td>Layer class used as parent of any implemented layer.</td>
+</tr>
+</tbody>
+</table>
 <p class="rubric"><a class="reference internal" href="layer/io.html"><span class="doc">Input Output Layer</span></a></p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -272,7 +287,7 @@
 <td>Applies an additive or multiplicative Uniform noise to the input</td>
 </tr>
 <tr class="row-even"><td><a class="reference internal" href="layer/perturb.html#sknet.layer.RandomCrop" title="sknet.layer.RandomCrop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomCrop</span></code></a></td>
-<td>Random cropping of input images</td>
+<td>Random cropping of input images.</td>
 </tr>
 <tr class="row-odd"><td><a class="reference internal" href="layer/perturb.html#sknet.layer.RandomRot90" title="sknet.layer.RandomRot90"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomRot90</span></code></a></td>
 <td>randomly rotate by 90 degrees the input</td>
@@ -316,7 +331,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="layer/io.html" class="btn btn-neutral float-right" title="Input Output Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="layer/base.html" class="btn btn-neutral float-right" title="Base Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="network.html" class="btn btn-neutral float-left" title="sknet.network" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

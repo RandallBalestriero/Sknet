@@ -25,7 +25,7 @@ class DummyTrainer(object):
 
 
 class Pipeline(object):
-    def __init__(self, network, dataset=None, loss=None, lr_schedule=None, 
+    def __init__(self, network, dataset=None, external_loss=0, lr_schedule=None, 
                                 optimizer=None, test_loss=None):
         # Tensorflow Config
 #        tf.reset_default_graph()
@@ -35,7 +35,7 @@ class Pipeline(object):
         self.session                    = tf.Session(config=config)
         # Attributes
         self.network  = network
-        self.loss     = loss
+        self.loss     = external_loss+self.network.loss
         self.test_loss= test_loss
         self.dataset  = dataset
         self.lr_schedule = lr_schedule
@@ -43,14 +43,14 @@ class Pipeline(object):
         self.batch_size = self.network[0].shape.as_list()[0]
 
         # set up the network input-output shortcut
-        self.input  = self.network.input
-        self.output = self.network.output
-        self.infered_observed = self.network.infered_observed
+#        self.input  = self.network.input
+#        self.output = self.network.output
+#        self.infered_observed = self.network.infered_observed
 
         # Get the train op
         self.update_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
         with tf.control_dependencies(self.update_op):
-            self.train_op = self.optimizer.minimize(loss)
+            self.train_op = self.optimizer.minimize(self.loss)
 
         # initialize the variables
         self.session.run(tf.global_variables_initializer())

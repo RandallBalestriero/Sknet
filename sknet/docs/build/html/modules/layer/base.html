@@ -1,0 +1,378 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Base Layer &mdash; Sknet alpha.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'alpha.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Input Output Layer" href="io.html" />
+    <link rel="prev" title="sknet.layer" href="../layer.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Sknet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Base Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="special.html">Special Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normalize.html">Normalization Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perturb.html">Perturb Layer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Sknet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> &raquo;</li>
+        
+      <li>Base Layer</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/modules/layer/base.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-sknet.layer">
+<span id="base-layer"></span><h1>Base Layer<a class="headerlink" href="#module-sknet.layer" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sknet.layer.Layer">
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Layer</code><span class="sig-paren">(</span><em>input</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Layer" title="Permalink to this definition">¶</a></dt>
+<dd><p>Layer class used as parent of any implemented layer.</p>
+<p><a class="reference internal" href="../base.html#module-sknet" title="sknet"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet</span></code></a> relies extremely heavily on the <a class="reference internal" href="#module-sknet.layer" title="sknet.layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer</span></code></a>
+modules. The layers store the computations, the losses, the penalties,
+and everything that might be needed for deep learning applications. 
+As such, understanding the parent class <a class="reference internal" href="#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer.Layer</span></code></a>
+from which all the layers inherit is crucial.</p>
+<p class="rubric">Layers are tensors</p>
+<p>The <a class="reference internal" href="#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer.Layer</span></code></a> class inherits from 
+<a class="reference internal" href="../base.html#sknet.ObservedTensor" title="sknet.ObservedTensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.ObservedTensor</span></code></a> for two reasons. First, it
+allows the layer to be treater as a tensor in the computational
+graph and thus to be used as a standard variable for computation, such
+as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set some arbitrary layer given some previous_layer</span>
+<span class="n">some_layer</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous</span><span class="p">,</span><span class="n">units</span> <span class="o">=</span> <span class="mi">20</span><span class="p">)</span>
+<span class="c1"># the variable some_layer is a Layer, treated as a</span>
+<span class="c1"># standard tf.Tensor and thus can be used as a variable</span>
+<span class="n">some_stats</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">some_layer</span><span class="o">/</span><span class="mf">0.1</span><span class="o">+</span><span class="mi">4</span><span class="p">,</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>this allows great flexibility in the code as well as for customized
+computations without requiring to access to some attribute or method
+from the instanciated layer.</p>
+<p class="rubric">Layer variables and variable functions:</p>
+<p>All the variables of a layer (let say <code class="xref py py-data docutils literal notranslate"><span class="pre">W</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">b</span></code> 
+for example) are access via <code class="docutils literal notranslate"><span class="pre">layer_instance._W</span></code> and 
+<code class="docutils literal notranslate"><span class="pre">layer_instance._b</span></code>.  While those are the variables of the layer (given
+at initialization of created), the ones used for the forward computation
+are <code class="docutils literal notranslate"><span class="pre">layer_instance.W</span></code> and <code class="docutils literal notranslate"><span class="pre">layer_instance.b</span></code>. In fact, those are the
+ones that have the (optional) weight function applied onto them. For
+example, <code class="docutils literal notranslate"><span class="pre">layer_instance.W=W_func(layer_instance._W)</span></code>. In fact, one can
+pass any arbitrary function to be applied onto any of the variables of the
+layer, the only requirements is that the induces parameter has the required
+shape for the forward pass. For example, if one simply wants to impose
+nonnegative weights for the slope of a <a class="reference internal" href="dense.html#sknet.layer.Dense" title="sknet.layer.Dense"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer.Dense</span></code></a> 
+layer</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">layer</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">W_func</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">)</span> 
+</pre></div>
+</div>
+<p>or with a more conventional case of imposing unit
+norm (exact, not as a penalty) to the weights</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># define the function to be applied onto the weights to have unit norm</span>
+<span class="n">renorm_func</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">W</span><span class="p">:</span><span class="n">W</span><span class="o">/</span><span class="n">tf</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_sum</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">square</span><span class="p">(</span><span class="n">W</span><span class="p">)))</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">W_func</span><span class="o">=</span><span class="n">renorm_func</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Variables initialization:</p>
+<p>The _variables are initialized by the layer based on the values given
+for <code class="xref py py-data docutils literal notranslate"><span class="pre">W</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">b</span></code> during initialization or created is
+none is passed. In ALL cases, if
+the passed argument is an actual variable with values, s.a. a 
+<code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>, a <code class="xref py py-class docutils literal notranslate"><span class="pre">tf.Tensor</span></code> etc, then it is considered
+as a given value and not an initialization to the learnable parameter. If a
+function is given, then the constructor calls it with the shape of the
+parameter in question as input to obtain an actual initial value for the
+learnable parameter. This makes it easy to set a parameter learnable or not
+as for example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Random normal (gaussian) initialization, learnable weights,</span>
+<span class="c1"># the layer W will be turned into a trainable tf.Variable</span>
+<span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">W</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">)</span>
+<span class="c1"># Random normal weights that won&#39;t be learned, the passed value</span>
+<span class="c1"># is used as the actual parameter without any transformation</span>
+<span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">W</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">((</span><span class="mi">764</span><span class="p">,</span><span class="mi">10</span><span class="p">)))</span>
+<span class="c1"># this allow to use the following case where one pre-determines a </span>
+<span class="c1"># special form for the weights, and thus do not want this to be used</span>
+<span class="c1"># just as an initializer of a tf.Variable, but the actual weights to</span>
+<span class="c1"># be used by the layer</span>
+<span class="n">W1</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">((</span><span class="mi">764</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">W2</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">((</span><span class="mi">764</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">W</span><span class="o">=</span><span class="n">W1</span><span class="o">*</span><span class="n">W2</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that if the input shape of the layer is unknown, one can retreive it 
+via <code class="docutils literal notranslate"><span class="pre">previous_layer.shape</span></code>. This also allows to use a 
+<code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.ObservedVariable</span></code> as a layer variable, allowing to set
+manually some values of the variable values hwen desired. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># set some weights that won&#39;t be learned</span>
+<span class="n">fixed_W</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">((</span><span class="mi">764</span><span class="p">,</span><span class="mi">10</span><span class="p">))</span>
+<span class="c1"># set the standard learnable weights</span>
+<span class="n">learnable_W</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">Variable</span><span class="p">(</span><span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">((</span><span class="mi">764</span><span class="p">,</span><span class="mi">10</span><span class="p">)))</span>
+<span class="c1"># create the W variables used by the layer as an ObservedTensor</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">ObservedTensor</span><span class="p">(</span><span class="n">learnable_W</span><span class="p">,</span><span class="n">observed</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span><span class="n">observation</span><span class="o">=</span><span class="n">fixed_W</span><span class="p">)</span>
+<span class="c1"># create the layer</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span><span class="n">W</span><span class="o">=</span><span class="n">W</span><span class="p">)</span>
+<span class="c1"># this layer will thus either use the (possibly learned) value from</span>
+<span class="c1"># learnable_W or the fixed (random but not learned) value from fixed_W</span>
+<span class="c1"># depending on the value feed to W.teacher_forcing</span>
+</pre></div>
+</div>
+<p class="rubric">Loss and penalties</p>
+<p>In sknet, the losses and penalties are part of the layers. Each layer can
+be equipped with any loss or penalty (which can involve the layer
+parameters or any other). A typical example would be to apply a
+Tikhonov regularization to the weights of the layer as</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># first the layer is instanciated</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="c1"># we now add a loss to the W parameters</span>
+<span class="n">layer</span><span class="o">.</span><span class="n">add_loss</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">l2</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">W</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>recall that this applies the loss onto <code class="docutils literal notranslate"><span class="pre">layer.W</span></code> which might be a
+transformation of the true parameter <code class="docutils literal notranslate"><span class="pre">layer._W</span></code>, this during
+learning the applied functional will matter in the gradient computation.
+Another important case is the one of the network loss often seen as a 
+global loss, s.a. the classification loss. In this case one would do</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># first the layer is instanciated</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="c1"># we now add a loss to the W parameters</span>
+<span class="n">layer</span><span class="o">.</span><span class="n">add_loss</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">q</span><span class="o">=</span><span class="n">layer</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>recall that <code class="xref py py-data docutils literal notranslate"><span class="pre">layer</span></code> which is a layer also behaves as a tensor 
+and thus can be used directly as the term to be used for hte loss
+computation. In this case, we did not create a target variable for the
+<code class="xref py py-data docutils literal notranslate"><span class="pre">p</span></code> distribution and thus set it to <code class="xref py py-data docutils literal notranslate"><span class="pre">None</span></code> to allow
+the loss to create it itself. For training, one would have to
+feed the true labels for <code class="docutils literal notranslate"><span class="pre">layer.cross_entropy.p</span></code> since it is now
+a placeholder.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>input</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tf.Tensor or tf.Layer</span></dt>
+<dd><p class="first last">the input to the layer, can eb any arbitrary variable or layer instance
+this allows the user to feed directly a tensorflow variable as input</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="io.html" class="btn btn-neutral float-right" title="Input Output Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../layer.html" class="btn btn-neutral float-left" title="sknet.layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sknet contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

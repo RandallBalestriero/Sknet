@@ -88,6 +88,7 @@ If you are looking for information on a specific function:
 .. toctree::
   :maxdepth: 2
 
+  modules/base
   modules/dataset
   modules/network
   modules/layer

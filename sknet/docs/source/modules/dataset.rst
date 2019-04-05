@@ -15,13 +15,13 @@
     :nosignatures:
 
     load_mnist
-    fashionmnist
-    svhn
-    cifar10
-    cifar100
-    stl10
-    warblr
-    freefield1010
+    load_fashionmnist
+    load_svhn
+    load_cifar10
+    load_cifar100
+    load_stl10
+    load_warblr
+    load_freefield1010
     
 .. rubric:: :doc:`dataset/preprocess`
 

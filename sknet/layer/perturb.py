@@ -124,6 +124,8 @@ class Gaussian(Layer):
     """
     def __init__(self, incoming, noise_type="additive", mu = np.float32(0), 
             sigma = np.float32(1), deterministic=None, **kwargs):
+        """init
+        """
         super().__init__(incoming, **kwargs)
 
         # Set attributes
@@ -150,7 +152,7 @@ class Gaussian(Layer):
 
 
 class RandomCrop(Layer):
-    """Random cropping of input images
+    """Random cropping of input images.
 
     During deterministic, a random continuous part of the image
     of shape crop_shape is extracted and used as layer output.
@@ -166,6 +168,7 @@ class RandomCrop(Layer):
         # output of this layer is (64,3,28,28)
         crop_layer.output_shape
 
+
     Parameters
     ----------
 
@@ -175,9 +178,12 @@ class RandomCrop(Layer):
     crop_shape : int or couple of int
         the shape of part of the input to be
         cropped
+
     """
 
     def __init__(self, incoming, crop_shape, deterministic=None, **kwargs):
+        """init
+        """
         super().__init__(incoming, **kwargs)
         # Set attributes
         if np.isscalar(crop_shape):

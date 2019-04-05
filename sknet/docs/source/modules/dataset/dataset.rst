@@ -7,39 +7,18 @@ Dataset
 
 .. autofunction:: load_mnist
  
-.. autoclass:: fashionmnist
-    :members:
-    :special-members:
-    :exclude-members: __weakref__
+.. autofunction:: load_fashionmnist
    
-.. autoclass:: svhn
-    :members:
-    :special-members:
-    :exclude-members: __weakref__
+.. autofunction:: load_svhn
 
-.. autoclass:: cifar10
-    :members:
-    :special-members:
-    :exclude-members: __weakref__
+.. autofunction:: load_cifar10
 
-.. autoclass:: cifar100
-    :members:
-    :special-members:
-    :exclude-members: __weakref__
+.. autofunction:: load_cifar100
 
-.. autoclass:: stl10
-    :members:
-    :special-members:
-    :exclude-members: __weakref__
+.. autofunction:: load_stl10
 
-.. autoclass:: warblr
-    :members:
-    :special-members:
-    :exclude-members: __weakref__
+.. autofunction:: load_warblr
 
-.. autoclass:: freefield1010
-    :members:
-    :special-members:
-    :exclude-members: __weakref__
+.. autofunction:: load_freefield1010
 
 

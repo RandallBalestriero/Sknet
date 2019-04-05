@@ -81,7 +81,7 @@ def load_freefield1010(data_format='NCT', PATH=None):
         wavs[i]   = wav_read(byt)[1].astype('float32')
         
     labels = labels[:,1]
-    wavs   = np.expand_dims(wavs,1+int(self["data_format"]=="NTC"))
+    wavs   = np.expand_dims(wavs,1+int(data_format=="NTC"))
 
     dataset.add_variable({'signals':{'train_set':wavs},
                         'labels':{'train_set':labels}})

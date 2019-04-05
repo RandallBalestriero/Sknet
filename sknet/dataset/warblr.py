@@ -11,7 +11,7 @@ from . import Dataset
 
 from ..utils import to_one_hot
 
-def load_warblr(data_format='NCT',path=None):
+def load_warblr(data_format='NCT', PATH=None):
     """Binary audio classification, presence or absence of a bird.
     `Warblr <http://machine-listening.eecs.qmul.ac.uk/bird-audio-detection-challenge/#downloads>`_ 
     comes from a UK bird-sound crowdsourcing 
@@ -74,13 +74,13 @@ def load_warblr(data_format='NCT',path=None):
     f    = zipfile.ZipFile(PATH+'warblr/warblrb10k_public_wav.zip')
     N    = labels.shape[0]
     wavs = list()
-    exp_dim_opt = int(self['data_format']=='NTC')
+    exp_dim_opt = int(data_format=='NTC')
     for i,files_ in enumerate(labels):
         wavfile   = f.read('wav/'+files_[0]+'.wav')
         byt       = io.BytesIO(wavfile)
-        wavs.append(np.expand_dims(wav_read(byt)[1].astype('float32'),exp_dim_opt))
-        labels    = labels[:,1].astype('int32')
-
+        wavs.append(np.expand_dims(wav_read(byt)[1].astype('float32'),
+                                    exp_dim_opt))
+    labels    = labels[:,1].astype('int32')
     dataset.add_variable({'signals':{'train_set':wavs},
                         'labels':{'train_set':labels}})
 

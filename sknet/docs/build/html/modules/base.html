@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>sknet.network &mdash; Sknet alpha.1 documentation</title>
+  <title>sknet &mdash; Sknet alpha.1 documentation</title>
   
 
   
@@ -45,8 +45,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sknet.layer" href="layer.html" />
-    <link rel="prev" title="Preprocessing" href="dataset/preprocess.html" /> 
+    <link rel="next" title="sknet.dataset" href="dataset.html" />
+    <link rel="prev" title="Pipeline" href="../user/pipeline.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -104,9 +104,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1"><a class="reference internal" href="base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a><ul class="simple">
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
@@ -154,13 +156,13 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></li>
+      <li><code class="docutils literal notranslate"><span class="pre">sknet</span></code></li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/modules/network.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/modules/base.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -173,36 +175,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="sknet-network">
-<h1><a class="toc-backref" href="#id1"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.network</span></code></a><a class="headerlink" href="#sknet-network" title="Permalink to this headline">¶</a></h1>
-<div class="contents topic" id="table-of-contents">
-<p class="topic-title first">Table of Contents</p>
-<ul class="simple">
-<li><a class="reference internal" href="#sknet-network" id="id1"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-</ul>
+  <div class="section" id="module-sknet">
+<span id="sknet"></span><h1><a class="reference internal" href="#module-sknet" title="sknet"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet</span></code></a><a class="headerlink" href="#module-sknet" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
 </div>
+<p>All the <a class="reference internal" href="layer/base.html#module-sknet.layer" title="sknet.layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> inherit from this base class. Its documentation
+presents all the details about thegeneral behaviors of the layers.</p>
 <dl class="class">
-<dt id="sknet.network.Network">
-<em class="property">class </em><code class="descclassname">sknet.network.</code><code class="descname">Network</code><span class="sig-paren">(</span><em>layers=None</em>, <em>name='model'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/network.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.network.Network" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="method">
-<dt id="sknet.network.Network.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>layers=None</em>, <em>name='model'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/network.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.network.Network.__init__" title="Permalink to this definition">¶</a></dt>
-<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+<dt id="sknet.Tensor">
+<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">Tensor</code><span class="sig-paren">(</span><em>tensor_or_func=None</em>, <em>shape=None</em>, <em>dtype=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.Tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloading the <code class="xref py py-class docutils literal notranslate"><span class="pre">tf.Tensor</span></code></p>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="sknet.network.Network.__weakref__">
-<code class="descname">__weakref__</code><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/network.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.network.Network.__weakref__" title="Permalink to this definition">¶</a></dt>
-<dd><p>list of weak references to the object (if defined)</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="sknet.network.Network.get_layers">
-<code class="descname">get_layers</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/network.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.network.Network.get_layers" title="Permalink to this definition">¶</a></dt>
-<dd><p>To implement model specific list of layers 
-that has to be passed to the network</p>
-</dd></dl>
-
+<dl class="class">
+<dt id="sknet.ObservedTensor">
+<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">ObservedTensor</code><span class="sig-paren">(</span><em>tensor</em>, <em>observation=None</em>, <em>teacher_forcing=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.ObservedTensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tensor with dual behavior</p>
+<p>This tensor is doing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tensor</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tf.Tensor</span></dt>
+<dd><p class="first last">the tensor to equip with dual behavior</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 </div>
@@ -215,10 +217,10 @@ that has to be passed to the network</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="layer.html" class="btn btn-neutral float-right" title="sknet.layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="dataset.html" class="btn btn-neutral float-right" title="sknet.dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="dataset/preprocess.html" class="btn btn-neutral float-left" title="Preprocessing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="../user/pipeline.html" class="btn btn-neutral float-left" title="Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -6,6 +6,7 @@
 .. toctree::
     :hidden:
 
+    layer/base
     layer/io
     layer/dense
     layer/conv
@@ -14,6 +15,15 @@
     layer/normalize
     layer/perturb
     layer/shape
+
+
+All the :py:class:`sknet.layer` inherit from this base class. Its documentation
+presents all the details about thegeneral behaviors of the layers.
+
+.. autosummary::
+    :nosignatures:
+
+    Layer
 
 .. rubric:: :doc:`layer/io`
 

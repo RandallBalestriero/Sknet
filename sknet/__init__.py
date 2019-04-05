@@ -10,8 +10,8 @@ __all__ = [
         "dataset",
         "layer",
         "utils",
-        "optimize",
         "network",
+        "optimize",
         "sampler"]
 
 
@@ -169,36 +169,61 @@ class DataArray(np.ndarray):
 
 
 class Tensor(tf.Tensor):
-    def __init__(self,tensor, observed=False, observation=None, 
-                        teacher_forcing=None):
-        self._observed = observed
-        self._teacher_forcing = teacher_forcing
-        if observed:
-            if observation is None:
-                self._observation = tf.placeholder_with_default(
-                        tf.zeros(tensor.shape,dtype=tensor.dtype),
-                        shape = tensor.shape,
-                        name  = 'observation-'+tensor.name.replace(':','-'))
-            else:
-                self._observation = observation
-            if teacher_forcing is None:
-                self._teacher_forcing = tf.placeholder_with_default(False,
-                        shape = (),
-                        name  = 'teacherforcing-'+tensor.name.replace(':','-'))
-            else:
-                self._teacher_forcing = teacher_forcing
-            output = tf.cond(self._teacher_forcing, lambda :self._observation, 
-                                                    lambda :tensor)
-        else:
-            self._observation = None
-            output = tensor
-        self._op          = output._op
-        self._value_index = output._value_index
-        self._dtype       = dtypes.as_dtype(output._dtype)
+    """Overloading the :py:class:`tf.Tensor`
+    """
+    def __init__(self,tensor_or_func=None, shape=None, dtype = None):
+        if tensor_or_func is None:
+            tensor_or_func = tf.zeros
+        if callable(tensor_or_func):
+            tensor_or_func = tensor_or_func(shape,dtype=dtype)
+        if not hasattr(tensor_or_func,'_op'):
+            tensor_or_func = tf.identity(tensor_or_func)
+
+        self._op          = tensor_or_func._op
+        self._value_index = tensor_or_func._value_index
+        self._dtype       = dtypes.as_dtype(tensor_or_func._dtype)
         self._tf_output   = None
         self._shape_val   = self._c_api_shape()
-        self._consumers   = output._consumers
-        self._id          = output._id
+        self._consumers   = tensor_or_func._consumers
+        self._id          = tensor_or_func._id
+
+
+
+class ObservedTensor(Tensor):
+    """Tensor with dual behavior
+    
+    This tensor is doing 
+    
+    Parameters
+    ----------
+    
+    tensor : tf.Tensor
+        the tensor to equip with dual behavior
+        
+    """
+    def __init__(self, tensor, observation=None, 
+                        teacher_forcing=None):
+        self._observed        = observed
+        self._teacher_forcing = teacher_forcing
+
+        if observation is None:
+            self._observation = tf.placeholder_with_default(
+                    tf.zeros(tensor.shape,dtype=tensor.dtype),
+                    shape = tensor.shape,
+                    name  = 'observation-'+tensor.name.replace(':','-'))
+        else:
+            self._observation = observation
+        if teacher_forcing is None:
+            self._teacher_forcing = tf.placeholder_with_default(False,
+                    shape = (),
+                    name  = 'teacherforcing-'+tensor.name.replace(':','-'))
+        else:
+            self._teacher_forcing = teacher_forcing
+        output = tf.cond(self._teacher_forcing, lambda :self._observation, 
+                                                    lambda :tensor)
+        super().__init__(output)
+
+
     @property
     def observation(self):
         return self._observation
@@ -213,3 +238,4 @@ class Tensor(tf.Tensor):
 
 
 from . import *
+

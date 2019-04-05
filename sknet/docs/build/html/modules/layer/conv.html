@@ -104,9 +104,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">Base Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Convolutional Layer</a></li>
@@ -196,7 +198,7 @@ Layer to perform a 2D convolution onto a 4D input tensor</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (<em>Layer</em><em> or </em><em>tuple of int</em>) – input shape of incoming layer</li>
+<li><strong>incoming</strong> (<a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><em>Layer</em></a><em> or </em><em>tuple of int</em>) – input shape of incoming layer</li>
 <li><strong>filters</strong> (<em>triple of int</em>) – the shape of the filters in the form 
 (#filters, height, width)</li>
 <li><strong>nonlinearity_c</strong> (<em>scalar</em>) – coefficient of the nonlinearity,

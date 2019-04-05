@@ -7,7 +7,6 @@ Optimizers
 
 .. autoclass:: Adam
     :members:
-    :special-members:
 
 
 

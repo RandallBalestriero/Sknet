@@ -27,26 +27,41 @@ dataset.preprocess(sknet.dataset.Identity,data="images")
 
 batch_size  = 64
 input_shape = [batch_size]+list(dataset.datum_shape)
-model       = sknet.network.cnn.base(input_shape=input_shape,
-                    n_classes=dataset.n_classes,
-                    data_format=dataset.data_format)
 
-# Loss and Optimizer
-#-------------------
 
-lr_schedule = sknet.schedule.stepwise({0:0.001,50:0.0001,100:0.00005})
-loss        = sknet.loss.classification(model[-1])
-test_loss   = sknet.loss.accuracy(model[-1])
-optimizer   = sknet.optimizer.Adam()
 
-# Pipeline
-#---------
+with tf.device("/device:GPU:0"):
+    layers = [sknet.layer.Input(input_shape=input_shape,data_format=dataset.data_format)]
+    layers.append(sknet.layer.Dense(layers[-1],units=512))
+#    layers.append(tf.layers.dense(layers[-1],1225))
+#    layers.append(tf.layers.dense(layers[-1],1225))
+#    layers.append(tf.layers.dense(layers[-1],225))
+    layers.append(sknet.layer.Dense(layers[-1],units=512))
+    layers.append(sknet.layer.Activation(layers[-1],tf.nn.relu))
+    layers.append(sknet.layer.Dense(layers[-1],units=128))
+    layers.append(sknet.layer.Activation(layers[-1],tf.nn.relu))
+    layers.append(sknet.layer.Dense(layers[-1],units=10,data_format='NCHW'))
 
-pipeline    = sknet.utils.Pipeline(model,dataset,lr_schedule=lr_schedule,
-                            loss=loss,optimizer=optimizer,test_loss=test_loss)
+    layers[-1].add_loss(sknet.optimize.loss.sparse_cross_entropy_logits(p=None,q=layers[-1]))
 
-pipeline.link([[pipeline.network[0].observation,"images"],
-                [pipeline.network[-1].observation,"labels"]])
+    network = sknet.network.Network(layers,name='-model(cnn.base)')
+
+    # Loss and Optimizer
+    #-------------------
+
+    lr_schedule = sknet.optimize.schedule.stepwise({0:0.001,50:0.0001,100:0.00005})
+    test_loss   = network[-1].sparse_cross_entropy_logits0.accuracy
+    optimizer   = sknet.optimize.optimizer.Adam()
+
+    # Pipeline
+    #---------
+
+    pipeline    = sknet.utils.Pipeline(network,dataset,lr_schedule=lr_schedule,
+                    optimizer=optimizer,test_loss=test_loss)
+
+
+pipeline.link([[pipeline.network[0],"images"],
+                [pipeline.network[-1].sparse_cross_entropy_logits0.p,"labels"]])
 
 # Training
 #---------

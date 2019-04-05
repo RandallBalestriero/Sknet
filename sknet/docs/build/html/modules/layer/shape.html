@@ -104,9 +104,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">Base Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
 <li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
@@ -197,7 +199,7 @@ by reshaping the input according to a given shape</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (<em>Layer</em><em> or </em><em>tuple of int</em>) – input shape of incoming <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> object</li>
+<li><strong>incoming</strong> (<a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><em>Layer</em></a><em> or </em><em>tuple of int</em>) – input shape of incoming <a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> object</li>
 <li><strong>new_shape</strong> (<em>tuple of int</em>) – the shape to use to reshape the input</li>
 </ul>
 </td>
@@ -232,7 +234,7 @@ or elementwise maximum. The shape of the inputs must be the same.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (<em>list</em>) – list of input shapes or instances of <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></li>
+<li><strong>incoming</strong> (<em>list</em>) – list of input shapes or instances of <a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a></li>
 <li><strong>func</strong> (<em>func</em><em> or </em><em>str</em>) – function to use to merge the inputs can be either 
 a function of <code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;MAX&quot;</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;MIN&quot;</span></code>, 
 <code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;AVG&quot;</span></code>, <code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;SUM&quot;</span></code></li>
@@ -254,7 +256,7 @@ a specified axis.</p>
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incomings</strong> (<em>list</em>) – list of <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instances or shapes</li>
+<li><strong>incomings</strong> (<em>list</em>) – list of <a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> instances or shapes</li>
 <li><strong>axis</strong> (<em>int</em>) – axis along which the inputs are stacked</li>
 </ul>
 </td>
@@ -280,7 +282,7 @@ by <code class="xref py py-data docutils literal notranslate"><span class="pre">
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (shape or <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> instance) – the input shape of the layer</li>
+<li><strong>incoming</strong> (shape or <a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> instance) – the input shape of the layer</li>
 <li><strong>axis</strong> (<em>int</em>) – the axis to expand dim on</li>
 </ul>
 </td>
@@ -302,7 +304,7 @@ than <code class="xref py py-data docutils literal notranslate"><span class="pre
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incomings</strong> (<em>list</em>) – the list of <code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code> or input shapes
+<li><strong>incomings</strong> (<em>list</em>) – the list of <a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> or input shapes
 to be concatenated</li>
 <li><strong>axis</strong> (<em>int</em>) – the axis to concatenate over with</li>
 </ul>
