@@ -120,6 +120,7 @@ class Activation(Layer):
             if self._func_or_scalar==1:
                 output = input
             else:
+                self.mask = tf.greater(input,0)
                 output = tf.maximum(input,self._func_or_scalar*input)
         else:
             if self._func_or_scalar is tf.identity:

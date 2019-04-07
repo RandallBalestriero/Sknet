@@ -57,6 +57,9 @@ class Dense(Layer):
                             trainable=True,
                             name='dense_b_'+name)
 
+        self.W  = self._W
+        self.b  = self._b
+
         super().__init__(incoming, deterministic=deterministic,**kwargs)
 
     def forward(self, input, deterministic=None, **kwargs):

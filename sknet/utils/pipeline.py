@@ -35,12 +35,12 @@ class Pipeline(object):
         self.session                    = tf.Session(config=config)
         # Attributes
         self.network  = network
-        self.loss     = external_loss+self.network.loss
-        self.test_loss= test_loss
+#        self.loss     = external_loss+self.network.loss
+#        self.test_loss= test_loss
         self.dataset  = dataset
-        self.lr_schedule = lr_schedule
-        self.optimizer = optimizer
-        self.batch_size = self.network[0].shape.as_list()[0]
+#        self.lr_schedule = lr_schedule
+#        self.optimizer = optimizer
+#        self.batch_size = self.network[0].shape.as_list()[0]
 
         # set up the network input-output shortcut
 #        self.input  = self.network.input
@@ -137,17 +137,21 @@ class Pipeline(object):
             test_loss.append(self._epoch_test(items=items,set_='test_set'))
             self.lr_schedule.update(epoch=epoch,valid_accu=valid_loss)
             print('\tValid:',valid_loss[-1])
-        return train_loss,valid_accu,test_accu,self.lr_schedule.lrs
-    def predict(self,X):
+        return train_loss,valid_loss,test_loss,self.lr_schedule.lrs
+    def predict(self,variables,linkage, deterministic=None, concat=True):
         """
         Given an array return the prediction
         """
-        n = X.shape[0]//self.batch_size
+        if deterministic is not None:
+            self.network.set_deterministic(deterministic,self.session)
+        n = linkage[0][1].shape[0]//self.batch_size
         preds = []
-        for j in range(n):
-            preds.append(self.session.run(self.prediction,
-                feed_dict={self.x:X[self.batch_size*j:self.batch_size*(j+1)],self.training:False}))
-        return concatenate(preds,axis=0)
+        for i in range(n):
+            feed_dict = [(key,value[i*self.batch_size:(i+1)*self.batch_size]) for key,value in linkage]
+            preds.append(self.session.run(variables,feed_dict=dict(feed_dict)))
+        if concat:
+            preds = [np.concatenate([pred[i] for pred in preds],0) for i in range(len(variables))]
+        return preds
     def get_continuous_VQ(self,X):
         """
         given a collection of observations X, return the VQ for each of the layers

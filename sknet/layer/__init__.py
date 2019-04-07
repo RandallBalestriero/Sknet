@@ -183,13 +183,13 @@ class Layer(Tensor):
         else:
             session.run(self._set_not_deterministic)
 
-    def add_loss(self,loss):
-        number = 0
-        while loss.name+str(number) in self.__dict__:
-            number +=1
-        self.__dict__[loss.name+str(number)] = loss
-        print(loss.name+str(number))
-        self.losses.append(loss)
+#    def add_loss(self,loss):
+#        number = 0
+#        while loss.name+str(number) in self.__dict__:
+#            number +=1
+#        self.__dict__[loss.name+str(number)] = loss
+#        print(loss.name+str(number))
+#        self.losses.append(loss)
 
     @property
     def _variables(self):

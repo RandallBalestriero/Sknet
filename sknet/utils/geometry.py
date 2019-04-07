@@ -68,40 +68,71 @@ class Circle:
         self.X+=CENTER.reshape((1,-1))
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def get_input_space_partition(states,N,M):
+    #the following should take as input a collection of points
+    #in the input space and return a list of binary states, each 
+    #element of the list is for 1 specific layer and it is a 2D array
+    if states.ndim>1:
+        states = states2values(states)
+    partitioning  = grad(states.reshape((N,M)))
+    return partitioning
+
+
+
+
 def grad(x,duplicate=0):
     #compute each directional (one step) derivative as a boolean mask
     #representing jump from one region to another and add them (boolean still)
-    g_vertical   = greater(pad(abs(x[1:]-x[:-1]),[[1,0],[0,0]],'constant'),0)
-    g_horizontal = greater(pad(abs(x[:,1:]-x[:,:-1]),[[0,0],[1,0]],'constant'),0)
-    g_diagonaldo = greater(pad(abs(x[1:,1:]-x[:-1,:-1]),[[1,0],[1,0]],'constant'),0)
-    g_diagonalup = greater(pad(abs(x[:-1:,1:]-x[1:,:-1]),[[1,0],[1,0]],'constant'),0)
+    g_vertical   = np.greater(np.pad(np.abs(x[1:]-x[:-1]),((1,0),(0,0)),'constant'),0)
+    g_horizontal = np.greater(np.pad(np.abs(x[:,1:]-x[:,:-1]),[[0,0],[1,0]],'constant'),0)
+    g_diagonaldo = np.greater(np.pad(np.abs(x[1:,1:]-x[:-1,:-1]),[[1,0],[1,0]],'constant'),0)
+    g_diagonalup = np.greater(np.pad(np.abs(x[:-1:,1:]-x[1:,:-1]),[[1,0],[1,0]],'constant'),0)
     overall      = g_vertical+g_horizontal+g_diagonaldo+g_diagonalup
     if duplicate>0:
-        overall                 = stack([roll(overall,k,1) for k in range(duplicate+1)]\
-                                    +[roll(overall,k,0) for k in range(duplicate+1)]).sum(0)
+        overall                 = np.stack([np.roll(overall,k,1) for k in range(duplicate+1)]\
+                                    +[np.roll(overall,k,0) for k in range(duplicate+1)]).sum(0)
         overall[:duplicate]    *= 0
         overall[-duplicate:]   *= 0
         overall[:,:duplicate]  *= 0
         overall[:,-duplicate:] *= 0
-    return greater(overall,0).astype('float32')
+    return np.greater(overall,0).astype('float32')
 
 
 
 
 
-def states2values(states,state2values_dict):
+def states2values(states):
     #get an array of binary values representing the relu 
     #or absolute value etc state and thus is 1 if the relu
     #was active and 0 otherwise and this for each unit
     #so states is a 2D array of shape (#samples,#units)
-    #this has ot be applied for the states of each layer indpendently
+    state2values_dict = dict()
     values            = zeros(states.shape[0])
     for i in range(states.shape[0]):
         str_s = str(states[i].astype('uint8'))
-        if(str_s not in state2values_dict.keys()):
+        if(str_s not in state2values_dict):
             state2values_dict[str_s] = randn()
         values[i]=state2values_dict[str_s]
-    return values,state2values_dict
+    return values
 
 
 
