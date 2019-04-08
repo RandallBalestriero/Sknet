@@ -32,6 +32,11 @@ class Layer(Tensor):
     computations without requiring to access to some attribute or method
     from the instanciated layer.
 
+    Another implication is the ability to use the standard tensorflow
+    Tensor methods such as (to get the output shape) ``some_layer.shape``
+    which will return a tensorflow shape, or ``some_layer.shape.as_list()``
+    to get it as a standard listo f int.
+
     .. rubric:: Layer variables and variable functions:
 
     All the variables of a layer (let say :py:data:`W` and :py:data:`b` 
@@ -100,28 +105,6 @@ class Layer(Tensor):
         # learnable_W or the fixed (random but not learned) value from fixed_W
         # depending on the value feed to W.teacher_forcing
 
-    .. rubric:: Loss and penalties
-
-    In sknet, the losses and penalties are part of the layers. Each layer can
-    be equipped with any loss or penalty (which can involve the layer
-    parameters or any other). A typical example would be to apply a
-    Tikhonov regularization to the weights of the layer as ::
-
-        # first the layer is instanciated
-        layer = sknet.layer.Dense(previous_layer,units=10)
-        # we now add a loss to the W parameters
-        layer.add_loss(sknet.loss.l2(layer.W))
-
-    recall that this applies the loss onto ``layer.W`` which might be a
-    transformation of the true parameter ``layer._W``, this during
-    learning the applied functional will matter in the gradient computation.
-    Another important case is the one of the network loss often seen as a 
-    global loss, s.a. the classification loss. In this case one would do ::
-
-        # first the layer is instanciated
-        layer = sknet.layer.Dense(previous_layer,units=10)
-        # we now add a loss to the W parameters
-        layer.add_loss(sknet.loss.cross_entropy(p=None,q=layer))
 
     recall that :py:data:`layer` which is a layer also behaves as a tensor 
     and thus can be used directly as the term to be used for hte loss
@@ -166,8 +149,6 @@ class Layer(Tensor):
         # compute the layer output based on the layer forward method
         output = self.forward(input,self.deterministic)
 
-        # Set the per layer penalty list to empty
-        self.losses = []
 
         # initialize the variable
         super().__init__(output)
@@ -183,13 +164,6 @@ class Layer(Tensor):
         else:
             session.run(self._set_not_deterministic)
 
-#    def add_loss(self,loss):
-#        number = 0
-#        while loss.name+str(number) in self.__dict__:
-#            number +=1
-#        self.__dict__[loss.name+str(number)] = loss
-#        print(loss.name+str(number))
-#        self.losses.append(loss)
 
     @property
     def _variables(self):
@@ -209,6 +183,9 @@ class Layer(Tensor):
     @property
     def input(self):
         return self._input
+
+
+
 
 from . import *
 from .pool import *

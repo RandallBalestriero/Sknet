@@ -4,6 +4,7 @@
 
 import tensorflow as tf
 import numpy as np
+
 from .. import layer
 
 from .. import optimize
@@ -27,7 +28,7 @@ def get_tensor_dependencies(tensor):
 
     # If we've reached the "end", return the op's name
     if tensor_op.type == 'Placeholder':
-        dependencies = [tensor_op]
+        dependencies = [tensor.name]
 
     # Return a list of tensor op names
     return dependencies
@@ -35,17 +36,20 @@ def get_tensor_dependencies(tensor):
 
 
 class Network:
-    def __init__(self, layers=None, name = 'model', **kwargs):
+    def __init__(self, layers=None, name = 'model',dataset = None ,**kwargs):
         if layers is None:
             self.layers = self.get_layers(**kwargs)
         else:
             self.layers = layers
         self.name     = name
+        self.dataset  = dataset
+        self.batch_size = layers[0].shape.as_list()[0]
 #        self.losses   = 
 #        self.init_values()
 #        self.reset_op = tf.group([layer.reset_op for layer in self.layers])
         self.losses = dict()
         self.variables = dict()
+        self._dependencies = dict()
     def __getitem__(self,key):
         return self.layers[key]
     def __len__(self):
@@ -66,45 +70,62 @@ class Network:
         self.losses[name]=(loss,name,optimizer,schedule)
     def add_variable(self,variable,name):
         self.variables[name]=variable
+    def get_input_for(self,var,indices,context):
+        """ given a placeholder, batch indices and a set_name (context)
+        return the data corresponding to be fed for this placeholder
+        extract from the given set and indices
 
-#    @property
-#    def loss(self):
-#        layer_losses = list()
-#        for layer in self.layers:
-#            if hasattr(layer,'losses'):
-#                layer_losses+=layer.losses
-#        return tf.add_n([layer_loss.loss for layer_loss in layer_losses])
+        Parameters
+        ----------
+
+        var : tf.placeholder
+            a placeholder, present in self.placeholders and that has been
+            linked with a corresponding dataset in ``self.linkage``
+
+        indices : list or array of int
+            the indices of the data to be extracted
+
+        context : the set to extract the data from
+        """
+
+        # first get the name
+        try:
+            var_name = self.linkage[var]
+        except:
+            print('beware,',var,' will need to be provided as part of')
+            print('additional, linkage, it was not given with linkage,')
+            print('probably because it is not a dataset based value')
+        # then extract this var form the correct context and indices
+        return self.dataset[var_name][context][indices]
+
     def set_deterministic(self,value,session=None):
         for layer in self:
             if hasattr(layer,'set_deterministic'):
                 layer.set_deterministic(value,session)
-    def _init_dependencies(self):
+    def init_dependencies(self):
         # init the dependencies
         dict_ = list()
-        for var in :
+        for var in self.variables.values():
             if isinstance(var,tf.Tensor):
                 dict_.append((var,get_tensor_dependencies(var)))
+                dependencies = get_tensor_dependencies(var)
             else:
-                dependencies = list()
-                for inner_var in var:
-                    dependencies.append(get_tensor_dependencies(var))
-                # ensure unique
-                dependencies = list(set(dependencies))
-                dict_.append((var,dependencies))
+                var_ = var.control_inputs
+                dependencies = []
+                for v in var_:
+                    dependencies.append(get_tensor_dependencies(v))
+                dependencies = list(set([item for sublist in dependencies for item in sublist]))
+            dict_.append((var,dependencies))
         self._dependencies = dict(dict_)
+    @property
+    def dependencies(self):
+        return self._dependencies
 
     def init_values(self):
         # init the dependencies
         self._init_dependencies()
 
 
-        update_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-        for loss in self.losses.values():
-            with tf.control_dependencies(update_op):
-                loss_    = loss[0]
-                train_op = loss[-2].minimize(loss_)
-
-                dependencies = get_tensor_dependencies(loss_)
 
 
 

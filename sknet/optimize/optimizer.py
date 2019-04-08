@@ -3,15 +3,18 @@
 
 import numpy as np
 import tensorflow as tf
+from . import schedule as sch
 
 class Adam:
-    def __init__(self,beta1=0.9, beta2=0.999, eps=1e-8):
+    def __init__(self,beta1=0.9, beta2=0.999, eps=1e-8, schedule = 0.0001):
+        if np.isscalar(schedule):
+            schedule = sch.constant(schedule)
+        self.schedule = schedule
         self.beta1 = beta1
         self.beta2 = beta2
         self.eps   = eps
-    def minimize(self,loss_or_grads,params=None):
+    def minimize(self,loss_or_grads,params=None,schedule=0.001):
         #
-        self.learning_rate = tf.placeholder(tf.float32)
         if params is None:
             params = tf.trainable_variables()
             gradients = tf.gradients(loss_or_grads, params)
@@ -27,6 +30,7 @@ class Adam:
         one = np.float32(1)
 
         t   = tf.assign_add(t_prev, one)
+        self.learning_rate = self.schedule(t)
         a_t = self.learning_rate*tf.sqrt(1-tf.pow(self.beta2,t))/(1-tf.pow(self.beta1, t))
 
         for param, g_t in zip(params, gradients):

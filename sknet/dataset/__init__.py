@@ -96,6 +96,8 @@ class Dataset(dict):
     def sets(self):
         return [k for k in self[self.variables[0]].keys() if type(k)==str]
 
+    def N(self,context):
+        return len(self[self.variables[0]][context])
 
 
 from .mnist import *

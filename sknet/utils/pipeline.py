@@ -48,9 +48,9 @@ class Pipeline(object):
 #        self.infered_observed = self.network.infered_observed
 
         # Get the train op
-        self.update_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-        with tf.control_dependencies(self.update_op):
-            self.train_op = self.optimizer.minimize(self.loss)
+#        self.update_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
+#        with tf.control_dependencies(self.update_op):
+#            self.train_op = self.optimizer.minimize(self.loss)
 
         # initialize the variables
         self.session.run(tf.global_variables_initializer())
@@ -93,34 +93,111 @@ class Pipeline(object):
                 self.network.set_deterministic(False,self.session)
                 print('\t\t{0:.1f}%'.format(100*i/(n//self.batch_size)),loss[-1])
         return loss
-    def _epoch_test(self,items=None, set_="test_set"):
-        acc = 0.0
-        self.network.set_deterministic(True,self.session)
-        if items is not None:
-            n = len(items[0][1])
-        else:
-            if self.items[0][1] is not None:
-                n = len(self.dataset[self.items[0][1]][set_])
-        for i in range(n//self.batch_size):
-            here = range(i*self.batch_size,(i+1)*self.batch_size)
-            if items is None:
-                feed_dict = [(key,self.dataset[value][set_][here]) for key,value in self.items]
-            else:
-                feed_dict = [(key,value[i*self.batch_size:(i+1)*self.batch_size]) for key,value in items]
-            acc += self.session.run(self.test_loss,feed_dict=dict(feed_dict))
-        return acc/(n//self.batch_size)
-    def link(self,items):
-        """items is a list of tuples of the form
-        (bn_layer,value,teacher_forcing_value) but it can be
-        (bn_layer,value) no teacher forcing, false by default
-        (bn_layer,None,teacher_forcing_value) is this layer.observation is not a placeholder
+    def epoch(self,op,linkage=None, context="test_set", deterministic=None, batch_size=None):
+        """Perform an epoch (according to the set given by context).
+        Execute and save the given ops and optionally apply a numpy function
+        on them at the end of the epoch. THis is usefull for example to only
+        return the average over the batches of the computed statistics, or the
+        max....
+
+        Example of use is ::
+
+            # typical training setting
+            op = [[minimizer_op,1],
+                  [loss,30,np.mean]]
+            pipeline.epoch(op=op,context='train_set',deterministic=False)
+
+            # typical test setting, average over the batch accuracies
+            op = [[accuracy,1,lambda x:np.mean(x,0)]]
+            pipeline.epoch(op=op,context='test_set',deterministic=True)
+
+        Parameters
+        ----------
+
+        op : tf.Tensor or list of tf.Tensor or list of descriptor
+            the op (or ops as a list of ops) to run for one epoch or 
+            a list of the form [(op1,periodicity, optional np op)] where op1 can again
+            be a list. For example, during training, one might prefer
+            to compute some statistics only every X batch for example ::
+
+
         """
-        if self.dataset is None:
-            print(error)
-            exit()
+        # find out the batch_size, if not given, take it from the network, if given
+        # (case when the network was build with None as batch_size, then assert that
+        # it is true (or at least that they both match)
+        if batch_size is None:
+            assert(self.network.batch_size is not None)
+            batch_size = self.network.batch_size
+        elif self.network.batch_size is not None:
+            assert(batch_size==self.network.batch_size)
+        # if a deterministic behavior is given, set it
+        if deterministic is not None:
+            self.network.set_deterministic(deterministic,self.session)
+        # compute the number of batches
+        if linkage is not None:
+            N = max([len(value) for value in linkage.values])
         else:
-            self.items = items
-    def fit(self, items=None, update_time = 50, n_epochs=5, passive_epochs=0):
+            N = self.network.dataset.N(context)
+        N_BATCH = N//batch_size
+        if hasattr(op,'__len__'):
+            if hasattr(op[0],'__len__'):
+                assert(type(op)==list)
+                assert(type(op[0])==list)
+                assert(not hasattr(op[0][0],'__len__'))
+                output = [[] for _ in range(len(op))]
+                multiple=True
+                # ensure that an op is given or set it to identity
+                for i in range(len(op)):
+                    if len(op[i])==2:
+                        op[i].append(lambda x:x)
+        else:
+            output = list()
+            multiple=False
+        for i in range(N_BATCH):
+            here = range(i*batch_size,(i+1)*batch_size)
+            if not multiple:
+                if linkage is None:
+                    output.append(self.execute(op,indices=here,context=context))
+                else:
+                    output.append(self.execute(op,linkage=linkage))
+            else:
+                for j in range(len(op)):
+                    if (i%op[j][1])==0:
+                        if linkage is None:
+                            output[j].append(self.execute(op[j][0],indices=here,context=context))
+                        else:
+                            output[j].append(self.execute(op[j][0],linkage=linkage))
+        if multiple:
+            output = [op[i][-1](np.concatenate([batch_out for 
+                            batch_out in output[i]],0)) if hasattr(output[i][0],'__len__') else op[i][-1](np.asarray([batch_out for
+                            batch_out in output[i]])) for i in range(len(op))]
+        elif hasattr(op,'__len__'):
+            output = np.concatenate([batch_out[i] for batch_out in output],0)
+        else:
+            output = np.concatenate(output,0)
+        return output
+    def fit(self, train_ops, valid_ops, test_ops, n_epochs=5, passive_epochs=0):
+        """Apply multiple consecutive epochs of train test and valid
+
+        Example of use ::
+
+            train_ops = [[minimizer_op,1],
+                         [loss,30]]
+            test_ops  = [[accuracy,1,lambda x:np.mean(x,0)],
+                         [loss,1,lambda x:np.mean(x,0)]]
+            valid_ops = test_ops
+
+            # will fit the model for 50 epochs and return the gathered op
+            # outputs given the above definitions
+            outputs = pipeline.fit(train_ops,valid_ops,test_ops,n_epochs=50)
+            train_output, valid_output, test_output = outputs
+
+        Parameters
+        ----------
+
+        train_ops : operators
+
+        """
         # Init list
         train_loss = []
         valid_loss = []
@@ -130,28 +207,65 @@ class Pipeline(object):
             self._epoch_fit_passive(items=items)
         for epoch in range(n_epochs):
             print("\tEpoch",epoch)
-            train_loss.append(self._epoch_train(items=items, update_time=update_time))
-            # NOW COMPUTE VALID SET ACCURACY
-            valid_loss.append(self._epoch_test(items=items,set_='valid_set'))
-            # NOW COMPUTE TEST SET ACCURACY
-            test_loss.append(self._epoch_test(items=items,set_='test_set'))
-            self.lr_schedule.update(epoch=epoch,valid_accu=valid_loss)
+            # TRAIN SET
+            train_loss.append(self.epoch(train_ops,context='train_set',deterministic=False))
+            # VALID SET
+            valid_loss.append(self.epoch(valid_ops,context='valid_set',deterministic=True))
+            # TEST SET
+            test_loss.append(self.epoch(test_ops,context='test_set',deterministic=True))
+#            self.lr_schedule.update(epoch=epoch,valid_accu=valid_loss)
             print('\tValid:',valid_loss[-1])
-        return train_loss,valid_loss,test_loss,self.lr_schedule.lrs
-    def predict(self,variables,linkage, deterministic=None, concat=True):
+            print('\tValid:',test_loss[-1])
+        return train_loss,valid_loss,test_loss
+
+    def execute(self,op,linkage=None,indices=None,context=None,additional_linkage=None):
+        """Execute a given op given a linkage of inputs:variables
+        or given indices and context additional linkage can be for 
+        example the learning rate etc as in
+        additional_linkage = {self.optimizer.learning_rate:np.float32(self.lr_schedule.lrs[-1])}
+        
+        Parameters
+        ----------
+
+        op : tf.Tensor or tf.Operation or list of tf.Tensor or tf.Operation
+            the operation(s) and/or tensor(s) to execute
+
+        context : str 
+            the name of the set onto which extract the data via indices, it 
+            should be a value present in dataset.sets
+
+        indices : list or array of int
+            the indices to extract the batch from the set given by context 
+            the obtained data will thus be from the following 
+            ``self.dataset[data][context][indices]`` where data is the name
+            of the variable needed for each dependency of op
+
         """
-        Given an array return the prediction
-        """
-        if deterministic is not None:
-            self.network.set_deterministic(deterministic,self.session)
-        n = linkage[0][1].shape[0]//self.batch_size
-        preds = []
-        for i in range(n):
-            feed_dict = [(key,value[i*self.batch_size:(i+1)*self.batch_size]) for key,value in linkage]
-            preds.append(self.session.run(variables,feed_dict=dict(feed_dict)))
-        if concat:
-            preds = [np.concatenate([pred[i] for pred in preds],0) for i in range(len(variables))]
-        return preds
+        assert(type(additional_linkage)==dict or additional_linkage is None)
+        if type(linkage)==dict:
+            if additional_linkage is not None:
+                return self.session.run(op,feed_dict=
+                                        {**linkage,**additional_linkage})
+            else:
+                return self.session.run(op,feed_dict=linkage)
+        # check if op is a list of op, in this case compute the non redundant
+        # dependencies
+        if hasattr(op,'__len__'):
+            assert(not hasattr(p[0],'__len__'))
+            dependencies = list(set(self.network.dependencies[op_] 
+                                                            for op_ in op))
+        else:
+            dependencies = self.network.dependencies[op]
+
+        feed_dict = [(var,self.network.get_input_for(var,indices,context)) 
+                                for var in dependencies]
+        if additional_linkage is not None:
+            feed_dict = feed_dict+additional_linkage.items()
+        return self.session.run(op,feed_dict=dict(feed_dict))
+
+
+
+
     def get_continuous_VQ(self,X):
         """
         given a collection of observations X, return the VQ for each of the layers
@@ -166,25 +280,6 @@ class Pipeline(object):
                 VQs[l].append(values)
         VQs = stack([concatenate(VQ,0) for VQ in VQs],1)
         return VQs
-    def get_VQ(self,X):
-        """
-        given a collection of observations X, return the VQ (binary) of each layer"""
-        n      = X.shape[0]//self.batch_size
-        VQs    = []
-        for j in range(n):
-            VQs.append(self.session.run(self.VQ,feed_dict={self.x:X[self.batch_size*j:self.batch_size*(j+1)],self.training:False}))
-        return VQs
-    def get_radius(self,X):
-        """
-        given a collection of observations X, return the VQ (binary) of each layer"""
-        n      = X.shape[0]//self.batch_size
-        positive_radius = []
-        negative_radius = []
-        for j in range(n):
-            a = self.session.run(self.distances,feed_dict={self.x:X[self.batch_size*j:self.batch_size*(j+1)],self.training:False})
-            positive_radius.append(a)
-            negative_radius.append(a)
-        return concatenate(positive_radius,0),concatenate(negative_radius,0)
 
 
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-import numpy as np
 
+import numpy as np
+import tensorflow as tf
 
 class constant:
     """constant learning rate.
@@ -106,6 +107,28 @@ class stepwise:
                   rate change -> new learning rate
         :type lr: dict
         """
+        self.dict_lr = dict_lr
+        # get epoch and values
+        epochs = np.asarray(list(dict_lr.keys())).astype('int32')
+        values = np.asarray(list(dict_lr.values())).astype('float32')
+        # sort them
+        arg = np.argsort(epochs)
+        print(arg,epochs,values)
+        epochs=epochs[arg]
+        values=values[arg]
+        # set up tf variables
+        self.epochs = [tf.constant(e) for e in epochs]
+        self.values = [tf.constant(v) for v in values]
+
+    def __call__(self,epoch,*args,**kwargs):
+        
+        epoch = tf.cast(epoch,tf.int32)
+        pairs =[(tf.logical_and(tf.greater_equal(epoch,e),tf.less(epoch,ep)),lambda :v) 
+            for e,ep,v in zip(self.epochs[:-1],self.epochs[1:],self.values[:-1])]
+
+        lr = tf.case(pairs,default=lambda :self.values[-1], exclusive=True, strict=False, 
+                                    name='case_learningrate')
+        return lr
         self.lr   = dict_lr
         self.reset()
         self.name = '-schedule(stepwise,dict='+str(dict_lr).replace(' ','')+')'
