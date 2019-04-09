@@ -5,6 +5,7 @@ import tensorflow as tf
 from tensorflow.python.framework import dtypes
 import numpy as np
 import time
+import re
 
 __all__ = [
         "dataset",
@@ -16,6 +17,33 @@ __all__ = [
 
 
 __version__ = 'alpha.1'
+
+
+
+
+
+def get_tensor_dependencies(tensor):
+
+    # If a tensor is passed in, get its op
+    try:
+        tensor_op = tensor.op
+    except:
+        tensor_op = tensor
+
+    # Recursively analyze inputs
+    dependencies = []
+    for inp in tensor_op.inputs:
+        new_d = get_tensor_dependencies(inp)
+        non_repeated = [d for d in new_d if d not in dependencies]
+        dependencies = [*dependencies, *non_repeated]
+
+    # If we've reached the "end", return the op's name
+    if tensor_op.type == 'Placeholder':
+        dependencies = [tensor]
+
+    # Return a list of tensor op names
+    return dependencies
+
 
 
 
@@ -188,6 +216,185 @@ class Tensor(tf.Tensor):
         self._shape_val   = self._c_api_shape()
         self._consumers   = tensor_or_func._consumers
         self._id          = tensor_or_func._id
+
+
+
+# instruction
+def Parser(instruction):
+    """Parser to transform string into boolean variables.
+
+    command2 is applied at the end of the batche
+
+    command1 every time1 and command2 
+
+    time1 = - batch (same as 1 batch)
+            - (int) batch
+            - epoch
+
+    command1 = - (same as execute)
+               - save (will gather the output into list)
+               - print (will print the output)
+               - any combination of the above linked with &
+
+    command2 = same as command1 with extra possibility of giveing
+               - average or maximum (a function to be applied)
+
+    """
+    splitting = instruction.split('and')
+    part1     = splitting[0]
+    command1, periodicity = part1.split('every')
+    periodicity = periodicity.replace(' ','')
+    if periodicity[0].isdigit():
+        periodicity = re.findall(r'\d+', periodicity)[0]
+    else:
+        periodicity = 1
+    if len(splitting)>1:
+        command2 = splitting[1]
+    else:
+        command2 = ''
+    if 'average' in command2:
+        func = lambda x:np.mean(x,0)
+        transform = True
+    elif 'maximum' in command2:
+        func = lambda x:np.max(x,0)
+        transform = True
+    else:
+        func = lambda x:x
+        transform = False
+    attr = dict([('batch_instr',command1),('epoch_instr',command2),
+                ('periodicity',int(periodicity)),('transform',transform),
+                ('func',func)])
+    return attr
+
+
+
+
+class Worker(object):
+    def __init__(self,name,context,op, instruction, deterministic=None,repeat=1):
+        self._dependencies = get_tensor_dependencies(op)
+        self.name          = name
+        self.repeat        = repeat
+        self.deterministic = [deterministic]
+        self.context       = context
+        self._op           = [op]
+        # to gather all the epoch/batch data
+        self.data          = list()
+        # to gather transformed (epoch) data if present
+        self.transform_data= list()
+        # to gather data (batch) at each epoch
+        self.epoch_data    = list()
+        # specific to the saving and transformation
+        instr = Parser(instruction)
+        self.__dict__.update(instr)
+    @property
+    def dependencies(self):
+        return self._dependencies
+    @property
+    def op(self):
+        return self._op
+    def get_op(self,batch_nb):
+        if batch_nb%self.periodicity==0:
+            return self.op
+        else:
+            return []
+    def append(self,data,print_=True):
+        if len(data)==0:
+            return ''
+        data=data[0]
+        to_print = ''
+#        if len(data)==0:
+#            return
+        if 'save' in self.batch_instr or self.transform:
+            self.epoch_data.append(data)
+        if 'print' in self.batch_instr:
+            to_print = self.name+':'+str(data)
+            if print_:
+                print(to_print)
+        return to_print
+
+    def epoch_done(self,print_ = True):
+        to_print=''
+        if len(self.epoch_data)>0:
+            if hasattr(self.epoch_data[0],'__len__'):
+                self.epoch_data = np.concatenate(self.epoch_data,0)
+            else:
+                self.epoch_data = np.asarray(self.epoch_data)
+        # apply transform if needed
+        # then print if needed
+        # then save if needed
+        if self.transform:
+            transform = self.func(self.epoch_data)
+            if 'print' in self.epoch_instr:
+                to_print = self.name+':'+str(transform)
+                if print_:
+                    print(to_print)
+            if 'save' in self.epoch_instr:
+                self.transform_data.append(transform)
+        # save into the main data collection
+        if 'save' in self.batch_instr:
+            self.data.append(self.epoch_data)
+        # reset epoch data
+        self.epoch_data = list()
+        return to_print
+
+
+
+
+class WorkerPool(object):
+    def __init__(self,workers,name=''):
+        self.N_workers = len(workers)
+        self._workers = workers
+        assert(len(set([worker.context for worker in workers]))<2)
+        assert(len(set([worker.repeat for worker in workers]))<2)
+        self._dependencies = list(set([item for worker in workers 
+                                for item in worker.dependencies]))
+        self._op = [worker.op for worker in workers]
+        self._repeat = workers[0].repeat
+        self._context = workers[0].context
+        self._name = name
+        self._deterministic = [worker.deterministic for worker in workers]
+
+    @property
+    def name(self):
+        return self._name
+    @property
+    def repeat(self):
+        return self._repeat
+    @property
+    def op(self):
+        return self._op
+    @property
+    def context(self):
+        return self._context
+    @property
+    def dependencies(self):
+        return self._dependencies
+    @property
+    def workers(self):
+        return self._workers
+    @property
+    def deterministic(self):
+        return self._deterministic
+
+    def get_op(self,batch_nb):
+        ops = [worker.get_op(batch_nb) for worker in self.workers]
+        return ops
+
+    def append(self,data):
+        to_print = ''
+        for datum,worker in zip(data,self.workers):
+            to_print+=worker.append(datum,print_=False)
+        if len(to_print)>0:
+            print(to_print)
+
+    def epoch_done(self):
+        to_print=''
+        for worker in self.workers:
+            to_print+=worker.epoch_done(print_=False)
+        if len(to_print)>0:
+            print(to_print)
+
+
 
 
 

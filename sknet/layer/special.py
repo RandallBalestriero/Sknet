@@ -83,41 +83,43 @@ class Activation(Layer):
 
     Example of use::
 
-        input_shape = [10,1,32,32]
-        # simple case of renormalization of all the values
-        # by maximum value
-        layer = LambdaFunction(input_shape,func= lambda x:x,sh/tf.reduce_max(x))
-        # more complex case with shape alteration taking only the first
-        # half of the second dimension
-        def my_func(x,x_shape):
-            return x[:,:x_shape[1]//2]
-        def my_shape_func(x_shape):
-            new_shape = x_shape
-            new_shape[1]=new_shape[1]//2
-            return new_shape
-        layer = LambdaFunction(input_shape,func=my_func,
-                            shape_func = my_shape_func)
+        # relu case, recommanded to do it with a scalar for internal
+        # optimization, especially if using the backward method later
+        # in the graph
+        Activation(previous_layer,func_or_scalar = 0)
+        # otherwise, it is equivalent to
+        Activation(previous_layer,func_or_scalar = tf.nn.relu)
 
-    :param incoming: input shape of tensor
-    :type incoming: shape or :class:`Layer` instance
-    :param func: function to be applied taking as input the tensor
-    :type func: func
+    Parameters
+    ----------
+
+    incoming : tf.Tensor or np.ndarray
+        the input to the later
+
+    func_or_scalar : scalar or func
+        the function to be applied as activation function or the scalar
+        that correspond to the slope of the spline for negative inputs.
+        For example, -1 for absolute value, 0 for relu and 0.1 for 
+        leaky-relu. When using a spline activation as those ones,
+        it is recommended to pass a scalar to optimize the backward
+        method if used later in the graph.
+
     """
 
-    def __init__(self,incoming,func_or_scalar,
-                deterministic=None, batch_norm = False,
-                init_W = tfl.xavier_initializer(uniform=True),
-                init_b = tf.zeros, observed=False,observation=None,name='',
-                teacher_forcing=None):
+    def __init__(self,incoming,func_or_scalar,*args,**kwargs):
 
         self._func_or_scalar = func_or_scalar
-        super().__init__(incoming, deterministic=deterministic, 
-                        observed=observed, observation=observation, 
-                        teacher_forcing=teacher_forcing)
+        # determine if a max-affine spline
+        if np.isscalar(func_or_scalar):
+            self.mas=True
+        else:
+            self.mas=False
+        super().__init__(incoming)
 
     def forward(self,input,deterministic=None,**kwargs):
         if np.isscalar(self._func_or_scalar):
             if self._func_or_scalar==1:
+                self.mask = np.float32(1)
                 output = input
             else:
                 self.mask = tf.greater(input,0)
@@ -128,6 +130,13 @@ class Activation(Layer):
             else:
                 output = self._func_or_scalar(input)
         return output
+    def backward(self,input,*args,**kwargs):
+        if self.mas:
+            return input*self.mask
+        else:
+            return tf.gradient(self,self.input,input)[0]
+
+
 
 
 

@@ -183,10 +183,10 @@
 </div>
 <dl class="class">
 <dt id="sknet.network.Network">
-<em class="property">class </em><code class="descclassname">sknet.network.</code><code class="descname">Network</code><span class="sig-paren">(</span><em>layers=None</em>, <em>name='model'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/network.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.network.Network" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">sknet.network.</code><code class="descname">Network</code><span class="sig-paren">(</span><em>layers=None</em>, <em>name='model'</em>, <em>dataset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/network.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.network.Network" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="sknet.network.Network.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>layers=None</em>, <em>name='model'</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/network.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.network.Network.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>layers=None</em>, <em>name='model'</em>, <em>dataset=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/network.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.network.Network.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -194,6 +194,33 @@
 <dt id="sknet.network.Network.__weakref__">
 <code class="descname">__weakref__</code><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/network.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.network.Network.__weakref__" title="Permalink to this definition">¶</a></dt>
 <dd><p>list of weak references to the object (if defined)</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="sknet.network.Network.get_input_for">
+<code class="descname">get_input_for</code><span class="sig-paren">(</span><em>var</em>, <em>indices</em>, <em>context</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/network.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.network.Network.get_input_for" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a placeholder, batch indices and a set_name (context)
+return the data corresponding to be fed for this placeholder
+extract from the given set and indices</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>var</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tf.placeholder</span></dt>
+<dd><p class="first last">a placeholder, present in self.placeholders and that has been
+linked with a corresponding dataset in <code class="docutils literal notranslate"><span class="pre">self.linkage</span></code></p>
+</dd>
+<dt><strong>indices</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list or array of int</span></dt>
+<dd><p class="first last">the indices of the data to be extracted</p>
+</dd>
+<dt><strong>context</strong> <span class="classifier-delimiter">:</span> <span class="classifier">the set to extract the data from</span></dt>
+<dd></dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
 </dd></dl>
 
 <dl class="method">

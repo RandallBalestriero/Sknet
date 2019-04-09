@@ -219,6 +219,18 @@
 </tbody>
 </table>
 <span class="target" id="module-sknet.optimize.loss"></span><p class="rubric"><a class="reference internal" href="optimize/loss.html"><span class="doc">Loss</span></a></p>
+<p>All the losses are classes which inherit from <code class="xref py py-class docutils literal notranslate"><span class="pre">tf.Tensor</span></code> and thus behave
+as such (as standard tensorflow variables). Thus one can do the
+following for example</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">loss1</span> <span class="o">=</span> <span class="n">l2_norm</span><span class="p">(</span><span class="n">W1</span><span class="p">)</span>
+<span class="n">loss2</span> <span class="o">=</span> <span class="n">l2_norm</span><span class="p">(</span><span class="n">W2</span><span class="p">)</span>
+<span class="n">loss3</span> <span class="o">=</span> <span class="n">crossentropy_logits</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">q</span><span class="o">=</span><span class="n">network_output</span><span class="p">)</span>
+<span class="n">loss</span>  <span class="o">=</span> <span class="n">loss1</span><span class="o">+</span><span class="n">loss2</span>
+</pre></div>
+</div>
+<p>as such in the above, the variables also contrain the loss attributes such as
+<code class="docutils literal notranslate"><span class="pre">loss3.p</span></code> which will return the placeholder created to compute the loss (as
+<code class="xref py py-data docutils literal notranslate"><span class="pre">p</span></code> was not provided.</p>
 <table border="1" class="longtable docutils">
 <colgroup>
 <col width="10%" />
@@ -226,10 +238,13 @@
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="optimize/loss.html#sknet.optimize.loss.accuracy" title="sknet.optimize.loss.accuracy"><code class="xref py py-obj docutils literal notranslate"><span class="pre">accuracy</span></code></a></td>
-<td></td>
+<td>Accuracy</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="optimize/loss.html#sknet.optimize.loss.classification" title="sknet.optimize.loss.classification"><code class="xref py py-obj docutils literal notranslate"><span class="pre">classification</span></code></a></td>
-<td></td>
+<tr class="row-even"><td><a class="reference internal" href="optimize/loss.html#sknet.optimize.loss.crossentropy_logits" title="sknet.optimize.loss.crossentropy_logits"><code class="xref py py-obj docutils literal notranslate"><span class="pre">crossentropy_logits</span></code></a></td>
+<td>Cross entropy loss given that <span class="math notranslate nohighlight">\(p\)</span> is sparse and <span class="math notranslate nohighlight">\(q\)</span> is the log-probability.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="optimize/loss.html#sknet.optimize.loss.l2_norm" title="sknet.optimize.loss.l2_norm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">l2_norm</span></code></a></td>
+<td>Cross entropy loss given that <span class="math notranslate nohighlight">\(p\)</span> is sparse and <span class="math notranslate nohighlight">\(q\)</span> is the log-probability.</td>
 </tr>
 </tbody>
 </table>

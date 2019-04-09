@@ -3,6 +3,7 @@
 
 import tensorflow as tf
 import numpy as np
+from .. import Worker
 
 #ToDo set the seed for the batches etc
 
@@ -20,80 +21,25 @@ class DummyTrainer(object):
         self.network = network
 #        with tf.device('/device:GPU:0'):
         self.session.run(tf.global_variables_initializer())
-        self.input  = self.network.input
-        self.output = self.network.output 
-
+#        self.input  = self.network.input
+#        self.output = self.network.output 
+        self.ops    = dict()
 
 class Pipeline(object):
-    def __init__(self, network, dataset=None, external_loss=0, lr_schedule=None, 
-                                optimizer=None, test_loss=None):
-        # Tensorflow Config
-#        tf.reset_default_graph()
+    def __init__(self, network, dataset=None, linkage=None):
         config                          = tf.ConfigProto()
         config.gpu_options.allow_growth = True
         config.log_device_placement     = True
         self.session                    = tf.Session(config=config)
         # Attributes
         self.network  = network
-#        self.loss     = external_loss+self.network.loss
-#        self.test_loss= test_loss
         self.dataset  = dataset
-#        self.lr_schedule = lr_schedule
-#        self.optimizer = optimizer
-#        self.batch_size = self.network[0].shape.as_list()[0]
-
-        # set up the network input-output shortcut
-#        self.input  = self.network.input
-#        self.output = self.network.output
-#        self.infered_observed = self.network.infered_observed
-
-        # Get the train op
-#        self.update_op = tf.get_collection(tf.GraphKeys.UPDATE_OPS)
-#        with tf.control_dependencies(self.update_op):
-#            self.train_op = self.optimizer.minimize(self.loss)
-
+        self._linkage = linkage
+        self._ops     = dict()
         # initialize the variables
         self.session.run(tf.global_variables_initializer())
 
-    def _epoch_fit_passive(self,items):
-        """This method allows to run in training mode the network
-        without updating the network according to self.train_op,
-        this is to study the passive update rules
-        """
-        perm = np.random.permutation(len(items[0][1]))
-        n = len(items[0][1])//self.batch_size
-        self.network.set_deterministic(False,self.session)
-        for i in range(n):
-            here      = perm[i*self.batch_size:(i+1)*self.batch_size]
-            if self.dataset is None:
-                feed_dict = [(key,self.dataset["train_set"][value][here]) for key,value in items]
-            else:
-                feed_dict = [(key,value[here]) for key,value in items]
-            self.session.run(self.update_op,feed_dict=dict(feed_dict))
-    def _epoch_train(self,items=None,update_time=50,set_="train_set"):
-        loss = []
-        if items is not None:
-            n = len(items[0][1])
-        else:
-            if self.items[0][1] is not None:
-                n = len(self.dataset[self.items[0][1]][set_])
-        perm = np.random.permutation(n)
-        self.network.set_deterministic(False,self.session)
-        for i in range(n//self.batch_size):
-            here = perm[i*self.batch_size:(i+1)*self.batch_size]
-            if items is None:
-                feed_dict = [(key,self.dataset[value][set_][here]) for key,value in self.items]
-            else:
-                feed_dict = [(key,value[here]) for key,value in items]
-            lr_dict   = [self.optimizer.learning_rate,np.float32(self.lr_schedule.lrs[-1])]
-            self.session.run(self.train_op,feed_dict=dict(feed_dict+[lr_dict]))
-            if(i%update_time==0):
-                self.network.set_deterministic(True,self.session)
-                loss.append(self.session.run(self.loss,feed_dict=dict(feed_dict)))
-                self.network.set_deterministic(False,self.session)
-                print('\t\t{0:.1f}%'.format(100*i/(n//self.batch_size)),loss[-1])
-        return loss
-    def epoch(self,op,linkage=None, context="test_set", deterministic=None, batch_size=None):
+    def execute_op(self,op,feed_dict,batch_size=None,deterministic=None):
         """Perform an epoch (according to the set given by context).
         Execute and save the given ops and optionally apply a numpy function
         on them at the end of the epoch. THis is usefull for example to only
@@ -111,72 +57,137 @@ class Pipeline(object):
             op = [[accuracy,1,lambda x:np.mean(x,0)]]
             pipeline.epoch(op=op,context='test_set',deterministic=True)
 
+            # Case where one is autonomous
+            pipeline.epoch(op=[minimize,loss],context='train_set',
+                            deterministic=False,
+                            linkage={network[0]:X_train,loss.p:Y_train})
+
+
         Parameters
         ----------
 
-        op : tf.Tensor or list of tf.Tensor or list of descriptor
+        op : (one or list of) tf.Tensor or sknet.Op
             the op (or ops as a list of ops) to run for one epoch or 
-            a list of the form [(op1,periodicity, optional np op)] where op1 can again
-            be a list. For example, during training, one might prefer
-            to compute some statistics only every X batch for example ::
+            a list of the form [(op1,periodicity, optional np op)] 
+            where op1 can again be a list. For example, during training, 
+            one might prefer to compute 
 
 
         """
-        # find out the batch_size, if not given, take it from the network, if given
-        # (case when the network was build with None as batch_size, then assert that
+        N = max([len(value) for value in feed_dict.values()])
+        # find out the batch_size, if not given, take it from the network, 
+        # if given (case when the network was build with None 
+        # as batch_size, then assert that
         # it is true (or at least that they both match)
-        if batch_size is None:
-            assert(self.network.batch_size is not None)
+        if batch_size is None and self.network.batch_size is None:
+            batch_size = N
+        elif batch_size is None and self.network.batch_size is not None:
             batch_size = self.network.batch_size
-        elif self.network.batch_size is not None:
-            assert(batch_size==self.network.batch_size)
+        else:
+            print("error")
+            exit()
+        
         # if a deterministic behavior is given, set it
         if deterministic is not None:
             self.network.set_deterministic(deterministic,self.session)
-        # compute the number of batches
-        if linkage is not None:
-            N = max([len(value) for value in linkage.values])
-        else:
-            N = self.network.dataset.N(context)
+
+        # Get number of data and batches
         N_BATCH = N//batch_size
-        if hasattr(op,'__len__'):
-            if hasattr(op[0],'__len__'):
-                assert(type(op)==list)
-                assert(type(op[0])==list)
-                assert(not hasattr(op[0][0],'__len__'))
-                output = [[] for _ in range(len(op))]
-                multiple=True
-                # ensure that an op is given or set it to identity
-                for i in range(len(op)):
-                    if len(op[i])==2:
-                        op[i].append(lambda x:x)
-        else:
+
+        if N_BATCH>1:
             output = list()
-            multiple=False
-        for i in range(N_BATCH):
-            here = range(i*batch_size,(i+1)*batch_size)
-            if not multiple:
-                if linkage is None:
-                    output.append(self.execute(op,indices=here,context=context))
-                else:
-                    output.append(self.execute(op,linkage=linkage))
+            for i in range(N_BATCH):
+                here  = range(i*batch_size,(i+1)*batch_size)
+                feed_ = [(key,value[here]) for key,value in linkage.items()]
+                output.append(self.session.run(op,feed_dict=feed_))
+            # Concatenate the outputs over the batch axis
+            if hasattr(op,'__len__'):
+                output = np.concatenate([batch_out[i] 
+                            for batch_out in output],0)
             else:
-                for j in range(len(op)):
-                    if (i%op[j][1])==0:
-                        if linkage is None:
-                            output[j].append(self.execute(op[j][0],indices=here,context=context))
-                        else:
-                            output[j].append(self.execute(op[j][0],linkage=linkage))
-        if multiple:
-            output = [op[i][-1](np.concatenate([batch_out for 
-                            batch_out in output[i]],0)) if hasattr(output[i][0],'__len__') else op[i][-1](np.asarray([batch_out for
-                            batch_out in output[i]])) for i in range(len(op))]
-        elif hasattr(op,'__len__'):
-            output = np.concatenate([batch_out[i] for batch_out in output],0)
+                output = np.concatenate(output,0)
         else:
-            output = np.concatenate(output,0)
+            output = self.session.run(op,feed_dict=feed_dict)
         return output
-    def fit(self, train_ops, valid_ops, test_ops, n_epochs=5, passive_epochs=0):
+ 
+    def execute_worker(self,worker):
+        """Perform an epoch (according to the set given by context).
+        Execute and save the given ops and optionally apply a numpy function
+        on them at the end of the epoch. THis is usefull for example to only
+        return the average over the batches of the computed statistics, or the
+        max....
+
+        Example of use is ::
+
+            # typical training setting
+            op = [[minimizer_op,1],
+                  [loss,30,np.mean]]
+            pipeline.epoch(op=op,context='train_set',deterministic=False)
+
+            # typical test setting, average over the batch accuracies
+            op = [[accuracy,1,lambda x:np.mean(x,0)]]
+            pipeline.epoch(op=op,context='test_set',deterministic=True)
+
+            # Case where one is autonomous
+            pipeline.epoch(op=[minimize,loss],context='train_set',
+                            deterministic=False,
+                            linkage={network[0]:X_train,loss.p:Y_train})
+
+
+        Parameters
+        ----------
+
+        op : (one or list of) tf.Tensor or sknet.Op
+            the op (or ops as a list of ops) to run for one epoch or 
+            a list of the form [(op1,periodicity, optional np op)] 
+            where op1 can again be a list. For example, during training, 
+            one might prefer to compute 
+
+
+        """
+        # find out the batch_size, if not given, take it from the network, 
+        # if given (case when the network was build with None 
+        # as batch_size, then assert that
+        # it is true (or at least that they both match)
+        batch_size = self.network.batch_size
+        N = self.dataset.N(worker.context)
+        N_BATCH = N//batch_size
+        # get dependencies
+        dependencies = worker.dependencies
+        # get context
+        context = worker.context
+        # Loop over all the batches
+        for i in range(N_BATCH):
+            # current indices
+            here = range(i*batch_size,(i+1)*batch_size)
+            # create the feed dict for the batch
+            feed_dict = list()
+            for var in dependencies:
+                var_name = self.linkage[var.name]
+                value = self.dataset[var_name][worker.context][here]
+                feed_dict.append((var,value))
+            # get the op(s)
+            op = worker.get_op(i)
+            output = []
+            for op_,deterministic in zip(op,worker.deterministic):
+                if op_==[]:
+                    output.append([])
+                    continue
+                if deterministic is not None:
+                    self.network.set_deterministic(deterministic,self.session)
+                output.append(self.session.run(op_,feed_dict=dict(feed_dict)))
+            worker.append(output)
+        worker.epoch_done()
+ 
+    def add_linkage(self,linkage):
+        self._linkage = linkage
+    @property
+    def linkage(self):
+        return self._linkage
+    @property
+    def workers(self):
+        return self._workers
+    def execute_queue(self,queue, repeat=1):
         """Apply multiple consecutive epochs of train test and valid
 
         Example of use ::
@@ -195,91 +206,45 @@ class Pipeline(object):
         Parameters
         ----------
 
-        train_ops : operators
+        repeat : int (default to 1)
+            number of times to repeat the fit pattern
+
+        contexts : list of str (optional, default None)
+            the list describing the ops and the number of times
+            to execute them. For example, suppose that during
+            consturction, ops were added for context
+            ``"train_set"`` and ``"test_set"`` and ``"valid_set"``,
+            then one could do ::
+
+                # the pipeline fit will perform on epoch for 
+                # each and then going to the next, and this
+                # :py:data:`repeat` times, which would lead to 
+                # 1 epoch train_set -> 1 epoch valid_set
+                # -> 1 epoch test_set ->1 epoch train_set
+                # -> 1 epoch valid_set ...
+                contexts = ("train_set","valid_set","test_set")
+                # If one context needs to be execute more than 1
+                # epoch prior going to the next, then use
+                contexts = (("train_set",10),"valid_set","test_set")
+                # this would make the pipeline do 10 epochs of train_set
+                # prior doing 1 epoch of valid_set and 1 epoch of
+                # test_set and then starting again with 10 epochs
+                # of train_set. again, this process is reapeted 
+                # :py:data:`repeat` times
+
 
         """
-        # Init list
-        train_loss = []
-        valid_loss = []
-        test_loss  = []
-        # Perform training of batch-norm (optional, should be 0 in general)
-        for i in range(passive_epochs):
-            self._epoch_fit_passive(items=items)
-        for epoch in range(n_epochs):
-            print("\tEpoch",epoch)
-            # TRAIN SET
-            train_loss.append(self.epoch(train_ops,context='train_set',deterministic=False))
-            # VALID SET
-            valid_loss.append(self.epoch(valid_ops,context='valid_set',deterministic=True))
-            # TEST SET
-            test_loss.append(self.epoch(test_ops,context='test_set',deterministic=True))
-#            self.lr_schedule.update(epoch=epoch,valid_accu=valid_loss)
-            print('\tValid:',valid_loss[-1])
-            print('\tValid:',test_loss[-1])
-        return train_loss,valid_loss,test_loss
+        for _ in range(repeat):
+            print("Repeat",_)
+            for worker in queue:
+                n_epochs = worker.repeat
+                name     = worker.name
+                print("\trunning Worker:",name)
+                for epoch in range(n_epochs):
+                    if n_epochs>1:
+                        print("\t  Epoch",epoch,'...')
+                    self.execute_worker(worker)
 
-    def execute(self,op,linkage=None,indices=None,context=None,additional_linkage=None):
-        """Execute a given op given a linkage of inputs:variables
-        or given indices and context additional linkage can be for 
-        example the learning rate etc as in
-        additional_linkage = {self.optimizer.learning_rate:np.float32(self.lr_schedule.lrs[-1])}
-        
-        Parameters
-        ----------
-
-        op : tf.Tensor or tf.Operation or list of tf.Tensor or tf.Operation
-            the operation(s) and/or tensor(s) to execute
-
-        context : str 
-            the name of the set onto which extract the data via indices, it 
-            should be a value present in dataset.sets
-
-        indices : list or array of int
-            the indices to extract the batch from the set given by context 
-            the obtained data will thus be from the following 
-            ``self.dataset[data][context][indices]`` where data is the name
-            of the variable needed for each dependency of op
-
-        """
-        assert(type(additional_linkage)==dict or additional_linkage is None)
-        if type(linkage)==dict:
-            if additional_linkage is not None:
-                return self.session.run(op,feed_dict=
-                                        {**linkage,**additional_linkage})
-            else:
-                return self.session.run(op,feed_dict=linkage)
-        # check if op is a list of op, in this case compute the non redundant
-        # dependencies
-        if hasattr(op,'__len__'):
-            assert(not hasattr(p[0],'__len__'))
-            dependencies = list(set(self.network.dependencies[op_] 
-                                                            for op_ in op))
-        else:
-            dependencies = self.network.dependencies[op]
-
-        feed_dict = [(var,self.network.get_input_for(var,indices,context)) 
-                                for var in dependencies]
-        if additional_linkage is not None:
-            feed_dict = feed_dict+additional_linkage.items()
-        return self.session.run(op,feed_dict=dict(feed_dict))
-
-
-
-
-    def get_continuous_VQ(self,X):
-        """
-        given a collection of observations X, return the VQ for each of the layers
-        in the form of a real value vector and a dictionnary mapping each real value to a VQ"""
-        n            = X.shape[0]//self.batch_size
-        VQs          = [[] for i in range(len(self.layers)-1)]
-        dict_VQ2real = [dict() for i in range(len(self.layers)-1)]
-        for j in range(n):
-            vqs = self.session.run(self.VQ,feed_dict={self.x:X[self.batch_size*j:self.batch_size*(j+1)],self.training:False})
-            for l,vq in enumerate(vqs):
-                values,dict_VQ2real[l]=states2values(vq,dict_VQ2real[l])
-                VQs[l].append(values)
-        VQs = stack([concatenate(VQ,0) for VQ in VQs],1)
-        return VQs
 
 
 

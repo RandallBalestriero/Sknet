@@ -5,8 +5,16 @@ Loss
 
 .. currentmodule:: sknet.optimize.loss
 
-.. autofunction:: accuracy
+.. autoclass:: accuracy
+    :members:
 
-.. autofunction:: classification
+.. autoclass:: l2_norm
+    :members:
+
+.. autoclass:: crossentropy_logits
+    :members:
+
+
+
 
 

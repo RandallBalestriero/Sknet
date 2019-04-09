@@ -14,33 +14,60 @@ from ..utils import init_variable as init_var
 
 class Dense(Layer):
     """Dense or fully connected layer.
-    This layer implement a fully connected or a dense layer with or without
-    nonlinearity, and batch-norm
+    This layer implement a fully connected (or dense) linear operator.
 
-    :param incoming: input shape or incoming :class:`Layer` instance
-    :type incoming: tuple of int or Layer
-    :param units: then umber of output units (or neurons)
-    :type units: int
-    :param nonlinearity_c: the coefficient for the nonlinearity, 
-                           0 for ReLU, -1 for absolute value, ...
-    :type nonlinearity_c: scalar
-    :param deterministic: a dummy Tensorflow boolean stating if it is 
-                     deterministic time or testing time
-    :type deterministic: tf.bool
-    :param batch_norm: using or not the batch-normalization
-    :type batch_norm: bool
-    :param init_W: initialization for the W weights
-    :type init_W: initializer of tf.tensor or np.array
-    :param init_b: initialization for the b weights
-    :type init_b: initializer of tf.tensor or np.array
-    :param name: name for the layer
-    :type name: str
+    Parameters
+    ----------
+
+    incoming : tf.Tensor or np.ndarray
+        input to the dense operator, can be another 
+        :py:class:~`sknet.layer.Layer`, a :py:class:`tf.placeholder`, or even
+        a :py:class:`np.ndarray`.
+
+    units : int
+        the number of output units, must be greater or equal to 1.
+
+    W : func or tf.Tensor or np.ndarray
+        the initialization for the :math:`W` parameter. In any case, if the
+        given value is not a function then it is considered a not trainable
+        (because coming from another computation and thus not to be used
+        solely as initialization of a trainable unconstrained variable). If
+        a func then it is assumed to be trainable. The function will be passed
+        the shape of the parameter and should return the value that will be
+        used for initialization of the variable.
+        Example of use ::
+            
+            # the case where the W parameter will be treated as a given
+            # external (and thus non trainable in the layer) parameter
+            # assuming previous_layer is 2D
+            W = tf.random_normal((previous_layer.shape[1],20))
+            Dense(previous_layer,units=20,W = W)
+            # to have a learnable (unconstrained) parameter simply do
+            # if already given the value
+            Dense(previous_layer,units=20,W = lambda *x:W)
+            # or in this case, simply do
+            Dense(previous_layer,units=20,W = tf.random_normal)
+
+    b : func or tf.Tensor or np.ndarray
+        same than W but for the :math:`b` parameter.
+
+    func_W : (optional, default = tf.identity) func 
+        an external function to be applied onto the weights :math:`W` before
+        computing the forward pass
+        Example of use ::
+            
+            # this will force the weights W to be nonnegative to
+            # compute the layer output (all nonegative weights
+            # are turned to 0 by the relu applied on W)
+            Dense(previous_layer,units=20,func_W=tf.nn.relu)
+
+    func_b : (optional, default = tf.identity) func
+        same as func_W but for the :math:`b` parameter
 
     """
-    def __init__(self, incoming, units, nonlinearity = np.float32(1),
-                deterministic=None,
-                init_W = tfl.xavier_initializer(uniform=True), 
-                init_b = tf.zeros,name='',**kwargs):
+    def __init__(self, incoming, units, W = tfl.xavier_initializer(), 
+                b = tf.zeros, func_W = tf.identity, 
+                func_b = tf.identity, name='',*args, **kwargs):
         # Set up the input, flatten if needed
         if len(incoming.shape.as_list())>2:
             self._flatten_input = True
@@ -50,22 +77,27 @@ class Dense(Layer):
             flat_dim  = incoming.shape.as_list()[1]
 
         # Initialize the layer variables
-        self._W = init_var(init_W,(flat_dim,units),
+        self._W = init_var(W,(flat_dim,units),
                             name='dense_W_'+name,
                             trainable=True)
-        self._b = init_var(init_b,(1,units),
+        self._b = init_var(b,(1,units),
                             trainable=True,
                             name='dense_b_'+name)
 
-        self.W  = self._W
-        self.b  = self._b
+        self.W  = func_W(self._W)
+        self.b  = func_b(self._b)
 
-        super().__init__(incoming, deterministic=deterministic,**kwargs)
+        super().__init__(incoming)
 
-    def forward(self, input, deterministic=None, **kwargs):
+    def forward(self, input, *args, **kwargs):
         if self._flatten_input:
             input = tf.layers.flatten(input)
-        return tf.matmul(input,self._W)+self._b
+        return tf.matmul(input,self.W)+self.b
+    def backward(self,input,*args, **kwargs):
+        output = tf.matmul(input,tf.transpose(self.W))
+        if self._flatten_input:
+            return tf.reshape(output,self._input.shape)
+        return output
 
 
 
@@ -89,10 +121,10 @@ class Dense2:
     :type deterministic: tf.bool
     :param batch_norm: using or not the batch-normalization
     :type batch_norm: bool
-    :param init_W: initialization for the W weights
-    :type init_W: initializer of tf.tensor or np.array
-    :param init_b: initialization for the b weights
-    :type init_b: initializer of tf.tensor or np.array
+    :param W: initialization for the W weights
+    :type W: initializer of tf.tensor or np.array
+    :param b: initialization for the b weights
+    :type b: initializer of tf.tensor or np.array
     :param name: name for the layer
     :type name: str
 
@@ -100,8 +132,8 @@ class Dense2:
     variables=["W","b","output"]
     def __init__(self, incoming, units, nonlinearity = np.float32(1),
                 deterministic=None, batch_norm = False,
-                init_W = tfl.xavier_initializer(uniform=True), 
-                init_b = tf.zeros, observed=[],observation=[],
+                W = tfl.xavier_initializer(uniform=True), 
+                b = tf.zeros, observed=[],observation=[],
                 teacher_forcing=[],name=''):
         if len(observed)>0:
             for obs in observed:
@@ -115,10 +147,10 @@ class Dense2:
             flat_dim  = incoming.shape.as_list()[1]
 
         # Initialize the layer variables
-        self._W = init_var(init_W,(flat_dim,units),
+        self._W = init_var(W,(flat_dim,units),
                             name='dense_W_'+name,
                             trainable=True)
-        self._b = init_var(init_b,(1,units),
+        self._b = init_var(b,(1,units),
                             trainable=True,
                             name='dense_b_'+name)
         if "W" in observed:
@@ -145,12 +177,12 @@ class ConstraintDenseLayer:
         self.gamma  = tf.Variable(ones(1,float32),trainable=False)
         gamma_update= tf.assign(self.gamma,tf.clip_by_value(tf.cond(deterministic,lambda :self.gamma*1.005,lambda :self.gamma),0,60000))
         tf.add_to_collection(tf.GraphKeys.UPDATE_OPS,gamma_update)
-        init_W      = tf.contrib.layers.xavier_initializer(uniform=True)
+        W      = tf.contrib.layers.xavier_initializer(uniform=True)
         if(constraint=='none'):
-                self.W_     = tf.Variable(init_W((in_dim,n_output)),name='W_dense',trainable=True)
+                self.W_     = tf.Variable(W((in_dim,n_output)),name='W_dense',trainable=True)
                 self.W      = self.W_
         elif(constraint=='dt'):
-                self.W_     = tf.Variable(init_W((in_dim,n_output)),name='W_dense',trainable=True)
+                self.W_     = tf.Variable(W((in_dim,n_output)),name='W_dense',trainable=True)
                 self.alpha  = tf.Variable(randn(1,n_output).astype('float32'),trainable=True)
                 self.W      = self.alpha*tf.nn.softmax(tf.clip_by_value(self.gamma*self.W_,-20000,20000),axis=0)
         elif(constraint=='diag'):

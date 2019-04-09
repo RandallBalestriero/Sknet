@@ -190,7 +190,7 @@
 <span id="special-layer"></span><h1>Special Layer<a class="headerlink" href="#module-sknet.layer.special" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="sknet.layer.Activation">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Activation</code><span class="sig-paren">(</span><em>incoming</em>, <em>func_or_scalar</em>, <em>deterministic=None</em>, <em>batch_norm=False</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>init_b=&lt;function zeros&gt;</em>, <em>observed=False</em>, <em>observation=None</em>, <em>name=''</em>, <em>teacher_forcing=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Activation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Activation</code><span class="sig-paren">(</span><em>incoming</em>, <em>func_or_scalar</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Activation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Apply nonlinearity.</p>
 <p>this layer applies an element-wise nonlinearity to the
 input based on a given scalar to scalar function.
@@ -209,30 +209,31 @@ This corresponds to using a max-affine spline activation function.</li>
 We recommand user either one of the last two options for optimize the
 computations.</p>
 <p>Example of use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">]</span>
-<span class="c1"># simple case of renormalization of all the values</span>
-<span class="c1"># by maximum value</span>
-<span class="n">layer</span> <span class="o">=</span> <span class="n">LambdaFunction</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span><span class="n">func</span><span class="o">=</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span><span class="n">x</span><span class="p">,</span><span class="n">sh</span><span class="o">/</span><span class="n">tf</span><span class="o">.</span><span class="n">reduce_max</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
-<span class="c1"># more complex case with shape alteration taking only the first</span>
-<span class="c1"># half of the second dimension</span>
-<span class="k">def</span> <span class="nf">my_func</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">x_shape</span><span class="p">):</span>
-    <span class="k">return</span> <span class="n">x</span><span class="p">[:,:</span><span class="n">x_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span>
-<span class="k">def</span> <span class="nf">my_shape_func</span><span class="p">(</span><span class="n">x_shape</span><span class="p">):</span>
-    <span class="n">new_shape</span> <span class="o">=</span> <span class="n">x_shape</span>
-    <span class="n">new_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">=</span><span class="n">new_shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">//</span><span class="mi">2</span>
-    <span class="k">return</span> <span class="n">new_shape</span>
-<span class="n">layer</span> <span class="o">=</span> <span class="n">LambdaFunction</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,</span><span class="n">func</span><span class="o">=</span><span class="n">my_func</span><span class="p">,</span>
-                    <span class="n">shape_func</span> <span class="o">=</span> <span class="n">my_shape_func</span><span class="p">)</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># relu case, recommanded to do it with a scalar for internal</span>
+<span class="c1"># optimization, especially if using the backward method later</span>
+<span class="c1"># in the graph</span>
+<span class="n">Activation</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">func_or_scalar</span> <span class="o">=</span> <span class="mi">0</span><span class="p">)</span>
+<span class="c1"># otherwise, it is equivalent to</span>
+<span class="n">Activation</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">func_or_scalar</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">)</span>
 </pre></div>
 </div>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (shape or <a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> instance) – input shape of tensor</li>
-<li><strong>func</strong> (<em>func</em>) – function to be applied taking as input the tensor</li>
-</ul>
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tf.Tensor or np.ndarray</span></dt>
+<dd><p class="first last">the input to the later</p>
+</dd>
+<dt><strong>func_or_scalar</strong> <span class="classifier-delimiter">:</span> <span class="classifier">scalar or func</span></dt>
+<dd><p class="first last">the function to be applied as activation function or the scalar
+that correspond to the slope of the spline for negative inputs.
+For example, -1 for absolute value, 0 for relu and 0.1 for 
+leaky-relu. When using a spline activation as those ones,
+it is recommended to pass a scalar to optimize the backward
+method if used later in the graph.</p>
+</dd>
+</dl>
 </td>
 </tr>
 </tbody>

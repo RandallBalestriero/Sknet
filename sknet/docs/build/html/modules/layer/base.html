@@ -213,6 +213,10 @@ as</p>
 <p>this allows great flexibility in the code as well as for customized
 computations without requiring to access to some attribute or method
 from the instanciated layer.</p>
+<p>Another implication is the ability to use the standard tensorflow
+Tensor methods such as (to get the output shape) <code class="docutils literal notranslate"><span class="pre">some_layer.shape</span></code>
+which will return a tensorflow shape, or <code class="docutils literal notranslate"><span class="pre">some_layer.shape.as_list()</span></code>
+to get it as a standard listo f int.</p>
 <p class="rubric">Layer variables and variable functions:</p>
 <p>All the variables of a layer (let say <code class="xref py py-data docutils literal notranslate"><span class="pre">W</span></code> and <code class="xref py py-data docutils literal notranslate"><span class="pre">b</span></code> 
 for example) are access via <code class="docutils literal notranslate"><span class="pre">layer_instance._W</span></code> and 
@@ -277,28 +281,6 @@ manually some values of the variable values hwen desired. For example:</p>
 <span class="c1"># this layer will thus either use the (possibly learned) value from</span>
 <span class="c1"># learnable_W or the fixed (random but not learned) value from fixed_W</span>
 <span class="c1"># depending on the value feed to W.teacher_forcing</span>
-</pre></div>
-</div>
-<p class="rubric">Loss and penalties</p>
-<p>In sknet, the losses and penalties are part of the layers. Each layer can
-be equipped with any loss or penalty (which can involve the layer
-parameters or any other). A typical example would be to apply a
-Tikhonov regularization to the weights of the layer as</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># first the layer is instanciated</span>
-<span class="n">layer</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="c1"># we now add a loss to the W parameters</span>
-<span class="n">layer</span><span class="o">.</span><span class="n">add_loss</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">l2</span><span class="p">(</span><span class="n">layer</span><span class="o">.</span><span class="n">W</span><span class="p">))</span>
-</pre></div>
-</div>
-<p>recall that this applies the loss onto <code class="docutils literal notranslate"><span class="pre">layer.W</span></code> which might be a
-transformation of the true parameter <code class="docutils literal notranslate"><span class="pre">layer._W</span></code>, this during
-learning the applied functional will matter in the gradient computation.
-Another important case is the one of the network loss often seen as a 
-global loss, s.a. the classification loss. In this case one would do</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># first the layer is instanciated</span>
-<span class="n">layer</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">layer</span><span class="o">.</span><span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-<span class="c1"># we now add a loss to the W parameters</span>
-<span class="n">layer</span><span class="o">.</span><span class="n">add_loss</span><span class="p">(</span><span class="n">sknet</span><span class="o">.</span><span class="n">loss</span><span class="o">.</span><span class="n">cross_entropy</span><span class="p">(</span><span class="n">p</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span><span class="n">q</span><span class="o">=</span><span class="n">layer</span><span class="p">))</span>
 </pre></div>
 </div>
 <p>recall that <code class="xref py py-data docutils literal notranslate"><span class="pre">layer</span></code> which is a layer also behaves as a tensor 
