@@ -11,7 +11,7 @@ Installation
 
 Set up the environment variable DATASET_PATH to where you want sknet
 to put (when downloaded) all the dataset by default. It should be a valid path.
-It can be added in yor :filename:`.bashrc` as 
+It can be added in yoyr :file:`.bashrc` as 
 ``export DATASET_PATH='/home/user/DATASET/'``
  
 

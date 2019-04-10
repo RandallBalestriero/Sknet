@@ -73,16 +73,20 @@ work1 = sknet.Worker(op_name='minimizer',context='train_set',op=minimizer,
         description=optimizer.description)
 
 work2 = sknet.Worker(op_name='loss',context='train_set',op=loss,
-        instruction='save & print every 30 batch', deterministic=False)
+        instruction='save & print every 30 batch', deterministic=False,
+        description='saving the loss every 30 batches')
 
 work3 = sknet.Worker(op_name='accuracy',context='test_set',op=accuracy,
-        instruction='execute every batch and save & print & average', deterministic=True)
+        instruction='execute every batch and save & print & average', 
+        deterministic=True)
 
 work4 = sknet.Worker(op_name='accuracy',context='valid_set',op=accuracy,
-        instruction='execute every batch and save & print & average', deterministic=True)
+        instruction='execute every batch and save & print & average', 
+        deterministic=True, description='standard classification accuracy')
 
 work5 = sknet.Worker(op_name='accuracy',context='train_set',op=accuracy,
-        instruction='execute every batch and save & print & average', deterministic=True)
+        instruction='execute every batch and save & print & average', 
+        deterministic=True, description='standard classification accuracy')
 
 
 
@@ -102,11 +106,10 @@ workplace = sknet.utils.Workplace(network,dataset=dataset,
 
 # will fit the model for 50 epochs and return the gathered op
 # outputs given the above definitions
-output = workplace.execute_queue((work1+work2+work5,work3,work4),repeat=10)
 
+output = workplace.execute_queue((work1+work2+work5,work3,work4),repeat=10)
 sknet.to_file(output,'test.h5','w')
-#f = sknet.from_file('test.h5')
-#print('ok')
+
 
 exit()
 

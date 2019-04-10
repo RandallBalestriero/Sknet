@@ -339,6 +339,60 @@ def Parser(instruction):
 
 
 class Worker(object):
+    """processing unit that manages a single tensorflow op.
+    A Worker allows to specify a tensorflow op to execute. Whether
+    it is for monitoring or saving or printing, the user should favor
+    the use of Workers to simplify the workflow. A worker contains the
+    operator to use, the ations to take with it given by an instruction
+
+    Parameters
+    ----------
+    
+    op_name : str
+        the name of the worker, used for saving and printing
+
+    context : str
+        the name of the set to apply the op on from the dataset. Typical example
+        would be :py;data;`"train_set"` or :py:data:'"valid_set"'
+
+    op : tf.Tensor or tf.operation
+        the tensorflow variable of the worker that will be executed and monitored
+
+    instruction : str
+        a description of what how and when to interact with the op. We provide
+        some typical examples ::
+
+            instruction = "execute every batch"
+            # when given another command such as print, execute is
+            # always added by default
+            instruction = "print every 30 batch"
+            # one can give multiple commands to do at the same time, they
+            # are linked with a & a in
+            instruction = "print 7 save every 30 batch"
+            # one can also use the instruction to specify a standard 
+            # operation method to do after the epoch such as done with
+            # accuracy where it is computed on each batch and then averaged
+            instruction = "execute every batch and average & print"
+            # as an be seen, the commands to do after the epoch are introduced via
+            # the and keyword. One can also do something like
+            intruction = "execute every bath and save & print & average"
+            # the order of the commands 9around the &) do not matter
+            # finally, if asking to save and the per batch value AND
+            # the epoch value, then the last one is disregarded as it
+            # can be computed a posteriori from the batch ones, for example
+            instruction = "print&save every 30 batch and save & print & average"
+            # in this case the previous case will save only the batch values.
+
+        The second set of commands (after the ``"and"`` must contain either
+        ``"average'`` or ``"maximize"``.
+
+        deterministic : bool
+            the state of the network to execute the op in, for example it is common to 
+            set it to :data:`False` during training and :data:`True` during testing.
+
+        description : str (optional)
+            the description of the worker, used for saving, it is added to the h5 file.
+    """
     def __init__(self,op_name,context,op, instruction, deterministic=None,repeat=1,description=''):
         self._dependencies = get_tensor_dependencies(op)
         self._name          = context+"/"+op_name
@@ -430,6 +484,45 @@ class Worker(object):
 
 
 class WorkerGroup(Worker):
+    """Allow executing of multiple workers at once (similar to multi-threading).
+    it is common to need to monitor or execute multiple workers during the 
+    same process. Typical example would be to execute the weight update 
+    (learning) while monitoring (printing or saving) the loss. those two 
+    workers can thus be made parallel simply by using the 
+    :py:class:`sknet.WorkerGroup` class. To obtain a :class:`WorkerGroup`
+    one can do any of the followings ::
+
+        worker1 = sknet.Worker(...)
+        worker2 = sknet.Worker(...)
+        workergroup = sknet.WorkerGroup([worker1,worker2])
+        workergroup = worker1+worker2
+
+    Similarly, once given a :class:`WorkerGroup` instance, it is possible to add
+    workers (or evenwWorergroup) on the fly as follows ::
+        
+        extra_worker = sknet.Worker(...)
+        workergroup = workergroup+extra_worker
+        # or if adding an extra workergroup
+        workergroup=workergroup+other_workergroup
+
+    A typical example would be to do the following ::
+
+        worker1 = sknet.Worker(op_name="minimizer",op=minimizer,
+                    context="train_set",deterministic=False,
+                    instruction="execute every batch")
+        worker2 = sknet.Worker(op_name='loss',op=loss,context='train_set',
+                    deterministic=False, instruction="print every 30 batch")
+        train_worker = worker1+worker2
+        # then train
+        # ...
+
+    Parameters
+    ----------
+
+    worker : list of sknet.Worker
+        the list of workers that are to be run concurrently during an epoch
+
+    """
     def __init__(self,workers,name=''):
         self._workers      = [workers[0]]
         self._dependencies = workers[0].dependencies

@@ -175,23 +175,39 @@
             
   <div class="section" id="installation">
 <h1>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h1>
-<p>Requirements:
-_Python 3.
-_Tensorflow set up with GPU
-Set up environment variables DATASET_PATH and SAVE_PATH</p>
-<p>An easy way to get everything installed nad set-up out-of-the-box is to
-perform the installation via _Anaconda.
+<p class="rubric">Requirements
+- _Python 3.
+- _CuDNN
+- _Tensorflow set up with GPU
+- (h5py, numpy, …)</p>
+<p class="rubric">Environment variables</p>
+<p>Set up the environment variable DATASET_PATH to where you want sknet
+to put (when downloaded) all the dataset by default. It should be a valid path.
+It can be added in yoyr <code class="file docutils literal notranslate"><span class="pre">.bashrc</span></code> as
+<code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">DATASET_PATH='/home/user/DATASET/'</span></code></p>
+<p class="rubric">Installation (Anaconda)</p>
+<p>An easy way to get everything installed and set-up out-of-the-box is to
+perform the installation via _Anaconda following the below instructions.
 To do this, we propose a configuration file (not minimal) that can be
 used as is to set up an environment.</p>
-<p>Install Conda:</p>
+<p>Install Anaconda:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">wget</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">repo</span><span class="o">.</span><span class="n">anaconda</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">archive</span><span class="o">/</span><span class="n">Anaconda3</span><span class="o">-</span><span class="mf">2018.12</span><span class="o">-</span><span class="n">MacOSX</span><span class="o">-</span><span class="n">x86_64</span><span class="o">.</span><span class="n">sh</span> <span class="c1">#(python3.)</span>
 <span class="n">bash</span> <span class="n">Anaconda</span><span class="o">-</span><span class="n">latest</span><span class="o">-</span><span class="n">Linux</span><span class="o">-</span><span class="n">x86_64</span><span class="o">.</span><span class="n">sh</span>
-<span class="c1">#Create environment with packages</span>
-<span class="n">conda</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">tf3</span> <span class="o">--</span><span class="n">file</span> <span class="n">ranet</span><span class="o">/</span><span class="n">config</span><span class="o">/</span><span class="n">conda_spec</span><span class="o">-</span><span class="n">file</span><span class="o">.</span><span class="n">txt</span>
-<span class="c1"># OR Install packages into current (myenv) environment</span>
-<span class="n">conda</span> <span class="n">install</span> <span class="o">--</span><span class="n">name</span> <span class="n">myenv</span> <span class="o">--</span><span class="n">file</span> <span class="n">conda_spec</span><span class="o">-</span><span class="n">file</span><span class="o">.</span><span class="n">txt</span>
 </pre></div>
 </div>
+<p>Install all dependencies along with _Python 3+.
+Once Conda has been installed, the provided (non minimal) conda configuration
+can be used (from _Instructions).
+To use the spec file to create an identical environment on the same machine or another machine:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">--</span><span class="n">name</span> <span class="n">envname</span> <span class="o">--</span><span class="n">file</span> <span class="n">spec</span><span class="o">-</span><span class="n">file</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<p>To use the spec file to install its listed packages into an existing environment:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">install</span> <span class="o">--</span><span class="n">name</span> <span class="n">myenv</span> <span class="o">--</span><span class="n">file</span> <span class="n">spec</span><span class="o">-</span><span class="n">file</span><span class="o">.</span><span class="n">txt</span>
+</pre></div>
+</div>
+<p>where <span class="target" id="index-0"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">spec-file.txt</span></code> points toward the provided file originally
+in <span class="target" id="index-1"></span><code class="xref std std-envvar docutils literal notranslate"><span class="pre">sknet/config/conda_spec-file.txt</span></code>.</p>
 </div>
 
 
