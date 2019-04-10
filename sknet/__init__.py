@@ -6,6 +6,7 @@ from tensorflow.python.framework import dtypes
 import numpy as np
 import time
 import re
+import h5py
 
 __all__ = [
         "dataset",
@@ -43,6 +44,69 @@ def get_tensor_dependencies(tensor):
 
     # Return a list of tensor op names
     return dependencies
+
+
+
+
+def to_file(value,filename,mode='w',compression_level=4):
+    """dump the content of a worker, workergroupe, or
+    list/tuple of them into h5 files
+    if given with mode='w' then dump everything,
+    if given with mode='a' then dump only the non present keys
+    """
+    # if given a single worker
+    if type(value)==Worker:
+        f = h5py.File(filename,mode)
+        # if append mode
+        if mode=='a':
+            if value.name not in f.keys():
+                f.create_group(value.name)
+                f[value.name+'/description']=value.description
+            written = f[value.name].keys()
+            for i in range(len(value.data)):
+                if str(i) in written:
+                    continue
+                else:
+                    shape = np.shape(value.data[i])
+                    if np.isscalar(value.data[i]):
+                        f.create_dataset(value.name+'/'+str(i),shape)
+                    else:
+                        f.create_dataset(value.name+'/'+str(i),shape,
+                            compression='gzip',
+                            compression_opts=compression_level)
+                    f[value.name+'/'+str(i)][...] = value.data[i]
+        else:
+            f.create_group(value.name)
+            f[value.name+'/description']=value.description
+            for i in range(len(value.data)):
+                shape = np.shape(value.data[i])
+                if np.isscalar(value.data[i]):
+                    f.create_dataset(value.name+'/'+str(i),shape)
+                else:
+                    f.create_dataset(value.name+'/'+str(i),shape,
+                            compression='gzip',
+                            compression_opts=compression_level)
+                f[value.name+'/'+str(i)][...] = value.data[i]
+        f.close()
+    # given a workergroup
+    elif type(value)==WorkerGroup:
+        if mode=='w':
+            f = h5py.File(filename,mode)
+            f.close()
+        for worker in value.workers:
+            to_file(worker,filename,'a',compression_level=compression_level)
+    elif hasattr(value,'__len__'):
+        if mode=='w':
+            f = h5py.File(filename,mode)
+            f.close()
+        for item in value:
+            to_file(item,filename,'a',compression_level=compression_level)
+
+
+def from_file(filename):
+    f = h5py.File(filename,'r')
+    return f
+
 
 
 
@@ -261,6 +325,10 @@ def Parser(instruction):
     else:
         func = lambda x:x
         transform = False
+    # if we already save the results in batch pass, then
+    # do not save after
+    if 'save' in command1:
+        command2.replace('save','')
     attr = dict([('batch_instr',command1),('epoch_instr',command2),
                 ('periodicity',int(periodicity)),('transform',transform),
                 ('func',func)])
@@ -269,41 +337,57 @@ def Parser(instruction):
 
 
 
+
 class Worker(object):
-    def __init__(self,name,context,op, instruction, deterministic=None,repeat=1):
+    def __init__(self,op_name,context,op, instruction, deterministic=None,repeat=1,description=''):
         self._dependencies = get_tensor_dependencies(op)
-        self.name          = name
-        self.repeat        = repeat
-        self.deterministic = [deterministic]
-        self.context       = context
-        self._op           = [op]
+        self._name          = context+"/"+op_name
+        self._repeat        = repeat
+        self._description   = description
+        self._deterministic = deterministic
+        self._context       = context
+        self._op           = op
         # to gather all the epoch/batch data
         self.data          = list()
-        # to gather transformed (epoch) data if present
-        self.transform_data= list()
         # to gather data (batch) at each epoch
         self.epoch_data    = list()
         # specific to the saving and transformation
         instr = Parser(instruction)
         self.__dict__.update(instr)
+        self._concurrent = True
+    @property
+    def description(self):
+        return self._description
+    @property
+    def deterministic(self):
+        return self._deterministic
+    @property
+    def concurrent(self):
+        return self._concurrent
     @property
     def dependencies(self):
         return self._dependencies
     @property
     def op(self):
         return self._op
+    @property
+    def repeat(self):
+        return self._repeat
+    @property 
+    def name(self):
+        return self._name
+    @property
+    def context(self):
+        return self._context
     def get_op(self,batch_nb):
         if batch_nb%self.periodicity==0:
             return self.op
         else:
             return []
     def append(self,data,print_=True):
-        if len(data)==0:
+        if data==[]:
             return ''
-        data=data[0]
         to_print = ''
-#        if len(data)==0:
-#            return
         if 'save' in self.batch_instr or self.transform:
             self.epoch_data.append(data)
         if 'print' in self.batch_instr:
@@ -329,52 +413,64 @@ class Worker(object):
                 if print_:
                     print(to_print)
             if 'save' in self.epoch_instr:
-                self.transform_data.append(transform)
+                self.data.append(transform)
         # save into the main data collection
         if 'save' in self.batch_instr:
             self.data.append(self.epoch_data)
         # reset epoch data
         self.epoch_data = list()
         return to_print
+    def __add__(self,other):
+        return WorkerGroup([self,other])
+
+    def __radd__(self,other):
+        return self.__add__(other)
 
 
 
 
-class WorkerPool(object):
+class WorkerGroup(Worker):
     def __init__(self,workers,name=''):
-        self.N_workers = len(workers)
-        self._workers = workers
-        assert(len(set([worker.context for worker in workers]))<2)
-        assert(len(set([worker.repeat for worker in workers]))<2)
-        self._dependencies = list(set([item for worker in workers 
-                                for item in worker.dependencies]))
-        self._op = [worker.op for worker in workers]
-        self._repeat = workers[0].repeat
-        self._context = workers[0].context
-        self._name = name
-        self._deterministic = [worker.deterministic for worker in workers]
+        self._workers      = [workers[0]]
+        self._dependencies = workers[0].dependencies
+        self._op           = [worker.op for worker in workers]
+        self._repeat       = workers[0].repeat
+        self._context      = workers[0].context
+        self._deterministic_list = [workers[0].deterministic]
+        self.set_deterministic()
+        self._name = workers[0].name
+        for worker in workers[1:]:
+            self.__add__(worker)
+    def __add__(self,other):
+        assert(self.repeat==other.repeat)
+        assert(other.context==other.context)
+        self._dependencies = list(set(self._dependencies+other.dependencies))
+        if type(other)==WorkerGroup:
+            self._deterministic_list += list(other.deterministic)
+            self._workers            += other.workers
+            self._op                 += other.op 
+        else:
+            self._deterministic_list += [other.deterministic]
+            self._workers            += [other]
+            self._op                 += [other.op]
+        self.set_deterministic()
+        self._name = str(tuple([w.name for w in self.workers])).replace(' ','').replace('\'','')
+        return self
+    def __radd__(self,other):
+        return self.__add__(other)
+    def set_deterministic(self):
+        if len(set(self._deterministic_list))==1:
+            self._concurrent    = True
+            self._deterministic = self._deterministic_list[0]
+        else:
+            self._concurrent = False
 
     @property
-    def name(self):
-        return self._name
-    @property
-    def repeat(self):
-        return self._repeat
-    @property
-    def op(self):
-        return self._op
-    @property
-    def context(self):
-        return self._context
-    @property
-    def dependencies(self):
-        return self._dependencies
+    def deterministic_list(self):
+        return self._deterministic_list
     @property
     def workers(self):
         return self._workers
-    @property
-    def deterministic(self):
-        return self._deterministic
 
     def get_op(self,batch_nb):
         ops = [worker.get_op(batch_nb) for worker in self.workers]
@@ -393,6 +489,8 @@ class WorkerPool(object):
             to_print+=worker.epoch_done(print_=False)
         if len(to_print)>0:
             print(to_print)
+
+
 
 
 

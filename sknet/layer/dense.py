@@ -78,10 +78,8 @@ class Dense(Layer):
 
         # Initialize the layer variables
         self._W = init_var(W,(flat_dim,units),
-                            name='dense_W_'+name,
-                            trainable=True)
+                            name='dense_W_'+name)
         self._b = init_var(b,(1,units),
-                            trainable=True,
                             name='dense_b_'+name)
 
         self.W  = func_W(self._W)

@@ -10,23 +10,11 @@ __all__ = [
 
 
 
-def init_variable(var_or_func,var_shape,name=None,trainable=True, as_var=True):
-    if type(var_or_func)==np.ndarray:
-        assert(np.isequal(var_of_func.shape,var_shape))
-        if as_var:
-            return tf.Variable(var_or_func,name=name,trainable=trainable)
-        else:
-            return var_or_func
-    elif callable(var_or_func):
-        if as_var:
-            return tf.Variable(var_or_func(var_shape),name=name,trainable=trainable)
-        else:
-            return var_or_func(var_shape)
+def init_variable(var_or_func,var_shape,name=None):
+    if callable(var_or_func):
+        return tf.Variable(var_or_func(var_shape),name=name,trainable=True)
     else:
-        if as_var:
-            return tf.Variable(var_or_func,name=name,trainable=False)
-        else:
-            return var_or_func
+        return var_or_func
 
 
 
@@ -39,5 +27,5 @@ def to_one_hot(labels,K=None):
 
 
 from . import *
-from .pipeline import *
+from .workplace import *
 

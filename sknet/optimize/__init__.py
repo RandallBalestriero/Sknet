@@ -3,7 +3,8 @@
 
 __all__ = [
         "loss",
-        "optimizer",
         "schedule"]
 
 from . import *
+from .optimizer import *
+

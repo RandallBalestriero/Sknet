@@ -119,6 +119,7 @@ class stepwise:
         # set up tf variables
         self.epochs = [tf.constant(e) for e in epochs]
         self.values = [tf.constant(v) for v in values]
+        self.description = 'stepwise'+str(dict_lr).replace(' ','')
 
     def __call__(self,epoch,*args,**kwargs):
         

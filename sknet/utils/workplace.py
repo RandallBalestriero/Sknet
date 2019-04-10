@@ -9,33 +9,17 @@ from .. import Worker
 
 
 
-class DummyTrainer(object):
-    def __init__(self, network):
-        # Tensorflow Config
-        tf.reset_default_graph()
-        config                          = tf.ConfigProto()
-        config.gpu_options.allow_growth = True
-        config.log_device_placement     = True
-        self.session                    = tf.Session(config=config)
-        # Attributes
-        self.network = network
-#        with tf.device('/device:GPU:0'):
-        self.session.run(tf.global_variables_initializer())
-#        self.input  = self.network.input
-#        self.output = self.network.output 
-        self.ops    = dict()
 
-class Pipeline(object):
+class Workplace(object):
     def __init__(self, network, dataset=None, linkage=None):
         config                          = tf.ConfigProto()
         config.gpu_options.allow_growth = True
         config.log_device_placement     = True
         self.session                    = tf.Session(config=config)
         # Attributes
-        self.network  = network
         self.dataset  = dataset
+        self.network= network
         self._linkage = linkage
-        self._ops     = dict()
         # initialize the variables
         self.session.run(tf.global_variables_initializer())
 
@@ -156,6 +140,9 @@ class Pipeline(object):
         dependencies = worker.dependencies
         # get context
         context = worker.context
+        if worker.concurrent:
+            if worker.deterministic  is not None:
+                self.network.set_deterministic(worker.deterministic,self.session)
         # Loop over all the batches
         for i in range(N_BATCH):
             # current indices
@@ -168,14 +155,18 @@ class Pipeline(object):
                 feed_dict.append((var,value))
             # get the op(s)
             op = worker.get_op(i)
-            output = []
-            for op_,deterministic in zip(op,worker.deterministic):
-                if op_==[]:
-                    output.append([])
-                    continue
-                if deterministic is not None:
-                    self.network.set_deterministic(deterministic,self.session)
-                output.append(self.session.run(op_,feed_dict=dict(feed_dict)))
+            # if we can run the ops concurently, then do it
+            if worker.concurrent:
+                output = self.session.run(op,feed_dict=dict(feed_dict))
+            else:
+                output = []
+                for op_,deterministic in zip(op,worker.deterministic_list):
+                    if op_==[]:
+                        output.append([])
+                        continue
+                    if deterministic is not None:
+                        self.network.set_deterministic(deterministic,self.session)
+                    output.append(self.session.run(op_,feed_dict=dict(feed_dict)))
             worker.append(output)
         worker.epoch_done()
  
@@ -244,6 +235,7 @@ class Pipeline(object):
                     if n_epochs>1:
                         print("\t  Epoch",epoch,'...')
                     self.execute_worker(worker)
+        return queue
 
 
 
