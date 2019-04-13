@@ -1,0 +1,386 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Base &mdash; Sknet alpha.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'alpha.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="sknet.dataset" href="../dataset.html" />
+    <link rel="prev" title="sknet" href="../base.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Sknet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Base</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Sknet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a> &raquo;</li>
+        
+      <li>Base</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/modules/base/base.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="base">
+<h1>Base<a class="headerlink" href="#base" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sknet.Tensor">
+<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">Tensor</code><span class="sig-paren">(</span><em>tensor_or_func=None</em>, <em>shape=None</em>, <em>dtype=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.Tensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Overloading the <code class="xref py py-class docutils literal notranslate"><span class="pre">tf.Tensor</span></code></p>
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.ObservedTensor">
+<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">ObservedTensor</code><span class="sig-paren">(</span><em>tensor</em>, <em>observation=None</em>, <em>teacher_forcing=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.ObservedTensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Tensor with dual behavior</p>
+<p>This tensor is doing</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>tensor</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tf.Tensor</span></dt>
+<dd><p class="first last">the tensor to equip with dual behavior</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.Worker">
+<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">Worker</code><span class="sig-paren">(</span><em>op_name</em>, <em>context</em>, <em>op</em>, <em>instruction</em>, <em>deterministic=None</em>, <em>repeat=1</em>, <em>description=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.Worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>processing unit that manages a single tensorflow op.
+A Worker allows to specify a tensorflow op to execute. Whether
+it is for monitoring or saving or printing, the user should favor
+the use of Workers to simplify the workflow. A worker contains the
+operator to use, the ations to take with it given by an instruction</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>op_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">the name of the worker, used for saving and printing</p>
+</dd>
+<dt><strong>context</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first last">the name of the set to apply the op on from the dataset. Typical example
+would be :py;data;`”train_set”` or :py:data:‘“valid_set”’</p>
+</dd>
+<dt><strong>op</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tf.Tensor or tf.operation</span></dt>
+<dd><p class="first last">the tensorflow variable of the worker that will be executed and monitored</p>
+</dd>
+<dt><strong>instruction</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
+<dd><p class="first">a description of what how and when to interact with the op. We provide
+some typical examples</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">instruction</span> <span class="o">=</span> <span class="s2">&quot;execute every batch&quot;</span>
+<span class="c1"># when given another command such as print, execute is</span>
+<span class="c1"># always added by default</span>
+<span class="n">instruction</span> <span class="o">=</span> <span class="s2">&quot;print every 30 batch&quot;</span>
+<span class="c1"># one can give multiple commands to do at the same time, they</span>
+<span class="c1"># are linked with a &amp; a in</span>
+<span class="n">instruction</span> <span class="o">=</span> <span class="s2">&quot;print 7 save every 30 batch&quot;</span>
+<span class="c1"># one can also use the instruction to specify a standard </span>
+<span class="c1"># operation method to do after the epoch such as done with</span>
+<span class="c1"># accuracy where it is computed on each batch and then averaged</span>
+<span class="n">instruction</span> <span class="o">=</span> <span class="s2">&quot;execute every batch and average &amp; print&quot;</span>
+<span class="c1"># as an be seen, the commands to do after the epoch are introduced via</span>
+<span class="c1"># the and keyword. One can also do something like</span>
+<span class="n">intruction</span> <span class="o">=</span> <span class="s2">&quot;execute every bath and save &amp; print &amp; average&quot;</span>
+<span class="c1"># the order of the commands 9around the &amp;) do not matter</span>
+<span class="c1"># finally, if asking to save and the per batch value AND</span>
+<span class="c1"># the epoch value, then the last one is disregarded as it</span>
+<span class="c1"># can be computed a posteriori from the batch ones, for example</span>
+<span class="n">instruction</span> <span class="o">=</span> <span class="s2">&quot;print&amp;save every 30 batch and save &amp; print &amp; average&quot;</span>
+<span class="c1"># in this case the previous case will save only the batch values.</span>
+</pre></div>
+</div>
+<p>The second set of commands (after the <code class="docutils literal notranslate"><span class="pre">&quot;and&quot;</span></code> must contain either
+<code class="docutils literal notranslate"><span class="pre">&quot;average'</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;maximize&quot;</span></code>.</p>
+<dl class="last docutils">
+<dt>deterministic <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
+<dd><p class="first last">the state of the network to execute the op in, for example it is common to 
+set it to <code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code> during training and <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code> during testing.</p>
+</dd>
+<dt>description <span class="classifier-delimiter">:</span> <span class="classifier">str (optional)</span></dt>
+<dd><p class="first last">the description of the worker, used for saving, it is added to the h5 file.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.WorkerGroup">
+<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">WorkerGroup</code><span class="sig-paren">(</span><em>workers</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.WorkerGroup" title="Permalink to this definition">¶</a></dt>
+<dd><p>Allow executing of multiple workers at once (similar to multi-threading).
+it is common to need to monitor or execute multiple workers during the 
+same process. Typical example would be to execute the weight update 
+(learning) while monitoring (printing or saving) the loss. those two 
+workers can thus be made parallel simply by using the 
+<a class="reference internal" href="#sknet.WorkerGroup" title="sknet.WorkerGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.WorkerGroup</span></code></a> class. To obtain a <a class="reference internal" href="#sknet.WorkerGroup" title="sknet.WorkerGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkerGroup</span></code></a>
+one can do any of the followings</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">worker1</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">worker2</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">workergroup</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">WorkerGroup</span><span class="p">([</span><span class="n">worker1</span><span class="p">,</span><span class="n">worker2</span><span class="p">])</span>
+<span class="n">workergroup</span> <span class="o">=</span> <span class="n">worker1</span><span class="o">+</span><span class="n">worker2</span>
+</pre></div>
+</div>
+<p>Similarly, once given a <a class="reference internal" href="#sknet.WorkerGroup" title="sknet.WorkerGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkerGroup</span></code></a> instance, it is possible to add
+workers (or evenwWorergroup) on the fly as follows</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">extra_worker</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<span class="n">workergroup</span> <span class="o">=</span> <span class="n">workergroup</span><span class="o">+</span><span class="n">extra_worker</span>
+<span class="c1"># or if adding an extra workergroup</span>
+<span class="n">workergroup</span><span class="o">=</span><span class="n">workergroup</span><span class="o">+</span><span class="n">other_workergroup</span>
+</pre></div>
+</div>
+<p>A typical example would be to do the following</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">worker1</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="n">op_name</span><span class="o">=</span><span class="s2">&quot;minimizer&quot;</span><span class="p">,</span><span class="n">op</span><span class="o">=</span><span class="n">minimizer</span><span class="p">,</span>
+            <span class="n">context</span><span class="o">=</span><span class="s2">&quot;train_set&quot;</span><span class="p">,</span><span class="n">deterministic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">instruction</span><span class="o">=</span><span class="s2">&quot;execute every batch&quot;</span><span class="p">)</span>
+<span class="n">worker2</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="n">op_name</span><span class="o">=</span><span class="s1">&#39;loss&#39;</span><span class="p">,</span><span class="n">op</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span><span class="n">context</span><span class="o">=</span><span class="s1">&#39;train_set&#39;</span><span class="p">,</span>
+            <span class="n">deterministic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">instruction</span><span class="o">=</span><span class="s2">&quot;print every 30 batch&quot;</span><span class="p">)</span>
+<span class="n">train_worker</span> <span class="o">=</span> <span class="n">worker1</span><span class="o">+</span><span class="n">worker2</span>
+<span class="c1"># then train</span>
+<span class="c1"># ...</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>worker</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of sknet.Worker</span></dt>
+<dd><p class="first last">the list of workers that are to be run concurrently during an epoch</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="sknet.to_file">
+<code class="descclassname">sknet.</code><code class="descname">to_file</code><span class="sig-paren">(</span><em>value</em>, <em>filename</em>, <em>mode='w'</em>, <em>compression_level=4</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.to_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>dump the content of a worker, workergroupe, or
+list/tuple of them into h5 files
+if given with mode=’w’ then dump everything,
+if given with mode=’a’ then dump only the non present keys</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../dataset.html" class="btn btn-neutral float-right" title="sknet.dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../base.html" class="btn btn-neutral float-left" title="sknet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sknet contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

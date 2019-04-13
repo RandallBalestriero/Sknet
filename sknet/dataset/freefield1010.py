@@ -11,7 +11,7 @@ from ..utils import to_one_hot
 
 from . import Dataset
 
-def load_freefield1010(data_format='NCT', PATH=None):
+def load_freefield1010(PATH=None):
     """Audio binary classification, presence or absence of bird songs.
     `freefield1010 <http://machine-listening.eecs.qmul.ac.uk/bird-audio-detection-challenge/#downloads>`_. 
     is a collection of over 7,000 excerpts from field recordings 
@@ -28,14 +28,7 @@ def load_freefield1010(data_format='NCT', PATH=None):
     """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
-    if data_format=='NCT':
-        datum_shape = (1,441000)
-    else:
-        datum_shape = (441000,1)
-    dict_init = [("train_set",None),('sampling_rate',44100),
-                ("datum_shape",datum_shape),("n_classes",2),
-                ("n_channels",1),("spatial_shape",(441000,)),
-                ("path",path),("data_format",data_format),
+    dict_init = [('sampling_rate',44100),("n_classes",2),("path",PATH),
                 ("name","freefield1010"),('classes',["no bird","bird"])]
     dataset = Dataset(**dict(dict_init))
 
@@ -81,10 +74,12 @@ def load_freefield1010(data_format='NCT', PATH=None):
         wavs[i]   = wav_read(byt)[1].astype('float32')
         
     labels = labels[:,1]
-    wavs   = np.expand_dims(wavs,1+int(data_format=="NTC"))
+    wavs   = np.expand_dims(wavs,1)
 
-    dataset.add_variable({'signals':{'train_set':wavs},
-                        'labels':{'train_set':labels}})
+    dataset.add_variable({'signals':[{'train_set':wavs},
+                        (1,441000),'float32'],
+                        'labels':[{'train_set':labels},
+                        (),'int32']})
 
     print('Dataset freefield1010 loaded in','{0:.2f}'.format(time.time()-t),'s.')
     return dataset

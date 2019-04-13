@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="sknet.dataset" href="dataset.html" />
+    <link rel="next" title="Base" href="base/base.html" />
     <link rel="prev" title="Pipeline" href="../user/pipeline.html" /> 
 </head>
 
@@ -104,7 +104,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a><ul class="simple">
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="base/base.html">Base</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
@@ -181,32 +182,48 @@
 </div>
 <p>All the <a class="reference internal" href="layer/base.html#module-sknet.layer" title="sknet.layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> inherit from this base class. Its documentation
 presents all the details about thegeneral behaviors of the layers.</p>
-<dl class="class">
-<dt id="sknet.Tensor">
-<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">Tensor</code><span class="sig-paren">(</span><em>tensor_or_func=None</em>, <em>shape=None</em>, <em>dtype=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.Tensor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Overloading the <code class="xref py py-class docutils literal notranslate"><span class="pre">tf.Tensor</span></code></p>
-</dd></dl>
-
-<dl class="class">
-<dt id="sknet.ObservedTensor">
-<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">ObservedTensor</code><span class="sig-paren">(</span><em>tensor</em>, <em>observation=None</em>, <em>teacher_forcing=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.ObservedTensor" title="Permalink to this definition">¶</a></dt>
-<dd><p>Tensor with dual behavior</p>
-<p>This tensor is doing</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
+<p class="rubric">Tensor and Observed Tensor</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
 <tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>tensor</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tf.Tensor</span></dt>
-<dd><p class="first last">the tensor to equip with dual behavior</p>
-</dd>
-</dl>
-</td>
+<tr class="row-odd"><td><a class="reference internal" href="base/base.html#sknet.Tensor" title="sknet.Tensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Tensor</span></code></a></td>
+<td>Overloading the <code class="xref py py-class docutils literal notranslate"><span class="pre">tf.Tensor</span></code></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="base/base.html#sknet.ObservedTensor" title="sknet.ObservedTensor"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ObservedTensor</span></code></a></td>
+<td>Tensor with dual behavior</td>
 </tr>
 </tbody>
 </table>
-</dd></dl>
-
+<p class="rubric">Worker and WorkerGroup</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="base/base.html#sknet.Worker" title="sknet.Worker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Worker</span></code></a></td>
+<td>processing unit that manages a single tensorflow op.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="base/base.html#sknet.WorkerGroup" title="sknet.WorkerGroup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WorkerGroup</span></code></a></td>
+<td>Allow executing of multiple workers at once (similar to multi-threading).</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric">Utilities</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="base/base.html#sknet.to_file" title="sknet.to_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_file</span></code></a></td>
+<td>dump the content of a worker, workergroupe, or list/tuple of them into h5 files if given with mode=’w’ then dump everything, if given with mode=’a’ then dump only the non present keys</td>
+</tr>
+</tbody>
+</table>
 </div>
 
 
@@ -217,7 +234,7 @@ presents all the details about thegeneral behaviors of the layers.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="dataset.html" class="btn btn-neutral float-right" title="sknet.dataset" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="base/base.html" class="btn btn-neutral float-right" title="Base" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../user/pipeline.html" class="btn btn-neutral float-left" title="Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

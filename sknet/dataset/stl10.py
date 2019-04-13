@@ -10,7 +10,7 @@ from . import Dataset
 from ..utils import to_one_hot
 
 
-def load_stl10(data_format='NCHW',PATH=None):
+def load_stl10(PATH=None):
     """ Image classification with extra unlabeled images.
     The `STL-10 <https://cs.stanford.edu/~acoates/stl10/>`_ dataset is an image 
     recognition dataset for developing unsupervised feature learning, 
@@ -33,14 +33,7 @@ def load_stl10(data_format='NCHW',PATH=None):
     """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
-    if data_format=='NCHW':
-        datum_shape = (3,32,32)
-    else:
-        datum_shape = (32,32,3)
-    dict_init = [("train_set",None),("test_set",None),
-                ("datum_shape",datum_shape),("n_classes",10),
-                ("n_channels",3),("spatial_shape",(32,32)),
-                ("path",PATH),("data_format",data_format),("name","stl10")]
+    dict_init = [("n_classes",10),("path",PATH),("name","stl10")]
     classes      = ["airplane", "bird", "car", "cat", "deer", "dog",
                         "horse", "monkey", "ship", "truck"]
     dataset = Dataset(**dict(dict_init+[('classes',classes)]))
@@ -85,14 +78,13 @@ def load_stl10(data_format='NCHW',PATH=None):
     unlabeled_X = np.frombuffer(io.BytesIO(read_file).read(), 
             dtype=np.uint8).reshape((-1,3,96,96)).transpose([0,1,3,2])
 
-    # Check formatting
-    if data_format=='NHWC':
-        train_X     = np.transpose(train_X,[0,2,3,1])
-        test_X      = np.transpose(test_X,[0,2,3,1])
-        unlabeled_X = np.transpose(unlabeled_X,[0,2,3,1])
 
-    dataset.add_variable({'images':{'train_set':train_X,'test_set':test_X},
-                        'labels':{'train_set':train_y,'test_set':test_y}})
+    dataset.add_variable({'images':[{'train_set':train_X,
+                                    'test_set':test_X},
+                                    (3,96,96),'float32'],
+                        'labels':[{'train_set':train_y,
+                                    'test_set':test_y},
+                                    (),'int32']})
             
 #    unlabeled_X
 

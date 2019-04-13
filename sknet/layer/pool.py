@@ -12,111 +12,87 @@ class Pool(Layer):
         
     Example of use::
 
-        # (3,3) max pooling with (3,3) strides
+        # (3,3) max pooling with (3,3) stride
         # All ther below are equivalent
-        PoolLayer(previous_layer, windows=(3,3), strides=(3,3),data_format='NCHW')
-        PoolLayer(previous_layer, windows=(3,3),data_format='NCHW')
-        PoolLayer(previous_layer, windows=(1,3,3), strides=(1,3,3),data_format='NCHW')
-        PoolLayer(previous_layer, windows=(1,3,3),data_format='NCHW')
+        PoolLayer(previous_layer, window=(3,3), stride=(3,3))
+        PoolLayer(previous_layer, window=(3,3))
+        PoolLayer(previous_layer, window=(1,3,3), stride=(1,3,3))
+        PoolLayer(previous_layer, window=(1,3,3))
+        # Channel pooling (only)
+        PoolLayer(previous_layer, window=(4,1,1))
+        # Channel (with overlap) and Spatial Pooling
+        PoolLayer(previous_layer, window=(4,2,2), stride=(2,2,2))
+
 
     Each output position :math:'[z]_{n,i,j,c}' results form pooling 
     over the corresponding region in the input
 
-    :param incoming: input layer or input shape
-    :type incoming: ranet.layer or 1D-vector of ints    
-    :param windows: shape of the pooling window
-    :type windows: 1D-vector of ints
+    Parameters
+    ----------
+
+    incoming : tf.Tensor or sknet.Layer
+        The incoming tensor or layer instance
+
+    window : list of int
+        The size of the pooling window
+
+    stride : list of int (default=window)
+        The stride of the pooling
+
     """
-    def __init__(self, incoming, windows, strides=None, pool_type='MAX', 
-            padding='VALID'):
-        super().__init__(incoming)
-        self.pool_type = pool_type
-        self.padding = padding
-        if strides is not None:
-            assert(len(strides)==len(windows))
-        else:
-            strides = windows
-        if self.data_format=='NCHW' and windows[0]==1:
-            self.strides = strides[1:]
-            self.windows = windows[1:]
-        if self.data_format=='NHWC' and windows[2]==1:
-            self.strides = strides[:-1]
-            self.windows = windows[:-1]
-        if self.data_format=='NCHW':
-            if len(self.windows)==2:
-                h = 1+(self.in_shape[2]-self.windows[0])//self.strides[0]
-                w = 1+(self.in_shape[3]-self.windows[1])//self.strides[1]
-                self.out_shape = [self.in_shape[0],self.in_shape[1],h,w]
+    def __init__(self, incoming, window_shape, strides=None, pool_type='MAX',
+                    padding='VALID'):
+        with tf.variable_scope("Pool") as scope:
+            self.scope_name = scope.original_name_scope
+            self.pool_type = pool_type
+            self.padding   = padding
+            assert(len(window_shape)==len(incoming.shape)-1)
+            if strides is None:
+                strides = window_shape
             else:
-                c = 1+(self.in_shape[1]-self.windows[0])//self.strides[0]
-                h = 1+(self.in_shape[2]-self.windows[1])//self.strides[1]
-                w = 1+(self.in_shape[3]-self.windows[2])//self.strides[2]
-                self.out_shape = [self.in_shape[0],c,h,w]
-        else:
-            if len(self.windows)==2:
-                h = 1+(self.in_shape[1]-self.windows[0])//self.strides[0]
-                w = 1+(self.in_shape[2]-self.windows[1])//self.strides[1]
-                self.out_shape = [self.in_shape[0],self.in_shape[1],h,w]
+                for i,w in enumerate(window_shape):
+                    if w==-1:
+                        assert(strides[i]==1)
+            # DO THE CASES WHERE -1 IS PRESENT
+            self.total_axis = [i for i,w in enumerate(window_shape) if w==-1]
+            self.total      = len(self.total_axis)>0
+            if self.total:
+                self.total_func = tf.reduce_mean if pool_type=="AVG" else tf.reduce_max
+                self.window_shape = [1 if i in self.total_axis else w for
+                                            i,w in enumerate(window_shape)]
+                self.strides = [1 if i in self.total_axis else w for
+                                            i,w in enumerate(strides)]
             else:
-                c = 1+(self.in_shape[3]-self.windows[2])//self.strides[2]
-                h = 1+(self.in_shape[1]-self.windows[0])//self.strides[0]
-                w = 1+(self.in_shape[2]-self.windows[1])//self.strides[1]
-                self.out_shape = [self.in_shape[0],c,h,w]
-        if self.given_input:
-            self.forward(incoming.output)
-    def forward(self,input,**kwargs):
-        if len(self.windows)==2:
-            # This is the standard spatial pooling case
-            self.output = tf.nn.pool(input,window_shape=self.windows,
-                    strides=self.strides, pooling_type=self.pool_type, 
-                    padding=self.padding, data_format=self.data_format)
+                self.window_shape = window_shape
+                self.strides      = strides
+            super().__init__(incoming)
+
+    def forward(self,input,*args,**kwargs):
+        # This is the standard spatial pooling case
+        if self.total:
+            input = self.total_func(input,axis=self.total_axis,keepdims=True)
+        # pooling also occurs on channel axis
+        data_format = ["NCW","NCHW","NCDHW"]
+        if self.window_shape[0]>1:
+            data_format = data_format[len(input.shape)-2]
+            input = tf.expand_dims(input,1)
+            output = tf.nn.pool(input,window_shape=self.window_shape,
+                    strides=self.strides, pooling_type=self.pool_type,
+                    padding=self.padding, data_format=data_format)[:,0]
         else:
-            self.output = tf.nn.pool(tf.expand_dims(input,-1),
-                    window_shape=self.windows,strides=self.strides, 
-                    pooling_type=self.pool_type, padding=self.padding, 
-                    data_format=self.data_format)[...,0]
+            print(self.window_shape,self.strides)
+            data_format = data_format[len(input.shape)-3]
+            output = tf.nn.pool(input,window_shape=self.window_shape[1:],
+                    strides=self.strides[1:], pooling_type=self.pool_type, 
+                    padding=self.padding, data_format=data_format)
+
         # Set-up the the VQ
         if self.pool_type=='AVG':
             self.VQ = None
         else:
-            self.VQ = tf.gradients(self.output,input,tf.ones_like(self.output))[0]
-        return self.output
+            self.VQ = tf.gradients(output,input,tf.ones_like(output))[0]
+        return output
 
-
-class GlobalSpatialPool(Layer):
-    """Pooling over all spatial dimension.
-
-    This layer implements a global spatial pooling removing all spatial
-    dimension present in the input.
-
-    :param incoming: the input shape or an incoming layer
-    :type incoming: shape or :class:`Layer`
-    :param pool_type: the type of pooling to apply, can be either 
-                      :py:data:`"MAX"`, or :py:data:`"AVG"`
-    :type pool_type: str
-    """
-    def __init__(self,incoming, pool_type='AVG'):
-        super().__init__(incoming)
-        self.pool_type = pool_type
-        if self.data_format=='NCHW':
-            self.axis = [2,3]
-        else:
-            self.axis = [1,2]
-        # Set up output shape
-        if self.data_format=='NCHW':
-            self.out_shape = [self.in_shape[0],self.in_shape[1],1,1]
-        else:
-            self.out_shape = [self.in_shape[0],1,1,self.in_shape[1]]
-        if self.given_input:
-            self.forward(incoming.output)
-    def forward(self,input,**kwargs):
-        if self.pool_type=='AVG':
-            self.output = tf.reduce_mean(input,axis=self.axis,keep_dims=True)
-            self.VQ = None
-        else:
-            self.output = tf.reduce_max(input,axis=self.axis,keep_dims=True)
-            self.VQ = tf.gradients(self.output,input,tf.ones_like(self.output))[0]
-        return self.output
 
 
 

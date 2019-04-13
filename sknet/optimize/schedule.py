@@ -122,7 +122,7 @@ class stepwise:
         self.description = 'stepwise'+str(dict_lr).replace(' ','')
 
     def __call__(self,epoch,*args,**kwargs):
-        
+        return 0.01 
         epoch = tf.cast(epoch,tf.int32)
         pairs =[(tf.logical_and(tf.greater_equal(epoch,e),tf.less(epoch,ep)),lambda :v) 
             for e,ep,v in zip(self.epochs[:-1],self.epochs[1:],self.values[:-1])]

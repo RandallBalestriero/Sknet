@@ -24,27 +24,21 @@ __version__ = 'alpha.1'
 
 
 def get_tensor_dependencies(tensor):
-
-    # If a tensor is passed in, get its op
-    try:
-        tensor_op = tensor.op
-    except:
-        tensor_op = tensor
-
-    # Recursively analyze inputs
-    dependencies = []
-    for inp in tensor_op.inputs:
-        new_d = get_tensor_dependencies(inp)
-        non_repeated = [d for d in new_d if d not in dependencies]
-        dependencies = [*dependencies, *non_repeated]
-
-    # If we've reached the "end", return the op's name
-    if tensor_op.type == 'Placeholder':
-        dependencies = [tensor]
-
-    # Return a list of tensor op names
+    dependencies = list()
+    ops = tf.contrib.graph_editor.get_backward_walk_ops(tensor,control_inputs=True)
+    for op in ops:
+        if op.type == 'Placeholder' and 'deterministic' not in op.name:
+            dependencies.append(op.outputs[0])
     return dependencies
 
+def get_layers(tensor):
+    layers = list()
+    ops = tf.contrib.graph_editor.get_backward_walk_ops(tensor,control_inputs=True)
+    for op in ops:
+        print(op.outputs,isinstance(op.outputs[0],layer.Layer))
+        if isinstance(op.outputs[0],layer.Layer):
+            layers.append(op)
+    return layers
 
 
 
@@ -338,6 +332,87 @@ def Parser(instruction):
 
 
 
+class Variable(object):
+    """Analog to :class:`tf.Variable` used for initialization
+    with additional inplace option.
+
+    Example of use ::
+
+        # The layer (or other object) will call later in the
+        # construction ``w(some_shape)`` and the output will be
+        # ``tf.Variable(tf.zeros(some_shape),trainable=True)``
+        w=sknet.Variable(tf.zeros,trainable=True)
+        # When setting trainable=False, the same occurs but with
+        # a non trainable variable as output
+            
+        # It is also possible to give an already instanciated
+        # parameter as 
+        w=sknet.Variable(tf.zeros(known_shape),trainable=True)
+
+        # Finally, it is often required to use inplace the given
+        # parameter (for example in the reconstruction part of an
+        # autoencoder, we wish to use the encoder weights, inplace.
+        # And not as initialization of a trainable or not 
+        # tf.Variable. To do so, simply set trainable=None as in
+        w=sknet.Variable(encoder.W,trainable=None)
+
+    Parameters
+    ----------
+
+    var_or_func : tf.Tensor or func
+        The :class:`tf.Tensor` or :class:`np.ndarray` to use, or
+        the function to use, if a function, it will be given
+        the shape and should return a :class:`tf.Tensor` or 
+        :class:`np.ndarray`.
+
+    trainable : bool or None
+        If a boolean, then the variable will be a :class:`tf.Variable`
+        with trainable attribute set with the given one. If :data:`None`
+        then the variable will not be a :class:`tf.Variable but` directly
+        the tensor. This should be used if the passed value or function
+        should not be used as an initializer of a :class:`tf.Variable`
+        but as the parameter itself (inplace).
+    """
+    def __init__(self,var_or_func,trainable=True, name=None):
+
+        self._var_or_func = var_or_func
+        self._trainable   = trainable
+        self._name        = name
+        self._var         = None
+
+    def __call__(self,var_shape):
+        if type(self.trainable)==bool:
+            if callable(self.var_or_func):
+                self._var = tf.Variable(self.var_or_func(var_shape),
+                        name=self.name,trainable=self.trainable)
+            else:
+                self._var = tf.Variable(self.var_or_func,
+                        name=self.name,trainable=self.trainable)
+        else:
+            if callable(self.var_or_func):
+                self._var = self.var_or_func(var_shape)
+            else:
+                self._var = self.var_or_func
+        return self.var
+
+    @property
+    def var(self):
+        return self._var
+    @property
+    def name(self):
+        return self._name
+    @property
+    def trainable(self):
+        return self._trainable
+    @property
+    def var_or_func(self):
+        return self._var_or_func
+
+
+
+
+
+
 class Worker(object):
     """processing unit that manages a single tensorflow op.
     A Worker allows to specify a tensorflow op to execute. Whether
@@ -393,22 +468,26 @@ class Worker(object):
         description : str (optional)
             the description of the worker, used for saving, it is added to the h5 file.
     """
-    def __init__(self,op_name,context,op, instruction, deterministic=None,repeat=1,description=''):
-        self._dependencies = get_tensor_dependencies(op)
+    def __init__(self,op_name,context,op, instruction, deterministic=None,repeat=1,description='',sampling='continuous'):
+        self._dependencies  = get_tensor_dependencies(op)
         self._name          = context+"/"+op_name
         self._repeat        = repeat
         self._description   = description
         self._deterministic = deterministic
+        self._sampling      = sampling
         self._context       = context
-        self._op           = op
+        self._op            = op
         # to gather all the epoch/batch data
-        self.data          = list()
+        self.data           = list()
         # to gather data (batch) at each epoch
-        self.epoch_data    = list()
+        self.epoch_data     = list()
         # specific to the saving and transformation
         instr = Parser(instruction)
         self.__dict__.update(instr)
         self._concurrent = True
+    @property
+    def sampling(self):
+        return self._sampling
     @property
     def description(self):
         return self._description
@@ -526,6 +605,7 @@ class WorkerGroup(Worker):
     def __init__(self,workers,name=''):
         self._workers      = [workers[0]]
         self._dependencies = workers[0].dependencies
+        self._sampling     = workers[0].sampling
         self._op           = [worker.op for worker in workers]
         self._repeat       = workers[0].repeat
         self._context      = workers[0].context
@@ -535,6 +615,7 @@ class WorkerGroup(Worker):
         for worker in workers[1:]:
             self.__add__(worker)
     def __add__(self,other):
+#        assert(self.sampling==other.sampling)
         assert(self.repeat==other.repeat)
         assert(other.context==other.context)
         self._dependencies = list(set(self._dependencies+other.dependencies))
@@ -557,7 +638,6 @@ class WorkerGroup(Worker):
             self._deterministic = self._deterministic_list[0]
         else:
             self._concurrent = False
-
     @property
     def deterministic_list(self):
         return self._deterministic_list

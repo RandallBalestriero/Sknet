@@ -9,7 +9,7 @@ from . import Dataset
 
 from ..utils import to_one_hot
 
-def load_svhn(data_format='NCHW',PATH=None):
+def load_svhn(PATH=None):
     """Street number classification.
     The `SVHN <http://ufldl.stanford.edu/housenumbers/>`_
     dataset is a real-world 
@@ -23,22 +23,13 @@ def load_svhn(data_format='NCHW',PATH=None):
     scene images). SVHN is obtained from house numbers in Google 
     Street View images. 
 
-    :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
-    :type data_format: 'NCHW' or 'NHWC'
     :param path: (optional, default $DATASET_PATH), the path to look for the data and 
                  where the data will be downloaded if not present
     :type path: str
     """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
-    if data_format=='NCHW':
-        datum_shape = (3,32,32)
-    else:
-        datum_shape = (32,32,3)
-    dict_init = [("train_set",None),("test_set",None),
-                ("datum_shape",datum_shape),("n_classes",10),
-                ("n_channels",3),("spatial_shape",(32,32)),
-                ("path",PATH),("data_format",data_format),("name","svhn"),
+    dict_init = [("n_classes",10),("path",PATH),("name","svhn"),
                 ("classes",[str(1+u) for u in range(10)])]
     dataset = Dataset(**dict(dict_init))
 
@@ -73,13 +64,13 @@ def load_svhn(data_format='NCHW',PATH=None):
     test_set  = [test_set['X'].transpose([3,2,0,1]).astype('float32'),
                     np.squeeze(test_set['y']).astype('int32')-1]
 
-    # Check formatting
-    if data_format=='NHWC':
-        train_set[0] = np.transpose(train_set[0],[0,2,3,1])
-        test_set[0]  = np.transpose(test_set[0],[0,2,3,1])
 
-    dataset.add_variable({'images':{'train_set':train_set[0],'test_set':test_set[0]},
-                        'labels':{'train_set':train_set[1],'test_set':test_set[1]}})
+    dataset.add_variable({'images':[{'train_set':train_set[0],
+                                    'test_set':test_set[0]},
+                                    (3,32,32),'float32'],
+                        'labels':[{'train_set':train_set[1],
+                                    'test_set':test_set[1]},
+                                    (),'int32']})
 
     print('Dataset svhn loaded in','{0:.2f}'.format(time.time()-t),'s.')
     return dataset

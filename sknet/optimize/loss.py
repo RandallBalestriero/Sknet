@@ -37,7 +37,7 @@ class l2_norm(Tensor):
 
 
 
-class crossentropy_logits(Tensor):
+def crossentropy_logits(p,q,weights=None,p_sparse=True):
     """Cross entropy loss given that :math:`p` is sparse and
     :math:`q` is the log-probability.
 
@@ -67,44 +67,19 @@ class crossentropy_logits(Tensor):
     (output of the network). This class takes two non sparse
     vectors which should be nonnegative and sum to one.
     """
-    def __init__(self,p=None,q=None,weights=None,p_sparse=True):
-        if p is None and q is None:
-            print("error")
-            exit()
-        elif p is None:
-            if p_sparse:
-                p = tf.placeholder(tf.int32,shape=(q.shape[0],))
-            else:
-                p = tf.placeholder(tf.float32,shape=q.shape)
-        if q is None:
-            print('error')
-            exit()
-        self._p = p
-        self._q = q
-        if p_sparse:
-            indices = tf.stack([tf.range(self._p.shape[0],dtype=tf.int32),
-                            self._p],1)
-            linear_ = tf.gather_nd(self.q,indices)
-        else:
-            linear_ = tf.reduce_sum(p*q,1)
-        # LogSumExp with max removal
-        q_max      = tf.stop_gradient(tf.reduce_max(q,1,keepdims=True))
-        logsumexp  = tf.log(tf.reduce_sum(tf.exp(q-q_max),1))
-        if weights is not None:
-            loss = tf.reduce_mean(weights*(-linear_+logsumexp))
-        else:
-            loss = tf.reduce_mean(-linear_+logsumexp)
-
-        super().__init__(loss)
-
-
-    @property
-    def p(self):
-        return self._p
-
-    @property
-    def q(self):
-        return self._q
+    if p_sparse:
+        indices = tf.stack([tf.range(p.shape[0],dtype=tf.int32),p],1)
+        linear_ = tf.gather_nd(q,indices)
+    else:
+        linear_ = tf.reduce_sum(p*q,1)
+    # LogSumExp with max removal
+    q_max      = tf.stop_gradient(tf.reduce_max(q,1,keepdims=True))
+    logsumexp  = tf.log(tf.reduce_sum(tf.exp(q-q_max),1))+q_max[:,0]
+    if weights is not None:
+        return tf.reduce_mean(weights*(-linear_+logsumexp))
+    else:
+        return tf.reduce_mean(-linear_+logsumexp)
+ 
 
 
 
@@ -112,8 +87,7 @@ class crossentropy_logits(Tensor):
 
 
 
-
-class accuracy(Tensor):
+def accuracy(labels,predictions):
     """Accuracy
 
     The formal definition given that :math:`p` is now an
@@ -133,34 +107,11 @@ class accuracy(Tensor):
     vectors which should be nonnegative and sum to one.
 
     """
-    def __init__(self,labels=None,predictions=None):
-        if labels is None and predictions is None:
-            print("error")
-            exit()
-        elif labels is None:
-            labels = tf.placeholder(tf.int32,shape=(predictions.shape[0],))
-        if predictions is None:
-            print('error')
-            exit()
-
-        self._predictions = predictions
-        self._labels      = labels
-
-        loss = tf.reduce_mean(tf.cast(tf.equal(labels,tf.argmax(predictions,1,output_type=tf.int32)),tf.float32))
-
-        super().__init__(loss)
-
-    @property
-    def labels(self):
-        return self._labels
-
-    @property
-    def predictions(self):
-        return self._predictions
+    equals =tf.equal(labels,tf.argmax(predictions,1,output_type=tf.int32))
+    return tf.reduce_mean(tf.cast(equals,tf.float32))
 
 
 
 
-
-        
+      
 

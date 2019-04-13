@@ -9,7 +9,7 @@ from . import Dataset
 from ..utils import to_one_hot
 
 
-def load_fashionmnist(data_format='NCHW',PATH=None):
+def load_fashionmnist(PATH=None):
     """Grayscale `Zalando <https://jobs.zalando.com/tech/>`_ 's article image classification.
     `Fashion-MNIST <https://github.com/zalandoresearch/fashion-mnist>`_ is 
     a dataset of `Zalando <https://jobs.zalando.com/tech/>`_ 's article 
@@ -28,16 +28,10 @@ def load_fashionmnist(data_format='NCHW',PATH=None):
     """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
-    if data_format=='NCHW':
-        datum_shape = (1,28,28)
-    else:
-        datum_shape = (28,28,1)
-    dict_init = [("train_set",None),("test_set",None),
-                ("datum_shape",datum_shape),("n_classes",10),
-                ("n_channels",1),("spatial_shape",(28,28)),
-                ("path",PATH),("data_format",data_format),("name","fashionmnist"),
-                ("classes",["T-shirt/top", "Trouser", "Pullover","Dress", "Coat",
-                    "Sandal", "Shirt", "Sneaker", "Bag", "Ankle boot"])]
+    dict_init = [("n_classes",10),("path",PATH),("name","fashionmnist"),
+                ("classes",["T-shirt/top", "Trouser", "Pullover",
+                    "Dress", "Coat", "Sandal", "Shirt", 
+                    "Sneaker", "Bag", "Ankle boot"])]
 
     dataset = Dataset(**dict(dict_init))
     # Load the dataset (download if necessary) and set
@@ -93,13 +87,13 @@ def load_fashionmnist(data_format='NCHW',PATH=None):
     with gzip.open(PATH+'fashionmnist/test-images.gz', 'rb') as lbpath:
         test_images = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=16).reshape((-1,1,28,28))
 
-    # Check Formatting
-    if data_format=='NHWC':
-        train_images = np.transpose(train_images,[0,2,3,1])
-        test_images  = np.transpose(test_images,[0,2,3,1])
 
-    dataset.add_variable({"images":{'train_set':train_images,'test_set':test_images},
-                        "labels":{'train_set':train_labels,'test_set':test_labels}})
+    dataset.add_variable({"images":[{'train_set':train_images,
+                                    'test_set':test_images},
+                                    (1,28,28),'float32'],
+                        "labels":[{'train_set':train_labels,
+                                    'test_set':test_labels},
+                                    (),'int32']})
 
     print('Dataset fashionmnist loaded in','{0:.2f}'.format(time.time()-t),'s.')
     return dataset

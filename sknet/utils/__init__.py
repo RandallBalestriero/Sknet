@@ -8,14 +8,7 @@ __all__ = [
         "plotting",
         "geometry"]
 
-
-
-def init_variable(var_or_func,var_shape,name=None):
-    if callable(var_or_func):
-        return tf.Variable(var_or_func(var_shape),name=name,trainable=True)
-    else:
-        return var_or_func
-
+                        
 
 
 def to_one_hot(labels,K=None):

@@ -3,7 +3,9 @@
 
 import tensorflow as tf
 import numpy as np
+
 from .. import Worker
+from ..dataset import BatchIterator
 
 #ToDo set the seed for the batches etc
 
@@ -11,17 +13,18 @@ from .. import Worker
 
 
 class Workplace(object):
-    def __init__(self, network, dataset=None, linkage=None):
+    def __init__(self, network, dataset=None):
         config                          = tf.ConfigProto()
         config.gpu_options.allow_growth = True
         config.log_device_placement     = True
         self.session                    = tf.Session(config=config)
         # Attributes
         self.dataset  = dataset
-        self.network= network
-        self._linkage = linkage
+        self.network  = network
         # initialize the variables
-        self.session.run(tf.global_variables_initializer())
+        ops = tf.global_variables_initializer()
+        self.session.run(ops,
+                        feed_dict=dict(dataset.init_dict()))
 
     def execute_op(self,op,feed_dict,batch_size=None,deterministic=None):
         """Perform an epoch (according to the set given by context).
@@ -94,7 +97,7 @@ class Workplace(object):
             output = self.session.run(op,feed_dict=feed_dict)
         return output
  
-    def execute_worker(self,worker):
+    def execute_worker(self,worker,feed_dict={}):
         """Perform an epoch (according to the set given by context).
         Execute and save the given ops and optionally apply a numpy function
         on them at the end of the epoch. THis is usefull for example to only
@@ -129,56 +132,27 @@ class Workplace(object):
 
 
         """
-        # find out the batch_size, if not given, take it from the network, 
-        # if given (case when the network was build with None 
-        # as batch_size, then assert that
-        # it is true (or at least that they both match)
-        batch_size = self.network.batch_size
-        N = self.dataset.N(worker.context)
-        N_BATCH = N//batch_size
-        # get dependencies
-        dependencies = worker.dependencies
-        # get context
-        context = worker.context
-        if worker.concurrent:
-            if worker.deterministic  is not None:
-                self.network.set_deterministic(worker.deterministic,self.session)
         # Loop over all the batches
-        for i in range(N_BATCH):
-            # current indices
-            here = range(i*batch_size,(i+1)*batch_size)
-            # create the feed dict for the batch
-            feed_dict = list()
-            for var in dependencies:
-                var_name = self.linkage[var.name]
-                value = self.dataset[var_name][worker.context][here]
-                feed_dict.append((var,value))
-            # get the op(s)
-            op = worker.get_op(i)
-            # if we can run the ops concurently, then do it
+        self.dataset.set_set(worker.context,session=self.session)
+        if worker.concurrent:
+            feed_dict.update(self.network.deter_dict(worker.deterministic))
+        batch_nb = 0
+        while self.dataset.next(session=self.session):
+            op = worker.get_op(batch_nb)
+            print(self.session.run(self.dataset.images)[0,0,15,15])
+            print(self.session.run(self.dataset.labels)[0])
             if worker.concurrent:
-                output = self.session.run(op,feed_dict=dict(feed_dict))
+                output = self.session.run(op,feed_dict=feed_dict)
             else:
                 output = []
                 for op_,deterministic in zip(op,worker.deterministic_list):
-                    if op_==[]:
-                        output.append([])
-                        continue
-                    if deterministic is not None:
-                        self.network.set_deterministic(deterministic,self.session)
-                    output.append(self.session.run(op_,feed_dict=dict(feed_dict)))
+                    feed_dict.update(self.network.deter_dict(deterministic))
+                    output.append(self.session.run(op_,feed_dict=feed_dict))
             worker.append(output)
+            batch_nb+=1
         worker.epoch_done()
  
-    def add_linkage(self,linkage):
-        self._linkage = linkage
-    @property
-    def linkage(self):
-        return self._linkage
-    @property
-    def workers(self):
-        return self._workers
-    def execute_queue(self,queue, repeat=1):
+    def execute_queue(self,queue, repeat=1,feed_dict={}):
         """Apply multiple consecutive epochs of train test and valid
 
         Example of use ::
@@ -234,7 +208,7 @@ class Workplace(object):
                 for epoch in range(n_epochs):
                     if n_epochs>1:
                         print("\t  Epoch",epoch,'...')
-                    self.execute_worker(worker)
+                    self.execute_worker(worker,feed_dict=feed_dict)
         return queue
 
 

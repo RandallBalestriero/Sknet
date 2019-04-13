@@ -1,0 +1,23 @@
+Base
+----
+
+
+.. currentmodule:: sknet
+
+.. autoclass:: Tensor
+    :members:
+
+.. autoclass:: ObservedTensor
+    :members:
+
+
+.. autoclass:: Worker
+    :members:
+ 
+.. autoclass:: WorkerGroup
+    :members:
+
+
+.. autofunction:: to_file
+
+

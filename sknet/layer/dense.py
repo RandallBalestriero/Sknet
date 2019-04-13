@@ -1,14 +1,13 @@
 import tensorflow as tf
 import tensorflow.contrib.layers as tfl
-from .normalize import BatchNormalization as bn
+from .normalize import BatchNorm as bn
 from .special import Activation as sa
 from .special import Identity
 import numpy as np
 
 from . import Layer
 
-from ..utils import init_variable as init_var
-
+from .. import Variable
 
 
 
@@ -68,34 +67,46 @@ class Dense(Layer):
     def __init__(self, incoming, units, W = tfl.xavier_initializer(), 
                 b = tf.zeros, func_W = tf.identity, 
                 func_b = tf.identity, name='',*args, **kwargs):
-        # Set up the input, flatten if needed
-        if len(incoming.shape.as_list())>2:
-            self._flatten_input = True
-            flat_dim  = np.prod(incoming.shape.as_list()[1:])
-        else:
-            self._flatten_input = False
-            flat_dim  = incoming.shape.as_list()[1]
-
-        # Initialize the layer variables
-        self._W = init_var(W,(flat_dim,units),
-                            name='dense_W_'+name)
-        self._b = init_var(b,(1,units),
-                            name='dense_b_'+name)
-
-        self.W  = func_W(self._W)
-        self.b  = func_b(self._b)
-
-        super().__init__(incoming)
+        with tf.variable_scope("dense_layer") as scope:
+            self.scope_name = scope.original_name_scope
+            # Set up the input, flatten if needed
+            if len(incoming.shape.as_list())>2:
+                self._flatten_input = True
+                flat_dim  = np.prod(incoming.shape.as_list()[1:])
+            else:
+                self._flatten_input = False
+                flat_dim  = incoming.shape.as_list()[1]
+    
+            # Initialize W
+            if type(W)!=Variable:
+                W = Variable(W,name='dense_W_'+name)
+            self._W = W((flat_dim,units))
+            self.W  = func_W(self._W)
+            # Initialize b
+            if b is None:
+                self._b = None
+                self.b  = None
+            else:
+                if type(b)!=Variable:
+                    b = Variable(b,name='dense_b_'+name)
+                self._b = b((1,units))
+                self.b  = func_b(self._b)
+    
+            super().__init__(incoming)
 
     def forward(self, input, *args, **kwargs):
         if self._flatten_input:
             input = tf.layers.flatten(input)
-        return tf.matmul(input,self.W)+self.b
+        if self.b is None:
+            return tf.matmul(input,self.W)
+        else:
+            return tf.matmul(input,self.W)+self.b
     def backward(self,input,*args, **kwargs):
-        output = tf.matmul(input,tf.transpose(self.W))
+        output = tf.matmul(input,self.W,transpose_b=True)
         if self._flatten_input:
             return tf.reshape(output,self._input.shape)
-        return output
+        else:
+            return output
 
 
 

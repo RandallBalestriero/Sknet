@@ -9,7 +9,7 @@ from . import Dataset
 
 from ..utils import to_one_hot
 
-def load_cifar10(data_format='NCHW',PATH=None):
+def load_cifar10(PATH=None):
     """Image classification.
     The `CIFAR-10 <https://www.cs.toronto.edu/~kriz/cifar.html>`_ dataset 
     was collected by Alex Krizhevsky, Vinod Nair, and Geoffrey 
@@ -22,22 +22,13 @@ def load_cifar10(data_format='NCHW',PATH=None):
     contain more images from one class than another. Between them, the 
     training batches contain exactly 5000 images from each class. 
 
-    :param data_format: (optional, default 'NCHW'), 
-    :type data_format: 'NCHW' or 'NHWC'
     :param path: (optional, default :envvar:`$DATASET_PATH`), the path to look 
                  for the data and where the data will be downloaded if not present
     :type path: str
     """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
-    if data_format=='NCHW':
-        datum_shape = (3,32,32)
-    else:
-        datum_shape = (32,32,3)
-    dict_init = [("train_set",None),("test_set",None),
-                ("datum_shape",datum_shape),("n_classes",10),
-                ("n_channels",3),("spatial_shape",(32,32)),
-                ("path",PATH),("data_format",data_format),("name","cifar10")]
+    dict_init = [("n_classes",10),("path",PATH),("name","cifar10")]
     class_init = ["airplane", "automobile", "bird", "cat", "deer", "dog",
                 "frog", "horse", "ship", "truck"]
     dataset = Dataset(**dict(dict_init+[('classes',class_init)]))
@@ -68,13 +59,8 @@ def load_cifar10(data_format='NCHW',PATH=None):
     # Load training set
     train_images  = list()
     train_labels  = list()
-    train_names = ['cifar-10-batches-py/data_batch_1',
-                'cifar-10-batches-py/data_batch_2',
-                'cifar-10-batches-py/data_batch_3',
-                'cifar-10-batches-py/data_batch_4',
-                'cifar-10-batches-py/data_batch_5']
-    for names in train_names:
-        f        = tar.extractfile('cifar-10-batches-py/data_batch_1').read()
+    for k in range(1,6):
+        f        = tar.extractfile('cifar-10-batches-py/data_batch_'+str(k)).read()
         data_dic = pickle.loads(f,encoding='latin1')
         train_images.append(data_dic['data'].reshape((-1,3,32,32)))
         train_labels.append(data_dic['labels'])
@@ -87,15 +73,14 @@ def load_cifar10(data_format='NCHW',PATH=None):
     test_labels = list()
     f        = tar.extractfile('cifar-10-batches-py/test_batch').read()
     data_dic = pickle.loads(f,encoding='latin1')
-    test_set = [data_dic['data'].reshape((-1,3,32,32)),data_dic['labels']]
+    test_set = [data_dic['data'].reshape((-1,3,32,32)),np.array(data_dic['labels'])]
 
-    # Check formatting
-    if data_format=='NHWC':
-        train_set[0] = np.transpose(train_set[0],[0,2,3,1])
-        test_set[0]  = np.transpose(test_set[0],[0,2,3,1])
-
-    dataset.add_variable({'images':{'train_set':train_set[0],'test_set':test_set[0]},
-                        'labels':{'train_set':train_set[1],'test_set':test_set[1]}})
+    dataset.add_variable({'images':[{'train_set':train_set[0].astype('float32'),
+                                    'test_set':test_set[0].astype('float32')},
+                                    (3,32,32),'float32'],
+                        'labels':[{'train_set':train_set[1].astype('int32'),
+                                    'test_set':test_set[1].astype('int32')},
+                                    (),'int32']})
 
     print('Dataset cifar10 loaded in','{0:.2f}'.format(time.time()-t),'s.')
 

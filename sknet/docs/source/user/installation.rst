@@ -15,6 +15,21 @@ It can be added in yoyr :file:`.bashrc` as
 ``export DATASET_PATH='/home/user/DATASET/'``
  
 
+.. rubric:: CUDA Driver installation
+
+One solution to install the lastest driver is ::
+
+    sudo add-apt-repository ppa:graphics-drivers/ppa
+    sudo apt update
+    sudo apt upgrade
+
+then display the available drivers with ``ubuntu-drivers list`` and simply 
+install the desired one via ::
+
+    sudo apt install nvidia-driver-VERSION_NUMBER
+
+which will be loaded at the next reboot of the machine. For the last version of Tensorflow (>=1.10), it is required to have the lastest driver (>=400).
+
 .. rubric:: Installation (Anaconda)
 
 An easy way to get everything installed and set-up out-of-the-box is to

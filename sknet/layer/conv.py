@@ -1,8 +1,11 @@
 import tensorflow as tf
 import tensorflow.contrib.layers as tfl
-from .normalize import BatchNormalization as bn
+from .normalize import BatchNorm as bn
 import numpy as np
 from . import Layer
+
+
+from .. import Variable
 
 class Conv2D(Layer):
     """2D (spatial) convolutional layer.
@@ -18,83 +21,62 @@ class Conv2D(Layer):
     :type nonlinearity_c: scalar
 
     """
-    def __init__(self,incoming,filters,nonlinearity = np.float32(1),
-                    training=None, batch_norm = True, 
-                    init_W = tfl.xavier_initializer(uniform=True),
-                    strides=1,pad='valid',mode='CONSTANT', name=''):
-        super().__init__(incoming)
-        
-        if np.isscalar(strides):
-            self.strides = [strides,strides]
-        else:
-            self.strides = strides
-            
-        # Define the padding function
-        if pad=='valid' or filter_shape==1:
-            self.pad = lambda x:x
-            p = [0,0]
-        else:
-            if pad=='same':
-                assert(filters[1]%2==1 and filters[2]%2==1)
-                p = [(filters[1]-1)//2,(filters[2]-1)//2]
+    def __init__(self,incoming,filters,W = tfl.xavier_initializer(),
+                    b = tf.zeros, strides=1, pad='valid',
+                    mode='CONSTANT', name='', func_W = tf.identity,
+                    func_b = tf.identity):
+        with tf.variable_scope("Conv2D") as scope:
+            self.scope_name = scope.original_name_scope
+            self.mode = mode
+            if np.isscalar(strides):
+                self.strides = [strides,strides]
             else:
-                p = [filters[1]-1,filters[2]-1]
-            if self.data_format=='NCHW':
-                self.pad = lambda x: tf.pad(x,[[0,0],[0,0],
-                                    [p[0],p[0]],[p[1],p[1]]],mode=mode)
+                self.strides = strides
+                
+            # Define the padding function
+            if pad=='valid' or (filters[1]==1 and filters[2]==1):
+                self.to_pad=False
             else:
-                self.pad = lambda x: tf.pad(x,[[0,0],[p[0],p[0]],
-                                        [p[1],p[1]],[0,0]],mode=mode)
-                                        
-        # Set up output shape
-        if self.data_format=='NCHW':
-            height = (self.input_shape[2]+p[0]-filters[1])//self.strides[0]+1
-            width  = (self.input_shape[2]+p[0]-filters[1])//self.strides[0]+1
-            self.output_shape = [self.input_shape[0], filters[0], height, width]
-        else:
-            height = (self.input_shape[1]+p[0]-filters[1])//self.strides[0]+1
-            width  = (self.input_shape[2]+p[1]-filters[2])//self.strides[1]+1
-            self.output_shape = [self.input_shape[0], height, width, filters[0]]
-            
-        # Compute shape of the W filter parameter
-        w_shape = (filters[1],filters[2],self.input_shape[1],filters[0])
-        # Initialize parameters
-        self.W = tf.Variable(init_W(w_shape), name='conv2dlayer_W_'+name, 
-                            trainable=True)
-        self.b = tf.Variable(tf.zeros((1,1,1,filters[0])),
-                                trainable=True,name='conv2dlayer_b_'+name)
-
-        # Set up the nonlinearity layer
-        self.nonlinearity = ScalarActivation(self.input_shape,nonlinearity)
-
-        # Set-up batch norm layer
-        if batch_norm:
-            if self.data_format=='NHWC':
-                self.batch_norm = bn(self.input_shape,axis=[0,1,2],gamma=False)
+                if pad=='same':
+                    assert(filters[1]%2==1 and filters[2]%2==1)
+                    self.p = [(filters[1]-1)//2,(filters[2]-1)//2]
+                else:
+                    self.p = [filters[1]-1,filters[2]-1]
+                self.to_pad = True
+                                            
+            # Compute shape of the W filter parameter
+            w_shape = (filters[1],filters[2],
+                                incoming.shape.as_list()[1],filters[0])
+            # Initialize W
+            if type(W)!=Variable:
+                W = Variable(W, name='conv2dlayer_W_'+name)
+            self._W = W(w_shape)
+            self.W  = func_W(self._W)
+            # Initialize b
+            if b is None:
+                self._b = None
+                self.b  = None
             else:
-                self.batch_norm = bn(self.input_shape,axis=[0,2,3],gamma=False)
+                if type(b)!=Variable:
+                    b = Variable(b, name='conv2dlayer_b_'+name)
+                self._b = b((1,filters[0],1,1))
+                self.b  = func_b(self._b)
+    
+            super().__init__(incoming)
+
+    def forward(self,input, *args,**kwargs):
+        if self.to_pad:
+            padded = tf.pad(input,[[0,0],[0,0],[self.p[0]]*2,
+                                [self.p[1]]*2],mode=self.mode)
         else:
-            self.batch_norm = Identity(self.input_shape)
-    def forward(self,input=None, training=None,**kwargs):
-        if input is None:
-            self.incoming.forward(training=training)
-        Wx = tf.nn.conv2d(self.pad(input),self.W,
-                strides=[1,self.strides[0],self.strides[1],1],padding='VALID', 
-                data_format=self.data_format)
-        self.output = self.nonlinearity.forward(
-                        self.batch_norm.forward(Wx,training=training),
-                        training=training)
-        return self.output
-#        W_norm            = tf.sqrt(tf.reduce_sum(tf.square(self.W*self.scaling),[0,1,2]))
-#        self.positive_radius = tf.reduce_min(tf.where(tf.greater(self.S,tf.zeros_like(self.S)),self.S,tf.reduce_max(self.S,keepdims=True)),[1,2,3])
-#        self.negative_radius = tf.reduce_min(tf.where(tf.smaller(self.S,tf.zeros_like(self.S)),tf.abs(self.S),tf.reduce_max(tf.abs(self.S),keepdims=True)),[1,2,3])
-#        print(self.output.get_shape().as_list())
-
-
-
-
-
-
+            padded = input
+        Wx = tf.nn.conv2d(padded,self.W,
+                strides=[1,self.strides[0],self.strides[1],1],padding='VALID',
+                data_format="NCHW")
+        if self.b is None:
+            return Wx
+        else:
+            return Wx+self.b
 
 
 

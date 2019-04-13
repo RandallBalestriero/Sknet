@@ -48,11 +48,9 @@ class Network:
         return self.layers[key]
     def __len__(self):
         return len(self.layers)
-    def set_deterministic(self,value,session=None):
-        for layer in self:
-            if hasattr(layer,'set_deterministic'):
-                layer.set_deterministic(value,session)
-
+    def deter_dict(self,value):
+        return dict([(layer.deterministic,value) 
+                for layer in self.layers if hasattr(layer,'deterministic')])
 
 
 

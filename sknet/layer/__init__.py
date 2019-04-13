@@ -128,41 +128,16 @@ class Layer(Tensor):
         # Link this tensor to its input
         self._input = input
 
-        # set data_format
-        if isinstance(input,Layer):
-            self._data_format = input.data_format
-        else:
-            self._data_format = kwargs["data_format"]
-
         # set deterministic
         if deterministic is None:
-            self._deterministic = tf.Variable(np.float32(0),name='deterministic',trainable=False)
-            # create the operation to change the state of self.deterministic
-            # this is done only if deterministic was not passed to avoid
-            # uncontrollable behavior for example if a single variable is used
-            # for all the layers
-            self._set_deterministic     = tf.assign(self._deterministic,np.float32(1))
-            self._set_not_deterministic = tf.assign(self._deterministic,np.float32(0))
+            self.deterministic = tf.placeholder(tf.bool,name='deterministic')
         else:
-            self._deterministic = deterministic
-
+            self.deterministic = deterministic
         # compute the layer output based on the layer forward method
         output = self.forward(input,self.deterministic)
 
-
         # initialize the variable
         super().__init__(output)
-
-    def set_deterministic(self,value, session=None):
-        if not hasattr(self,'_set_deterministic'):
-            warnings.warn("deterministic not change, should be done manually")
-            return
-        if session is None:
-            session = tf.get_default_session()
-        if value:
-            session.run(self._set_deterministic)
-        else:
-            session.run(self._set_not_deterministic)
 
 
     @property
@@ -172,13 +147,6 @@ class Layer(Tensor):
         """
         return self._variables
 
-    @property
-    def deterministic(self):
-        return tf.cast(self._deterministic,tf.bool)
-
-    @property
-    def data_format(self):
-        return self._data_format
 
     @property
     def input(self):
@@ -194,6 +162,5 @@ from .normalize import *
 from .conv import *
 from .dense import *
 from .shape import *
-from .io import *
 from .special import *
 #from .meta import *

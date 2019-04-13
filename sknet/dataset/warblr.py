@@ -11,7 +11,7 @@ from . import Dataset
 
 from ..utils import to_one_hot
 
-def load_warblr(data_format='NCT', PATH=None):
+def load_warblr(PATH=None):
     """Binary audio classification, presence or absence of a bird.
     `Warblr <http://machine-listening.eecs.qmul.ac.uk/bird-audio-detection-challenge/#downloads>`_ 
     comes from a UK bird-sound crowdsourcing 
@@ -32,15 +32,8 @@ def load_warblr(data_format='NCT', PATH=None):
     """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
-    if data_format=='NCT':
-        datum_shape = (1,None)
-    else:
-        datum_shape = (None,1)
-    dict_init = [("train_set",None),('sampling_rate',44100),
-                ("datum_shape",datum_shape),("n_classes",2),
-                ("n_channels",1),("spatial_shape",(None,)),
-                ("path",PATH),("data_format",data_format),("name","warblr"),
-                ('classes',["no bird","bird"])]
+    dict_init = [('sampling_rate',44100),("n_classes",2),("path",PATH),
+                ("name","warblr"),('classes',["no bird","bird"])]
 
     dataset = Dataset(**dict(dict_init))
         
@@ -74,15 +67,15 @@ def load_warblr(data_format='NCT', PATH=None):
     f    = zipfile.ZipFile(PATH+'warblr/warblrb10k_public_wav.zip')
     N    = labels.shape[0]
     wavs = list()
-    exp_dim_opt = int(data_format=='NTC')
     for i,files_ in enumerate(labels):
         wavfile   = f.read('wav/'+files_[0]+'.wav')
         byt       = io.BytesIO(wavfile)
-        wavs.append(np.expand_dims(wav_read(byt)[1].astype('float32'),
-                                    exp_dim_opt))
+        wavs.append(np.expand_dims(wav_read(byt)[1].astype('float32'),0))
     labels    = labels[:,1].astype('int32')
-    dataset.add_variable({'signals':{'train_set':wavs},
-                        'labels':{'train_set':labels}})
+    dataset.add_variable({'signals':[{'train_set':wavs},
+                                    (1,None),'float32'],
+                        'labels':[{'train_set':labels},
+                                    (),'int32']})
 
     print('Dataset warblr loaded in','{0:.2f}'.format(time.time()-t),'s.')
     return dataset

@@ -7,7 +7,7 @@ from . import Dataset
 
 from ..utils import to_one_hot
 
-def load_mnist(data_format='NCHW',PATH=None):
+def load_mnist(PATH=None):
     """Grayscale digit classification.
     The `MNIST <http://yann.lecun.com/exdb/mnist/>`_ database of handwritten 
     digits, available from this page, has a training set of 60,000 examples, 
@@ -17,8 +17,6 @@ def load_mnist(data_format='NCHW',PATH=None):
     techniques and pattern recognition methods on real-world data while 
     spending minimal efforts on preprocessing and formatting.
 
-    :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
-    :type data_format: 'NCHW' or 'NHWC'
     :param path: (optional, default $DATASET_PATH), the path to look for the data and
                      where the data will be downloaded if not present
     :type path: str
@@ -28,13 +26,8 @@ def load_mnist(data_format='NCHW',PATH=None):
 
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
-    if data_format=='NCHW':
-        datum_shape = (1,28,28)
-    else:
-        datum_shape = (28,28,1)
-    dict_init = [("datum_shape",datum_shape),("n_classes",10),
-                    ("n_channels",1),("spatial_shape",(28,28)),
-                    ("path",PATH),("data_format",data_format),("name","mnist"),
+    datum_shape = (1,28,28)
+    dict_init = [("n_classes",10),("name","mnist"),
                     ('classes',[str(u) for u in range(10)])]
 
     mnist_dataset = Dataset(**dict(dict_init))
@@ -70,12 +63,9 @@ def load_mnist(data_format='NCHW',PATH=None):
         'valid_set':valid_set[1],
         'test_set':test_set[1]}
 
-    # Check formatting
-    if data_format=='NHWC':
-        for key in images.keys():
-            images[key]=np.transpose(images[key],[0,2,3,1])
 
-    mnist_dataset.add_variable({'images':images,'labels':labels})
+    mnist_dataset.add_variable({'images':[images,(1,28,28),'float32'],
+                                'labels':[labels,(),'int32']})
 
     print('Dataset mnist loaded in','{0:.2f}'.format(time.time()-t),'s.')
 
