@@ -4,8 +4,7 @@
 import tensorflow as tf
 import numpy as np
 
-from .. import Worker
-from ..dataset import BatchIterator
+#from .. import Worker
 
 #ToDo set the seed for the batches etc
 
@@ -139,8 +138,6 @@ class Workplace(object):
         batch_nb = 0
         while self.dataset.next(session=self.session):
             op = worker.get_op(batch_nb)
-            print(self.session.run(self.dataset.images)[0,0,15,15])
-            print(self.session.run(self.dataset.labels)[0])
             if worker.concurrent:
                 output = self.session.run(op,feed_dict=feed_dict)
             else:
@@ -151,8 +148,9 @@ class Workplace(object):
             worker.append(output)
             batch_nb+=1
         worker.epoch_done()
+
  
-    def execute_queue(self,queue, repeat=1,feed_dict={}):
+    def execute_queue(self,queue, repeat=1,feed_dict={},filename=None):
         """Apply multiple consecutive epochs of train test and valid
 
         Example of use ::
@@ -209,6 +207,8 @@ class Workplace(object):
                     if n_epochs>1:
                         print("\t  Epoch",epoch,'...')
                     self.execute_worker(worker,feed_dict=feed_dict)
+            if filename is not None:
+                queue.dump(filename,flush=True)
         return queue
 
 

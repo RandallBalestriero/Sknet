@@ -23,8 +23,8 @@ class Conv2D(Layer):
     """
     def __init__(self,incoming,filters,W = tfl.xavier_initializer(),
                     b = tf.zeros, strides=1, pad='valid',
-                    mode='CONSTANT', name='', func_W = tf.identity,
-                    func_b = tf.identity):
+                    mode='CONSTANT', name='', W_func = tf.identity,
+                    b_func = tf.identity):
         with tf.variable_scope("Conv2D") as scope:
             self.scope_name = scope.original_name_scope
             self.mode = mode
@@ -51,7 +51,7 @@ class Conv2D(Layer):
             if type(W)!=Variable:
                 W = Variable(W, name='conv2dlayer_W_'+name)
             self._W = W(w_shape)
-            self.W  = func_W(self._W)
+            self.W  = W_func(self._W)
             # Initialize b
             if b is None:
                 self._b = None
@@ -60,7 +60,7 @@ class Conv2D(Layer):
                 if type(b)!=Variable:
                     b = Variable(b, name='conv2dlayer_b_'+name)
                 self._b = b((1,filters[0],1,1))
-                self.b  = func_b(self._b)
+                self.b  = b_func(self._b)
     
             super().__init__(incoming)
 

@@ -140,12 +140,12 @@ class Layer(Tensor):
         super().__init__(output)
 
 
-    @property
-    def _variables(self):
-        """Return a summary of the layer variables as a dictionnary as 
-        for example ``{'W':observed_variable_W.'b':observed_variable_b}``
-        """
-        return self._variables
+#    @property
+#    def _variables(self):
+#        """Return a summary of the layer variables as a dictionnary as 
+#        for example ``{'W':observed_variable_W.'b':observed_variable_b}``
+#        """
+#        return self._variables
 
 
     @property

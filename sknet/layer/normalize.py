@@ -41,8 +41,8 @@ class BatchNorm(Layer):
                   moments form the training batches ones
     :type decay: scalar
     """
-    def __init__(self,incoming,axis,deterministic=None, beta = tf.zeros,
-                gamma=tf.ones, beta_func=tf.identity, gamma_func=tf.identity,
+    def __init__(self,incoming,axis,deterministic=None, b = tf.zeros,
+                W=tf.ones, W_func=tf.identity, b_func=tf.identity,
                 name='bn_layer', epsilon=1e-4, decay=0.9, **kwargs):
 
         with tf.variable_scope("bn_layer") as scope:
@@ -54,23 +54,32 @@ class BatchNorm(Layer):
             else:
                 self.axis = axis
     
-        	# Infer the shape of the parameters, it is 1 for the axis that are
-        	# being normalized over and the same as the input shape for the others
+            # Infer the shape of the parameters, it is 1 for the axis that are
+            # being normalized over and the same as the input shape for 
+            # the others
             in_shape = incoming.shape.as_list()
             shape_= [s if i not in self.axis else 1 for i,s in enumerate(in_shape)]
     
     
             # Initialization beta
-            if type(beta)!=Variable:
-                beta = Variable(beta,name=name+'_beta')
-            self._beta  = beta(shape_)
-            self.beta   = beta_func(self._beta)
+            if b is None:
+                self._b = None
+                self.b  = 0
+            else:
+                if type(b)!=Variable:
+                    b = Variable(b,name=name+'_beta')
+                self._b = b(shape_)
+                self.b  = b_func(self._b)
     
             # Initialization gamma
-            if type(gamma)!=Variable:
-                gamma = Variable(gamma,name=name+'_beta')
-            self._gamma = gamma(shape_)
-            self.gamma  = gamma_func(self._gamma)
+            if W is None:
+                self._W = None
+                self.W = 1
+            else:
+                if type(W)!=Variable:
+                    W = Variable(W,name=name+'_beta')
+                self._W = W(shape_)
+                self.W  = W_func(self._W)
     
             self.ema  = tf.train.ExponentialMovingAverage(decay=decay)
     
@@ -97,8 +106,8 @@ class BatchNorm(Layer):
 
         # we also compute those quantities that allow to rewrite the output as
         # A*input+b, this might be of use for research pruposes
-        output = self.gamma*(input-use_mean)/use_std+self.beta
-        self.b = -(self.gamma*use_mean)/use_std+self.beta
-        self.A = self.gamma/use_std
+        output = self.W*(input-use_mean)/use_std+self.b
+        self.b = -(self.W*use_mean)/use_std+self.b
+        self.A = self.W/use_std
         return output
 

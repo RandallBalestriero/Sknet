@@ -7,6 +7,7 @@ import numpy as np
 import time
 import re
 import h5py
+import copy
 
 __all__ = [
         "dataset",
@@ -62,25 +63,25 @@ def to_file(value,filename,mode='w',compression_level=4):
                     continue
                 else:
                     shape = np.shape(value.data[i])
+                    name  = value.name+'/'+str(value.epoch+i)
                     if np.isscalar(value.data[i]):
-                        f.create_dataset(value.name+'/'+str(i),shape)
+                        f.create_dataset(name,shape)
                     else:
-                        f.create_dataset(value.name+'/'+str(i),shape,
-                            compression='gzip',
+                        f.create_dataset(name,shape,compression='gzip',
                             compression_opts=compression_level)
-                    f[value.name+'/'+str(i)][...] = value.data[i]
+                    f[name][...] = value.data[i]
         else:
             f.create_group(value.name)
             f[value.name+'/description']=value.description
             for i in range(len(value.data)):
                 shape = np.shape(value.data[i])
+                name  = value.name+'/'+str(value.epoch+i)
                 if np.isscalar(value.data[i]):
-                    f.create_dataset(value.name+'/'+str(i),shape)
+                    f.create_dataset(name,shape)
                 else:
-                    f.create_dataset(value.name+'/'+str(i),shape,
-                            compression='gzip',
+                    f.create_dataset(name,shape,compression='gzip',
                             compression_opts=compression_level)
-                f[value.name+'/'+str(i)][...] = value.data[i]
+                f[name][...] = value.data[i]
         f.close()
     # given a workergroup
     elif type(value)==WorkerGroup:
@@ -103,6 +104,39 @@ def from_file(filename):
 
 
 
+class Queue(tuple):
+    def __new__(cls,*args,**kwargs):
+        obj = super(Queue,cls).__new__(cls,*args,**kwargs)
+#        self.filename = filename
+        return obj
+    def __init__(self,*args,**kwargs):
+        self.first_time_writting = True
+    def dump(self,filename,flush=False):
+        """Method to be called to save data from workers and empty them
+        """
+        while True:
+            if self.first_time_writting:
+                try:
+                    to_file(self,filename,mode='w')
+                except:
+                    print('Can not open file',filename,
+                                    '... retrying in 5 sec')
+                    time.sleep(5)
+                    continue
+                self.first_time_writting = False
+                break
+            else:
+                try:
+                    to_file(self,filename,mode='a')
+                except:
+                    print('Can not open file',filename,
+                                    '... retrying in 5 sec')
+                    time.sleep(5)
+                    continue
+                break
+        if flush:
+            for worker in self:
+                worker.empty()
 
 
 class DataArray(np.ndarray):
@@ -448,8 +482,8 @@ class Worker(object):
             # operation method to do after the epoch such as done with
             # accuracy where it is computed on each batch and then averaged
             instruction = "execute every batch and average & print"
-            # as an be seen, the commands to do after the epoch are introduced via
-            # the and keyword. One can also do something like
+            # as an be seen, the commands to do after the epoch are 
+            # introduced via the and keyword. One can also do something like
             intruction = "execute every bath and save & print & average"
             # the order of the commands 9around the &) do not matter
             # finally, if asking to save and the per batch value AND
@@ -462,21 +496,27 @@ class Worker(object):
         ``"average'`` or ``"maximize"``.
 
         deterministic : bool
-            the state of the network to execute the op in, for example it is common to 
-            set it to :data:`False` during training and :data:`True` during testing.
+            the state of the network to execute the op in, for example 
+            it is common to set it to :data:`False` during training 
+            and :data:`True` during testing.
 
         description : str (optional)
-            the description of the worker, used for saving, it is added to the h5 file.
+            the description of the worker, used for saving, 
+            it is added to the h5 file.
     """
-    def __init__(self,op_name,context,op, instruction, deterministic=None,repeat=1,description='',sampling='continuous'):
+    def __init__(self,op_name,context,op, instruction, deterministic=False,
+                    repeat=1,description='',sampling='continuous'):
         self._dependencies  = get_tensor_dependencies(op)
+        self._op_name       = op_name
         self._name          = context+"/"+op_name
         self._repeat        = repeat
         self._description   = description
+        self._instruction   = instruction
         self._deterministic = deterministic
         self._sampling      = sampling
         self._context       = context
         self._op            = op
+        self._epoch         = 0
         # to gather all the epoch/batch data
         self.data           = list()
         # to gather data (batch) at each epoch
@@ -485,12 +525,35 @@ class Worker(object):
         instr = Parser(instruction)
         self.__dict__.update(instr)
         self._concurrent = True
+    def alter(self,**kwargs):
+        init = {'op_name':self.op_name,
+                'context':self.context,
+                'op':self.op, 
+                'instruction':self.instruction, 
+                'deterministic':self.deterministic,
+                'repeat':self.repeat,
+                'description':self.description,
+                'sampling':self.sampling}
+        init.update(kwargs)
+        obj = Worker(**init)
+        return obj
+    def empty(self):
+        # to gather all the epoch/batch data
+        self.data           = list()
+        # to gather data (batch) at each epoch
+        self.epoch_data     = list()
+    @property
+    def instruction(self):
+        return self._instruction
     @property
     def sampling(self):
         return self._sampling
     @property
     def description(self):
         return self._description
+    @property
+    def op_name(self):
+        return self._op_name
     @property
     def deterministic(self):
         return self._deterministic
@@ -500,6 +563,9 @@ class Worker(object):
     @property
     def dependencies(self):
         return self._dependencies
+    @property
+    def epoch(self):
+        return self._epoch
     @property
     def op(self):
         return self._op
@@ -531,6 +597,7 @@ class Worker(object):
 
     def epoch_done(self,print_ = True):
         to_print=''
+        self._epoch +=1
         if len(self.epoch_data)>0:
             if hasattr(self.epoch_data[0],'__len__'):
                 self.epoch_data = np.concatenate(self.epoch_data,0)
@@ -614,6 +681,9 @@ class WorkerGroup(Worker):
         self._name = workers[0].name
         for worker in workers[1:]:
             self.__add__(worker)
+    def empty(self):
+        for worker in self.workers:
+            worker.empty()
     def __add__(self,other):
 #        assert(self.sampling==other.sampling)
         assert(self.repeat==other.repeat)

@@ -116,29 +116,26 @@ class Merge(Layer):
     :type func: func or str
     """
     def __init__(self,incomings,func,**kwargs):
-        super().__init__(incomings[0])
-        self.incomings = incomings
-        self.N         = np.float32(len(incomings))
-        self.out_shape = self.in_shape
+        super().__init__(incomings)
         self.func      = func
+        self.N         = len(incomings)
         if self.given_input:
             self.forward([incoming.output for incoming in incomings])
     def forward(self,inputs=None, training=None, **kwargs):
-        if inputs is None:
-            inputs = [incoming.forward(training=training) 
-                            for incoming in self.incomings]
+#        if inputs is None:
+#            inputs = [incoming.forward(training=training) 
+#                            for incoming in self.incomings]
         if type(self.func)==str:
             if self.func=='SUM':
-                self.output = tf.add_n(inputs)
+                return tf.add_n(inputs)
             elif self.func=='AVG':
-                self.output = tf.add_n(inputs)/self.N
+                return tf.add_n(inputs)/self.N
             elif self.func=='MAX':
-                self.output = tf.reduce_max(tf.stack(inputs,0),0)
+                return tf.reduce_max(tf.stack(inputs,0),0)
             elif self.func=='MIN':
-                self.output = tf.reduce_min(tf.stack(inputs,0),0)
+                return tf.reduce_min(tf.stack(inputs,0),0)
         else:
-            self.output = self.func(inputs)
-        return self.output
+            return self.func(inputs)
 
 
 

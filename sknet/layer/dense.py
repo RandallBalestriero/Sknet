@@ -65,8 +65,8 @@ class Dense(Layer):
 
     """
     def __init__(self, incoming, units, W = tfl.xavier_initializer(), 
-                b = tf.zeros, func_W = tf.identity, 
-                func_b = tf.identity, name='',*args, **kwargs):
+                b = tf.zeros, W_func = tf.identity, 
+                b_func = tf.identity, name='',*args, **kwargs):
         with tf.variable_scope("dense_layer") as scope:
             self.scope_name = scope.original_name_scope
             # Set up the input, flatten if needed
@@ -81,7 +81,7 @@ class Dense(Layer):
             if type(W)!=Variable:
                 W = Variable(W,name='dense_W_'+name)
             self._W = W((flat_dim,units))
-            self.W  = func_W(self._W)
+            self.W  = W_func(self._W)
             # Initialize b
             if b is None:
                 self._b = None
@@ -90,7 +90,7 @@ class Dense(Layer):
                 if type(b)!=Variable:
                     b = Variable(b,name='dense_b_'+name)
                 self._b = b((1,units))
-                self.b  = func_b(self._b)
+                self.b  = b_func(self._b)
     
             super().__init__(incoming)
 
