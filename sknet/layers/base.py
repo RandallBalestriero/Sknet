@@ -3,7 +3,9 @@
 
 import tensorflow as tf
 
+
 from .. import Tensor
+from .. import ops
 
 class Layer(Tensor):
     """Layer class used as parent of any implemented layer.
@@ -123,44 +125,57 @@ class Layer(Tensor):
         this allows the user to feed directly a tensorflow variable as input
 
     """
-    def __init__(self,input, deterministic=None, **kwargs):
+    def __init__(self, input, *args,deterministic=None):
         
         # Link this tensor to its input
         self._input = input
+        ops         = type(self)._ops
+
+        # create the chain of inner ops
+        inner_ops = [input]
+        for op, arglist in zip(ops,args):
+            argdict = {}
+            for i,arg in enumerate(arglist):
+                if type(arg)==dict:
+                    argdict = arg
+                    arglist.pop(i)
+                    break
+            inner_ops.append(op(inner_ops[-1],deterministic=deterministic,
+                                                *arglist,**argdict))
+        self._inner_ops = inner_ops[1:]
 
         # set deterministic
         if deterministic is None:
-            self.deterministic = tf.placeholder(tf.bool,name='deterministic')
+            self._deterministic = [op.deterministic 
+                    for op in self._inner_ops if hasattr(op,'deterministic')]
         else:
-            self.deterministic = deterministic
-        # compute the layer output based on the layer forward method
-        output = self.forward(input,self.deterministic)
+            self._deterministic = [deterministic]
 
-        # initialize the variable
-        super().__init__(output)
+        # initialize the Layer as a tf Variable
+        super().__init__(self._inner_ops[-1])
 
-
-#    @property
-#    def _variables(self):
-#        """Return a summary of the layer variables as a dictionnary as 
-#        for example ``{'W':observed_variable_W.'b':observed_variable_b}``
-#        """
-#        return self._variables
-
-
+    @property
+    def inner_ops(self):
+        return self._inner_ops
+    @property
+    def deterministic(self):
+        return self._deterministic
     @property
     def input(self):
         return self._input
+    @property
+    def params(self):
+        params = []
+        for op in self.inner_ops:
+            params+=op.params
+        return params
+    @property
+    def updates(self):
+        updates = []
+        for op in self.inner_ops:
+            updates+=op.updates
+        return updates
 
 
 
 
-from . import *
-from .pool import *
-from .perturb import *
-from .normalize import *
-from .conv import *
-from .dense import *
-from .shape import *
-from .special import *
-#from .meta import *

@@ -12,23 +12,14 @@ class Dataset(dict):
     def __init__(self,**args):
         super().__init__()
         self.__dict__.update(args)
-        self.datum_shape = {}
-        self.dtype = {}
     def add_variable(self,dict_):
-        for item in dict_.items():
-            self[item[0]]=item[1][0]
-            self.datum_shape[item[0]]=item[1][1]
-            self.dtype[item[0]]=item[1][2]
-        variables = self.variables
-        for set_ in self.sets:
-            lengths = [len(self[v][set_]) for v in variables]
-            assert(len(set(lengths))<=1)
-            self.__dict__["n_"+set_]=lengths[0]
+        self.update(dict_)
     def next(self,session=None):
         return self.iterators[self.current_set_string].next(session=session)
     def set_set(self,name,session):
         self.current_set_string = name
-        session.run(self.assign_set,feed_dict={self.current_set_:self.set2int[name]})
+        session.run(self.assign_set,
+                    feed_dict={self.current_set_:self.set2int[name]})
 
     def init_dict(self):
         init = []
@@ -38,9 +29,10 @@ class Dataset(dict):
         return init
     def create_placeholders(self,batch_size,iterators_dict,device="/cpu:0"):
         # Many settings are put in int64 for GPU compatibility with tf
-        sets = self.sets
-        self.set2int = dict([(b,np.int32(a)) for a,b in enumerate(sets)])
+        sets            = self.sets
+        self.set2int    = dict([(b,np.int64(a)) for a,b in enumerate(sets)])
         self.iterators  = iterators_dict
+        self.init_dict  = dict()
         with tf.device(device):
             self.current_set  = tf.Variable(np.int64(0),trainable=False,
                                         name='current_set')
@@ -53,31 +45,31 @@ class Dataset(dict):
                 self.iterators[context].set_batch_size(batch_size)
             #
             self.tf_variables = dict()
-            for var in self.variables:
+            for varn in self.variables:
                 # ensure that there is not already a member with this name
-                assert(var not in self.__dict__)
-                self.tf_variables[var] = dict()
+                assert(varn not in self.__dict__)
+                self.tf_variables[varn] = dict()
                 pairs = list()
                 for s in sets:
                     # cast also to int64 for GPU support
-                    if self[var][s][0].dtype=='int32':
-                        hold = tf.placeholder('int64',shape=self[var][s].shape,
-                                        name = var+'_'+s+'_holder')
-                        self.tf_variables[var][s]=(hold,
-                                        tf.Variable(hold,trainable=False))
-                        batch = tf.cast(tf.gather(tf.cast(
-                                    self.tf_variables[var][s][1],tf.float32),
+                    if self.dtype(varn)=='int32':
+                        hold = tf.placeholder('int64',shape=self[varn][s].shape,
+                                        name = varn+'_'+s+'_holder')
+                        var  = tf.Variable(hold,trainable=False)
+                        self.init_dict[hold]       = self[varn][s]
+                        self.tf_variables[varn][s] = (hold,var)
+                        batch = tf.cast(tf.gather(tf.cast(var,tf.float32),
                                     self.iterators[s].i),tf.int32)
                     else:
-                        hold = tf.placeholder(self[var][s][0].dtype,
-                                shape=self[var][s].shape,name = var+s+'Holder')
-                        self.tf_variables[var][s]=(hold,
-                                        tf.Variable(hold,trainable=False))
-                        batch = tf.gather(self.tf_variables[var][s][1],
-                                    self.iterators[s].i)
-                    pairs.append(batch)
+                        hold  = tf.placeholder(self.dtype(varn),
+                                shape=self[varn][s].shape,name = varn+s+'holder')
+                        var   = tf.Variable(hold,trainable=False)
+                        self.init_dict[hold]      = self[varn][s]
+                        self.tf_variables[varn][s]=(hold,var)
+                        batch = tf.gather(var,self.iterators[s].i)
+                    pairs.append(tf.placeholder_with_default(batch,batch.shape))
 
-                self.__dict__[var] = case(self.current_set,pairs)
+                self.__dict__[varn] = case(self.current_set,pairs)
 
     def preprocess(self,method,data,fitting_sets="train_set",
                         inplace=True, **kwargs):
@@ -110,7 +102,6 @@ class Dataset(dict):
             self.preprocessing.fit(self[data][fitting_sets])
             for key in self[data].keys():
                 self[data][key] = self.preprocessing.transform(self[data][key])
-                print(key)
         else:
             # gather all the set data and stack them vertically
             all_data = np.concatenate([self[data][s] for s in fitting_sets],0)
@@ -127,7 +118,6 @@ class Dataset(dict):
                 c_indices = np.where(y==c)[0]
                 np.random.shuffle(c_indices)
                 limit = int(len(c_indices)*test_ratio)
-                print(limit,len(c_indices))
                 train_indices.append(c_indices[limit:])
                 valid_indices.append(c_indices[:limit])
             train_indices = np.concatenate(train_indices,0)
@@ -141,13 +131,11 @@ class Dataset(dict):
                         else [s[i] for i in train_indices]
                         for s in self["train_set"]]
         else:
-            indices  = np.random.permutation(self.__dict__["n_"+set_])
-            const    = int(self.__dict__["n_"+set_]*(1-ratio))
+            indices  = np.random.permutation(self.N(set_))
+            const    = int(self.N(set_)*(1-ratio))
             for var in variables:
                 self[var][new_set_]=self[var][set_][indices[const:]]
                 self[var][set_]=self[var][set_][indices[:const]]
-            # then we update the sizes
-            self.add_variable({})
 
     @property
     def variables(self):
@@ -159,4 +147,10 @@ class Dataset(dict):
 
     def N(self,context):
         return len(self[self.variables[0]][context])
+    def dtype(self,variable):
+        return self[variable][self.sets[0]].dtype
+    def datum_shape(self,variable):
+        return shape(self[variable][self.sets[0]][0])
+    def shape(self,variable,context):
+        return shape(self[variable][context])
 

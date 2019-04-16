@@ -3,9 +3,8 @@
 
 import tensorflow as tf
 import numpy as np
-
-#from .. import Worker
-
+import os
+import h5py
 #ToDo set the seed for the batches etc
 
 
@@ -22,8 +21,7 @@ class Workplace(object):
         self.network  = network
         # initialize the variables
         ops = tf.global_variables_initializer()
-        self.session.run(ops,
-                        feed_dict=dict(dataset.init_dict()))
+        self.session.run(ops,feed_dict=dataset.init_dict)
 
     def execute_op(self,op,feed_dict,batch_size=None,deterministic=None):
         """Perform an epoch (according to the set given by context).
@@ -150,7 +148,8 @@ class Workplace(object):
         worker.epoch_done()
 
  
-    def execute_queue(self,queue, repeat=1,feed_dict={},filename=None):
+    def execute_queue(self,queue, repeat=1,feed_dict={},filename=None,
+                        save_period=10):
         """Apply multiple consecutive epochs of train test and valid
 
         Example of use ::
@@ -197,8 +196,12 @@ class Workplace(object):
 
 
         """
-        for _ in range(repeat):
-            print("Repeat",_)
+        if filename is not None and os.path.isfile(filename):
+            os.remove(filename)
+            f=h5py.File(filename,'w')
+            f.close()
+        for e in range(repeat):
+            print("Repeat",e)
             for worker in queue:
                 n_epochs = worker.repeat
                 name     = worker.name
@@ -207,7 +210,7 @@ class Workplace(object):
                     if n_epochs>1:
                         print("\t  Epoch",epoch,'...')
                     self.execute_worker(worker,feed_dict=feed_dict)
-            if filename is not None:
+            if filename is not None and (e+1)%save_period==0:
                 queue.dump(filename,flush=True)
         return queue
 

@@ -3,7 +3,7 @@
 
 from .preprocess import *
 from .base import *
-from .batch_iterator import *
+from .iterator import *
 
 from .mnist import *
 from .svhn import *

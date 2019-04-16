@@ -1,5 +1,4 @@
 import tensorflow as tf
-from utils import *
 
 
 def count_number_of_params():

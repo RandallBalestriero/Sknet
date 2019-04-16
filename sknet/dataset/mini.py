@@ -8,22 +8,6 @@ from sklearn.datasets import make_moons, make_circles
 from sklearn.model_selection import train_test_split
 
 def load_mini():
-    """Grayscale digit classification.
-    The `MNIST <http://yann.lecun.com/exdb/mnist/>`_ database of handwritten 
-    digits, available from this page, has a training set of 60,000 examples, 
-    and a test set of 10,000 examples. It is a subset of a larger set available 
-    from NIST. The digits have been size-normalized and centered in a 
-    fixed-size image. It is a good database for people who want to try learning
-    techniques and pattern recognition methods on real-world data while 
-    spending minimal efforts on preprocessing and formatting.
-
-    :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
-    :type data_format: 'NCHW' or 'NHWC'
-    :param path: (optional, default $DATASET_PATH), the path to look for the data and
-                     where the data will be downloaded if not present
-    :type path: str
-    """
-
     X,y   = make_moons(10000,noise=0.035,random_state=20)
     x_,y_ = make_circles(10000,noise=0.02,random_state=20)
     x_[:,1]+= 2.
@@ -37,8 +21,7 @@ def load_mini():
     y=y.astype('int32')
 
     dict_init = [("datum_shape",(2,)),("n_classes",4),
-                    ("name","mini"),("data_format","D"),
-                    ('classes',[str(u) for u in range(4)])]
+                    ("name","mini"),('classes',[str(u) for u in range(4)])]
 
     dataset= Dataset(**dict(dict_init))
 
@@ -47,6 +30,31 @@ def load_mini():
     labels = {'train_set':y}
 
     dataset.add_variable({'images':images,'labels':labels})
+
+    return dataset
+
+def load_chirp2D(N,seed=0):
+    X1,X2 = np.meshgrid(np.linspace(0,4,N),np.linspace(0,4,N))
+    np.random.seed(seed)
+    M     = np.array([[1.4,-0.4],
+                    [-0.4,0.6]])
+    X     = np.stack([X1.flatten(),X2.flatten()],1)
+    y     = np.sin((X*np.dot(X,M)).sum(1))
+    y    -= y.mean()
+    y    /= y.max()
+
+    X=X.astype('float32')
+    y=y.astype('float32')
+
+    dict_init = [("datum_shape",(2,)),("name","chirp2D")]
+
+    dataset= Dataset(**dict(dict_init))
+
+    images = {'train_set':X}
+
+    labels = {'train_set':y}
+
+    dataset.add_variable({'input':images,'output':labels})
 
     return dataset
 

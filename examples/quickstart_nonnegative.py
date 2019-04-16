@@ -17,6 +17,7 @@ import pylab as pl
 import time
 import tensorflow as tf
 from sknet.dataset import BatchIterator
+from sknet import ops,layers
 
 
 # Data Loading
@@ -30,7 +31,7 @@ dataset.preprocess(sknet.dataset.Standardize,data="images",axis=[0])
 dataset.create_placeholders(batch_size=64,
         iterators_dict={'train_set':BatchIterator("random_see_all"),
                         'valid_set':BatchIterator('continuous'),
-                        'test_set':BatchIterator('continuous')},device="/GPU:0")
+                        'test_set':BatchIterator('continuous')},device="/cpu:0")
 
 # Create Network
 #---------------
@@ -39,52 +40,43 @@ dataset.create_placeholders(batch_size=64,
 # obtain the shape of 1 observation and create the input shape
 NN_func = tf.nn.softplus
 
+my_layer = layers.custom_layer(ops.Dense,ops.BatchNorm,ops.Activation)
 
-layers=[sknet.layer.Conv2D(dataset.images,(64,3,3),W_func=NN_func,b=None)]
-layers.append(sknet.layer.BatchNorm(layers[-1],[0,2,3],W_func=NN_func))
-layers.append(sknet.layer.Activation(layers[-1],0))
+dnn = sknet.network.Network(name='model_base')
 
-layers.append(sknet.layer.Conv2D(layers[-1],(128,3,3),W_func=NN_func,b=None))
-layers.append(sknet.layer.BatchNorm(layers[-1],[0,2,3],W_func=NN_func))
-layers.append(sknet.layer.Activation(layers[-1],0))
-layers.append(sknet.layer.Pool(layers[-1],(1,2,2)))
+dnn.append(layers.Conv2D(dataset.images,[(64,3,3),{'W_func':NN_func,'b':None}],
+                                  [[0,2,3],{'W_func':NN_func}],[0]))
 
-layers.append(sknet.layer.Conv2D(layers[-1],(192,3,3),W_func=NN_func,b=None))
-layers.append(sknet.layer.BatchNorm(layers[-1],[0,2,3],W_func=NN_func))
-layers.append(sknet.layer.Activation(layers[-1],0))
-layers.append(sknet.layer.Pool(layers[-1],(1,2,2)))
+dnn.append(layers.Conv2DPool(dnn[-1],[(256,3,3),{'W_func':NN_func,'b':None}],
+                                [[0,2,3],{'W_func':NN_func}],[0],[(1,2,2)]))
 
-layers.append(sknet.layer.Dense(layers[-1],units=300,W_func=NN_func))
-layers.append(sknet.layer.BatchNorm(layers[-1],[0],W_func=NN_func))
-layers.append(sknet.layer.Activation(layers[-1],0))
-layers.append(sknet.layer.Dense(layers[-1],units=dataset.n_classes,func_W=NN_func))
+dnn.append(layers.Conv2DPool(dnn[-1],[(512,3,3),{'W_func':NN_func,'b':None}],
+                                  [[0,2,3],{'W_func':NN_func}],[0],[(1,2,2)]))
 
+dnn.append(my_layer(dnn[-1],[1080,{'W_func':NN_func,'b':None}],
+                                    [[0],{'W_func':NN_func}],[0]))
 
-network = sknet.network.Network(layers,name='-model(cnn.base)')
+dnn.append(ops.Dense(dnn[-1],units=dataset.n_classes,func_W=NN_func))
+
 
 
 # Loss and Optimizer
 #-------------------
 
 # Compute some quantities that we want to keep track and/or act upon
-loss     = crossentropy_logits(p=dataset.labels,q=network[-1])
-accuracy = accuracy(labels=dataset.labels,predictions=network[-1])
+loss     = crossentropy_logits(p=dataset.labels,q=dnn[-1])
+accuracy = accuracy(labels=dataset.labels,predictions=dnn[-1])
 
 # we aim at minimizing the loss, so we create the optimizer (Adam in this case)
 # with a stepwise learning rate, the minimizer is the operation that applies
 # the changes to the model parameters, we also specify that this process
 # should also include some possible network dependencies present in UPDATE_OPS
 
-#learning_rate_schedule = schedule.stepwise({0:0.05})
-#with tf.control_dependencies(tf.get_collection(tf.GraphKeys.UPDATE_OPS)):
-optimizer = sknet.optimize.Adam(loss,0.01)#schedule = learning_rate_schedule,
-minimizer = tf.group(optimizer.updates\
-                        +tf.get_collection(tf.GraphKeys.UPDATE_OPS))
-
+optimizer = sknet.optimize.Adam(loss,0.01,params=dnn.params)
+minimizer = tf.group(optimizer.updates+dnn.updates)
 
 # Workers
 #---------
-
 
 work1 = sknet.Worker(op_name='minimizer',context='train_set',op=minimizer, 
         instruction='execute every batch', deterministic=False,
@@ -110,13 +102,11 @@ queue = sknet.Queue((work1+work2+work3,
 # from the network have to be searched for in the dataset 
 # (for example, the labels)
 
-workplace = sknet.utils.Workplace(network,dataset=dataset)
+workplace = sknet.utils.Workplace(dnn,dataset=dataset)
 
 # will fit the model for 50 epochs and return the gathered op
 # outputs given the above definitions
 
-output = workplace.execute_queue(queue,repeat=2000,filename='test.h5')
-#sknet.to_file(output,'test.h5','w')
-
+output = workplace.execute_queue(queue,repeat=2000,filename='test.h5',save_period=20)
 
 

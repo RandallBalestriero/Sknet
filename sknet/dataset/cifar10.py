@@ -75,12 +75,10 @@ def load_cifar10(PATH=None):
     data_dic = pickle.loads(f,encoding='latin1')
     test_set = [data_dic['data'].reshape((-1,3,32,32)),np.array(data_dic['labels'])]
 
-    dataset.add_variable({'images':[{'train_set':train_set[0].astype('float32'),
+    dataset.add_variable({'images':{'train_set':train_set[0].astype('float32'),
                                     'test_set':test_set[0].astype('float32')},
-                                    (3,32,32),'float32'],
-                        'labels':[{'train_set':train_set[1].astype('int32'),
-                                    'test_set':test_set[1].astype('int32')},
-                                    (),'int32']})
+                        'labels':{'train_set':train_set[1].astype('int32'),
+                                    'test_set':test_set[1].astype('int32')}})
 
     print('Dataset cifar10 loaded in','{0:.2f}'.format(time.time()-t),'s.')
 

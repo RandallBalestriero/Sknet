@@ -33,8 +33,12 @@ class l2_norm(Tensor):
         super().__init__(loss)
 
 
+def MSE(target,prediction):
+    N = np.float32(np.prod(target.shape.as_list()))
+    return SSE(target,prediction)/N
 
-
+def SSE(target,prediction):
+    return tf.nn.l2_loss(target-prediction)*2
 
 
 def crossentropy_logits(p,q,weights=None,p_sparse=True):

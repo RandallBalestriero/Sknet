@@ -11,7 +11,8 @@ import copy
 
 __all__ = [
         "dataset",
-        "layer",
+        "layers",
+        "ops",
         "utils",
         "network",
         "optimize",
@@ -52,50 +53,27 @@ def to_file(value,filename,mode='w',compression_level=4):
     # if given a single worker
     if type(value)==Worker:
         f = h5py.File(filename,mode)
-        # if append mode
-        if mode=='a':
-            if value.name not in f.keys():
-                f.create_group(value.name)
-                f[value.name+'/description']=value.description
-            written = f[value.name].keys()
-            for i in range(len(value.data)):
-                if str(i) in written:
-                    continue
-                else:
-                    shape = np.shape(value.data[i])
-                    name  = value.name+'/'+str(value.epoch+i)
-                    if np.isscalar(value.data[i]):
-                        f.create_dataset(name,shape)
-                    else:
-                        f.create_dataset(name,shape,compression='gzip',
-                            compression_opts=compression_level)
-                    f[name][...] = value.data[i]
-        else:
-            f.create_group(value.name)
+        try:
             f[value.name+'/description']=value.description
-            for i in range(len(value.data)):
-                shape = np.shape(value.data[i])
-                name  = value.name+'/'+str(value.epoch+i)
-                if np.isscalar(value.data[i]):
-                    f.create_dataset(name,shape)
-                else:
-                    f.create_dataset(name,shape,compression='gzip',
-                            compression_opts=compression_level)
-                f[name][...] = value.data[i]
+        except:
+            1
+            #already wrote it
+        data = value.get_concatenate()
+        name = value.name+'/'+str(value.start)
+        if np.isscalar(data):
+            f.create_dataset(name,shape)
+        else:
+            f.create_dataset(name,data.shape,compression='gzip',
+                    compression_opts=compression_level)
+        f[name][...] = data
         f.close()
     # given a workergroup
     elif type(value)==WorkerGroup:
-        if mode=='w':
-            f = h5py.File(filename,mode)
-            f.close()
         for worker in value.workers:
-            to_file(worker,filename,'a',compression_level=compression_level)
+            to_file(worker,filename,mode,compression_level=compression_level)
     elif hasattr(value,'__len__'):
-        if mode=='w':
-            f = h5py.File(filename,mode)
-            f.close()
         for item in value:
-            to_file(item,filename,'a',compression_level=compression_level)
+            to_file(item,filename,mode,compression_level=compression_level)
 
 
 def from_file(filename):
@@ -109,31 +87,19 @@ class Queue(tuple):
         obj = super(Queue,cls).__new__(cls,*args,**kwargs)
 #        self.filename = filename
         return obj
-    def __init__(self,*args,**kwargs):
-        self.first_time_writting = True
+#    def __init__(self,*args,**kwargs):
+#        self.first_time_writting = True
     def dump(self,filename,flush=False):
         """Method to be called to save data from workers and empty them
         """
         while True:
-            if self.first_time_writting:
-                try:
-                    to_file(self,filename,mode='w')
-                except:
-                    print('Can not open file',filename,
-                                    '... retrying in 5 sec')
-                    time.sleep(5)
-                    continue
-                self.first_time_writting = False
-                break
-            else:
-                try:
-                    to_file(self,filename,mode='a')
-                except:
-                    print('Can not open file',filename,
-                                    '... retrying in 5 sec')
-                    time.sleep(5)
-                    continue
-                break
+#            try:
+            to_file(self,filename,mode='a')
+#            except:
+#                print('Can not open file',filename,'... retrying in 5 sec')
+#                time.sleep(5)
+#                continue
+            break
         if flush:
             for worker in self:
                 worker.empty()
@@ -465,7 +431,8 @@ class Worker(object):
         would be :py;data;`"train_set"` or :py:data:'"valid_set"'
 
     op : tf.Tensor or tf.operation
-        the tensorflow variable of the worker that will be executed and monitored
+        the tensorflow variable of the worker that will be executed 
+        and monitored
 
     instruction : str
         a description of what how and when to interact with the op. We provide
@@ -517,6 +484,7 @@ class Worker(object):
         self._context       = context
         self._op            = op
         self._epoch         = 0
+        self._start         = 0
         # to gather all the epoch/batch data
         self.data           = list()
         # to gather data (batch) at each epoch
@@ -538,6 +506,7 @@ class Worker(object):
         obj = Worker(**init)
         return obj
     def empty(self):
+        self._start         = self.epoch
         # to gather all the epoch/batch data
         self.data           = list()
         # to gather data (batch) at each epoch
@@ -567,6 +536,9 @@ class Worker(object):
     def epoch(self):
         return self._epoch
     @property
+    def start(self):
+        return self._start
+    @property
     def op(self):
         return self._op
     @property
@@ -594,7 +566,11 @@ class Worker(object):
             if print_:
                 print(to_print)
         return to_print
-
+    def get_concatenate(self):
+        try:
+            return np.concatenate(self.data)
+        except:
+            return np.asarray(self.data)
     def epoch_done(self,print_ = True):
         to_print=''
         self._epoch +=1
