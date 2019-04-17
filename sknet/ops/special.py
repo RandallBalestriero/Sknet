@@ -106,6 +106,9 @@ class Activation(Op):
 
     """
 
+    name = 'Activation'
+    deterministic_behavior = False
+
     def __init__(self,incoming,func_or_scalar,*args,**kwargs):
 
         self._func_or_scalar = func_or_scalar

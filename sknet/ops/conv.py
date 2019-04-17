@@ -3,8 +3,8 @@ import tensorflow.contrib.layers as tfl
 from .normalize import BatchNorm as bn
 import numpy as np
 from . import Op
-
-
+    
+from .. import utils
 from .. import Variable
 
 class Conv2D(Op):
@@ -22,18 +22,19 @@ class Conv2D(Op):
 
     """
     name = 'Conv2D'
+    deterministic_behavior = False
     def __init__(self,incoming,filters,W = tfl.xavier_initializer(),
                     b = tf.zeros, strides=1, pad='valid',
                     mode='CONSTANT', name='', W_func = tf.identity,
                     b_func = tf.identity,*args,**kwargs):
-        with tf.variable_scope("Conv2D") as scope:
+        with tf.variable_scope("Conv2DOp") as scope:
             self.scope_name = scope.original_name_scope
             self.mode = mode
             if np.isscalar(strides):
                 self.strides = [strides,strides]
             else:
                 self.strides = strides
-                
+
             # Define the padding function
             if pad=='valid' or (filters[1]==1 and filters[2]==1):
                 self.to_pad=False
@@ -44,27 +45,29 @@ class Conv2D(Op):
                 else:
                     self.p = [filters[1]-1,filters[2]-1]
                 self.to_pad = True
-                                            
+
             # Compute shape of the W filter parameter
             w_shape = (filters[1],filters[2],
                                 incoming.shape.as_list()[1],filters[0])
             # Initialize W
-            if type(W)!=Variable:
-                W = Variable(W, name='conv2dlayer_W_'+name)
-            self._W = W(w_shape)
+            if callable(W):
+                self._W = Variable(W(w_shape), name='conv2dlayer_W_'+name)
+            else:
+                self.W  = W
             self.W  = W_func(self._W)
+            self.add_param(self._W)
+
             # Initialize b
             if b is None:
-                self._b = None
-                self.b  = None
-                self._params = [self._W]
+                self._b  = 0
+            elif callable(b):
+                self._b = Variable(b((1,filters[0],1,1)),
+                                        name='conv2dlayer_b_'+name)
             else:
-                if type(b)!=Variable:
-                    b = Variable(b, name='conv2dlayer_b_'+name)
-                self._b = b((1,filters[0],1,1))
-                self.b  = b_func(self._b)
-                self._params = [self._W,self._b]
-    
+                self._b = b
+            self.b  = b_func(self._b) if b is not None else self._b
+            self.add_param(self._b)
+
             super().__init__(incoming)
 
     def forward(self,input, *args,**kwargs):
@@ -92,191 +95,184 @@ class Conv2D(Op):
 
 
 
+class SplineWaveletTransform(Op):
+    """Learnable scattering network layer.
 
+    Parameters
+    ----------
 
-def complex_hermite_interp(t, all_knots, m, p):
-    # Create it here for graph bugs
-    M = tf.constant(np.array([[1, 0, -3, 2],
-               [0, 0, 3, -2],
-               [0, 1, -2, 1],
-               [0, 0, -1, 1]]).astype('float32'))
-    # Concatenate coefficients onto knots 0:-1 and 1:end
-    xx = tf.stack([all_knots[:,:-1], all_knots[:,1:]], axis=2) # (SCALES KNOTS-1 2)
-    mm = tf.stack([m[:,:-1], m[:,1:]], axis=2)  # (2 KNOTS-1 2)
-    pp = tf.stack([p[:,:-1], p[:,1:]], axis=2)  # (2 KNOTS-1 2)
+    J : int
+        The number of octave (from Nyquist) to decompose.
 
-    y  = tf.concat([mm, pp], axis=2)            # (2 KNOTS-1 4)
+    Q : int
+        The resolution (number of wavelets per octave).
 
-    ym   = tf.einsum('iab,bc->iac',y, M)        # (KNOTS-1 4)
+    K : int
+        The number of knots to use for the spline approximation of the
+        mother wavelet. Should be odd, if not, will be rounded to the lesser
+        odd value.
 
-    x_n  = (t-tf.expand_dims(xx[:,:,0],2))/tf.expand_dims(xx[:,:,1]-xx[:,:,0],2) #(SCALES KNOTS-1,t)
-    mask = tf.cast(tf.logical_and(tf.greater_equal(x_n, 0.), tf.less(x_n, 1.)), tf.float32)
-    x_p  = tf.pow(tf.expand_dims(x_n,-1), [0,1,2,3])
-    yi   = tf.einsum('irf,srtf->ist',ym,x_p*tf.expand_dims(mask,-1))
-    return yi
+    strides : int (default 1)
+        The stride for the 1D convolution.
 
+    init : str (default gabor)
+        The initialization  for the spline wavelet, can be :data:`"gabor"`,
+        :data:`"random"`, :data:`"paul"`.
 
+    trainable_scales : bool (default True)
+        If the scales (dilation of the mother wavelet) should be learned
 
+    trainable_knots : bool (default True)
+        If the knots (position for the spline region boundaries) should be
+        learned
+    """
+    deterministic_behavior = False
+    name = 'SplineWaveletTransform'
 
-def real_hermite_interp(t, all_knots, m, p):
-    # Create it here for graph bugs
-    M = tf.constant(np.array([[1, 0, -3, 2],
-               [0, 0, 3, -2],
-               [0, 1, -2, 1],
-               [0, 0, -1, 1]]).astype('float32'))
-    # Concatenate coefficients onto knots 0:-1 and 1:end
-    xx = tf.stack([all_knots[:,:-1], 
-                all_knots[:,1:]], axis=2)#(SCALES KNOTS-1 2)
-    mm = tf.stack([m[:-1], m[1:]], axis=1)  # (KNOTS-1 2)
-    pp = tf.stack([p[:-1], p[1:]], axis=1)  # (KNOTS-1 2)
+    def __init__(self, input, J, Q, K, strides=1, init='gabor',
+                 trainable_scales=True, trainable_knots=True,
+                 trainable_filter=True, hilbert=False, m=None,
+                 p=None, padding='valid',n_conv=1, **kwargs):
+        with tf.variable_scope("SplineWaveletTransformOp") as scope:
+            # Attribution
+            K                    += (K%2)-1
+            self.J,self.Q,self.K  = J, Q, K
+            self.trainable_scales = trainable_scales
+            self.trainable_knots  = trainable_knots
+            self.trainable_filter = trainable_filter
+            self.hilbert          = hilbert
+            self.strides          = strides
 
-    y  = tf.concat([mm, pp], axis=1)        # (KNOTS-1 4)
+            # ------ SCALES
+            # we start with scale 1 for the nyquist and then increase 
+            # the scale for the lower frequencies. This is built by using
+            # a standard dyadic scale and then adding a (learnable) vector 
+            # to it. As such, regularizing this delta vector constrains the 
+            # learned scales to not be away from standard scales, we then 
+            # sort them to have an interpretable time/frequency plot and to 
+            # have coherency in case this is followed by 2D conv.
+            scales = 2**(tf.range(self.J,delta=1./self.Q,dtype=tf.float32))
+            delta_scales = tf.Variable(tf.zeros(self.J*self.Q),
+                                trainable=self.trainable_scales, name='scales')
+            self.scales  = tf.contrib.framework.sort(scales+delta_scales)
+            self._scales = np.arange(0,J,1./Q)
 
-    ym   = tf.matmul(y, M)                  # (KNOTS-1 4)
+            # We initialize the knots  with uniform spacing 
+            start = (self.K//2)
+            grid  = tf.lin_space(np.float32(-start),np.float32(start), self.K)
+            self.knots = tf.Variable(grid, self.trainable_knots, name='knots')
+            self.all_knots = tf.einsum('i,j->ij',self.scales,self.knots)
 
-    x_n  = (t-tf.expand_dims(xx[:,:,0],2))/tf.expand_dims(xx[:,:,1]-xx[:,:,0],2) #(SCALES KNOTS-1,t)
-    mask = tf.cast(tf.logical_and(tf.greater_equal(x_n, 0.), 
-                                        tf.less(x_n, 1.)), tf.float32)
-    x_p  = tf.pow(tf.expand_dims(x_n,-1), [0,1,2,3])
-    yi   = tf.einsum('rf,srtf->st',ym,x_p*tf.expand_dims(mask,-1))
-    return yi
+            # initialize m and p
+            self.init_mp(m,p,init)
 
+            # create the n_conv filter-bank(s)
+            self.W  = [self.init_filters(i*J*Q//n_conv,(i+1)*J*Q//n_conv)
+                                    for i in range(n_conv)]
 
+            super().__init__(input)
 
-class WaveletTransform:
-    """Learnable scattering network layer."""
-
-    def __init__(self, x, J, Q, K, strides, init='gabor',
-                 trainable_scales=True, trainable_knots=True, 
-                 trainable_filter=True, hilbert=False, W=None,
-                 padding='valid',W_type='dense',**kwargs):
-
-        # Attribution
-        self.trainable_scales = trainable_scales
-        self.trainable_knots  = trainable_knots
-        self.trainable_filter = trainable_filter
-        self.hilbert          = hilbert
+    def forward(self,input,*args,**kwargs):
         # Input shape
-        input_shape = x.get_shape().as_list()
+        input_shape = input.get_shape().as_list()
         n_channels  = np.prod(input_shape[:-1])
+        x_reshape   = tf.reshape(input,[n_channels,1,input_shape[-1]])
+        print('input shape',x_reshape.get_shape().as_list())
 
-        # Pad input
-        x_reshape = tf.reshape(x,[n_channels,1,input_shape[-1]])
-        if padding=='same':
-            amount = np.int32(np.floor((self.filter_samples-1)/2))
-            x_pad = tf.pad(x_reshape,paddings=[[0,0],[0,0],[amount]*2],
-                                    mode='SYMMETRIC')
-        elif padding=='valid':
-            x_pad = x_reshape
+        outputs = list()
+        for i in range(len(self.W)):
+            # shape of W is (width,inchannel,outchannel)
+            width,in_c,out_c = self.W[i].get_shape().as_list()
+            print('W shape',width,in_c,out_c)
+            amount_l = np.int32(np.floor((width-1)/2))
+            amount_r = np.int32(np.ceil((width-1)/2))
+            x_pad    = tf.pad(input,paddings=[[0,0],[0,0],
+                            [amount_l,amount_r]],mode='SYMMETRIC')
 
-        # Create filter bank (samples,1,J*Q) or (#,samples,1,J*Q/#)
-        # 
-        self.W = init_filters(J,Q,K)
-
-        if hasattr(self.W,'__len__'):
-            outputs = list()
-            for w in self.W:
-                if padding=='same':
-                    amount = np.int32(np.floor((self.filter_samples-1)/2))
-                    x_pad = tf.pad(x_reshape,paddings=[[0,0],[0,0],[amount]*2],
-                                        mode='SYMMETRIC')
-                elif padding=='valid':
-                    x_pad = x_reshape
-
-                conv = self.apply_filter_bank(x_pad,w,strides)
-                jq   = w.shape.as_list()[-1]
-                conv_shape = conv.shape.as_list()
-                new_shape  = input_shape[:-1]+[jq,conv_shape[-1]]
-                modulus    = tf.sqrt(tf.square(conv[:,:jq])
-                                        +tf.square(conv[:,jq:]))
-                outputs.append(tf.reshape(modulus,new_shape))
+            conv       = self.apply_filter_bank(x_pad,self.W[-1])
+            conv_shape = conv.shape.as_list()
+            print('conv shape',conv_shape)
+            print(out_c//2)
+            modulus    = tf.sqrt(tf.square(conv[:,:out_c])
+                                        +tf.square(conv[:,out_c:]))
+            new_shape  = input_shape[:-1]+[out_c,input_shape[-1]]
+            outputs.append(tf.reshape(modulus,new_shape))
+        if len(self.W)>1:
             output = tf.concat(outputs,-2)
         else:
-            if padding=='same':
-                amount = np.int32(np.floor((self.filter_samples-1)/2))
-                x_pad = tf.pad(x_reshape,paddings=[[0,0],[0,0],[amount]*2],
-                                    mode='SYMMETRIC')
-            elif padding=='valid':
-                x_pad = x_reshape
-
-            conv = self.apply_filter_bank(x_pad,self.W,strides)
-            conv_shape = conv.shape.as_list()
-            new_shape = input_shape.[:-1]+[F,conv_shape[-1]]
-            modulus   = tf.sqrt(tf.square(conv[:,:J*Q])+tf.square(conv[:,J*Q:]))
-            output    = tf.reshape(modulus,new_shape)
-
-        super().__init__(output)
+            output = outputs[0]
+        return output
 
 
-        def apply_filter_bank(self,input,W,strides):
+    def apply_filter_bank(self,input,W):
             filter_bank = tf.concat([tf.real(W),tf.imag(W)],2)
-            conv      = tf.nn.conv1d(input,filter_bank,stride=strides,
+            return tf.nn.conv1d(input,filter_bank,stride=self.strides,
                                         padding='VALID',data_format='NCW')
-            return conv
+    def init_mp(self, m, p, init):
+        if m is not None and p is not None:
+            self._m = m
+            self._p = p
+        else:
+            if init=='gabor':
+                window = np.hamming(self.K)
+                m_real = np.cos(np.arange(self.K) * np.pi)*window
+                m_imag = np.zeros(self.K)
+                p_real = np.zeros(self.K)
+                p_imag = np.cos(np.arange(self.K) * np.pi)*window
+            elif init=='random':
+                m_real = np.random.randn(self.K)/sqrt(self.K)
+                m_imag = np.random.randn(self.K)/sqrt(self.K)
+                p_real = np.random.randn(self.K)
+                p_imag = np.random.randn(self.K)
+            m = np.stack([m_real,m_imag]).astype('float32')
+            p = np.stack([p_real,p_imag]).astype('float32')
+
+            if self.hilbert:
+                self._m = tf.Variable(m[0], self.trainable_filter, name='m')
+                self._p = tf.Variable(p[0], self.trainable_filter, name='p')
+            else:
+                self._m = tf.Variable(m, self.trainable_filter, name='m')
+                self._p = tf.Variable(p, self.trainable_filter, name='p')
+
+        self.add_param(self._m)
+        self.add_param(self._p)
+
+        # Boundary Conditions and centering
+        mask    = np.ones(self.K, dtype=np.float32)
+        mask[0], mask[-1] = 0, 0
+        m_null  = self._m - tf.reduce_mean(self._m[...,1:-1],axis=-1,
+                                                    keepdims=True)
+        self.m  = m_null*mask
+        self.p  = self._p*mask
 
 
-
-
-def init_filters(self, j, q, k):
-        # bin length of the filter bank, (k needs to be odd)
+    def init_filters(self,start=0,end=-1):
+        """
+        Method initializing the filter-bank
+        """
 
         # ------ TIME SAMPLING
-        # add an extra octave if learnable scales 
-        # if needs be to go lower frequency
-        # Define the integer time grid (time sampling) = 
-        # [-k*2**(j-1),...,-1,0,1,...,k*2**(j-1)]
+        # add an extra octave if learnable scales (to go to lower frequency)
+        # Define the integer time grid (time sampling) 
+        length    = int(self.K*2**(self._scales[end-1]
+                                        +int(self.trainable_scales)))
+        time_grid = tf.linspace(np.float32(-(length//2)), 
+                                    np.float32(length//2), length)
 
-        self.filter_samples = k*2**(j+int(self.trainable_scales))
-        start_ = np.float32(-k*2**(j-1+int(self.trainable_scales)))
-        end_   = np.float32(k*2**(j-1+int(self.trainable_scales)))
-        time_grid = tf.lin_space(start_,end_, self.filter_samples)
-
-        # ------ SCALES
-        # we start with scale 1 for the nyquist and then increase 
-        # the scale for the lower frequencies
-        squeleton_scales = 2**(tf.range(j*q,dtype=tf.float32)/np.float32(q))
-        scales_diff      = tf.Variable(tf.zeros(j*q), 
-                            trainable=self.trainable_scales, name='scales')
-        self.scales      = tf.contrib.framework.sort(squeleton_scales+scales_diff)
-
-        # ------ KNOTS
-        # We initialize with uniform spacing 
-        grid = tf.lin_space(np.float32(-(k//2)),np.float32(k//2), k)
-        self.knots_ = tf.Variable(grid, trainable=self.trainable_knots, 
-                                                    name='knots')
-        self.knots = tf.einsum('i,j->ij',self.scales,self.knots_)
-
-        # ------ FILTERS
-        # Interpolation init, add the boundary condition mask and remove the mean
-        # filters of even indices are the real parts and odd indices are imaginary part
+        # ------ FILTER-BANK
         if self.hilbert:
-            # Create the parameters
-            self.m = tf.Variable((np.cos(np.arange(k) * np.pi)*np.hamming(k)).astype('float32'), name='m', trainable=self.trainable_filter)
-            self.p = tf.Variable((np.zeros(k)).astype('float32'), name='p', trainable=self.trainable_filter)
-            # Boundary Conditions and centering
-            mask              = np.ones(k, dtype=np.float32)
-            mask[0], mask[-1] = 0, 0
-            m_null            = self.m - tf.reduce_mean(self.m[1:-1])
-            filters           = real_hermite_interp(time_grid, self.knots, m_null*mask, self.p*mask)
-            # Renorm and set filter-bank
-            filters_renorm    = filters/tf.reduce_max(filters,1,keepdims=True)
-            filters_fft       = tf.spectral.rfft(filters_renorm)
-            self.filter_bank  = tf.ifft(tf.concat([filters_fft,tf.zeros_like(filters_fft)],1))
+            filters_real = utils.hermite_interp(time_grid, 
+                        self.all_knots[start:end], self.m, self.p, True)
+            filters_fft = tf.spectral.rfft(filters)
+            filters = tf.ifft(tf.concat([filters_fft,
+                                            tf.zeros_like(filters_fft)],1))
         else:
-            # Create the parameters
-            self.m = tf.Variable(np.stack([np.cos(np.arange(k) * np.pi)*np.hamming(k),
-                    np.zeros(k)*np.hamming(k)]).astype('float32') ,
-                    name='m',trainable=self.trainable_filter)
-            self.p = tf.Variable(np.stack([np.zeros(k),
-                    np.cos(np.arange(k) * np.pi)*np.hamming(k)]).astype('float32'),
-                    name='p',trainable=self.trainable_filter)
-            # Boundary Conditions and centering
-            mask              = np.ones((1,k), dtype=np.float32)
-            mask[0,0], mask[0,-1] = 0, 0
-            m_null            = self.m - tf.reduce_mean(self.m[:,1:-1],axis=1,keepdims=True)
-            filters           = complex_hermite_interp(time_grid, self.knots, m_null*mask, self.p*mask)
-            # Renorm and set filter-bank
-            filters_renorm    = filters/tf.reduce_max(filters,2,keepdims=True)
-            self.filter_bank  = tf.complex(filters_renorm[0],filters_renorm[1])
+            filters = utils.hermite_interp(time_grid, self.all_knots[start:end],
+                                            self.m, self.p,False)
+            filters = tf.complex(filters[0],filters[1])
+
+        W = tf.expand_dims(tf.transpose(filters),1)
+        W.set_shape((length,1,len(self._scales[start:end])))
+        return W
 
 

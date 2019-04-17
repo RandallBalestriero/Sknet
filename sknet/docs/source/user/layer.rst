@@ -4,19 +4,8 @@ Layer
 =====
 
 All the layers use the following approach.
-They can be initialized given an input shape or an input layer. Excpet for the 
-:class:`sknet.layer.Input` which can take only an input shape or an input shape and
-a tensorflow variable. This flexibility allow anyone to use those object to create
-new models. 
+They can be initialized given an input shape or an input layer. 
 
-Special
--------
-
-Input 
-Output
-Reshape
-Lambda
-ExpandDim
 
 
 Data Augmentation
@@ -33,7 +22,7 @@ We provide some simple data augmentation tools that can be combined, they are co
 
 for example, running the following code
 
-.. literalinclude:: ../../../../quickstart_perturb.py
+.. literalinclude:: ../../../../examples/quickstart_perturb.py
 
 
 .. rubric:: Crop 2626

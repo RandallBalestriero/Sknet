@@ -41,7 +41,7 @@ class Dropout(Op):
         return self.output
 
 
-class Uniform(Op):
+class UniformNoise(Op):
     """Applies an additive or multiplicative Uniform noise to the input
 
     This layer applies an additive or multiplicative perturbation
@@ -69,7 +69,10 @@ class Uniform(Op):
 
     """
 
-    def __init__(self, incoming, noise_type="additive", lower = np.float32(0), 
+    name = 'UniformNoise'
+    deterministic_behavior = True
+
+    def __init__(self, incoming, noise_type="additive", lower = np.float32(0),
             upper = np.float32(1), deterministic=None, **kwargs):
         super().__init__(incoming, **kwargs)
 
@@ -81,7 +84,8 @@ class Uniform(Op):
             self.forward(incoming.output,deterministic=deterministic)
     def forward(self,input=None, deterministic=None, _input=None, **kwargs):
         # Random indices
-        random_values = tf.random_uniform(self.input_shape)*(self.upper-self.lower)-self.lower
+        random_values = tf.random_uniform(self.input_shape)\
+                                *(self.upper-self.lower)-self.lower
         if input is None:
             input = self.incoming.forward(deterministic=deterministic,_input=_input)
         if self.noise_type=="additive":
@@ -95,7 +99,7 @@ class Uniform(Op):
         return self.output
 
 
-class Gaussian(Op):
+class GaussianNoise(Op):
     """Applies an additive or multiplicative Gaussian noise to the input
 
     This layer applies an additive or multiplicative perturbation
@@ -120,9 +124,13 @@ class Gaussian(Op):
 
     sigma : Tensor or Array
         the standard deviation of the Gaussian distribution
-        
+
     """
-    def __init__(self, incoming, noise_type="additive", mu = np.float32(0), 
+
+    name = 'GaussianNoise'
+    deterministic_behavior = True
+
+    def __init__(self, incoming, noise_type="additive", mu = np.float32(0),
             sigma = np.float32(1), deterministic=None, **kwargs):
         """init
         """
@@ -161,10 +169,10 @@ class RandomCrop(Op):
     to all the channels of the input.
 
     Example of use::
-    
+
         input_shape = (64,3,32,32)
         # Init an input layer with input shape
-        crop_layer  = RandomCrop(input_shape,(28,28)) 
+        crop_layer  = RandomCrop(input_shape,(28,28))
         # output of this layer is (64,3,28,28)
         crop_layer.output_shape
 
@@ -181,10 +189,12 @@ class RandomCrop(Op):
 
     """
 
-    def __init__(self, incoming, crop_shape, deterministic=None, **kwargs):
+    name = 'RandomCrop'
+    deterministic_behavior = True
+
+    def __init__(self, input, crop_shape, deterministic=None, **kwargs):
         """init
         """
-        super().__init__(incoming, **kwargs)
         # Set attributes
         if np.isscalar(crop_shape):
             self.crop_shape = [crop_shape,crop_shape]
@@ -194,65 +204,44 @@ class RandomCrop(Op):
 
         # Set shape after transpose as this function needs
         # data_format='NHWC' always
-        if self.data_format=='NCHW':
-            self.images_shape = [self.input_shape[i] for i in [0,2,3,1]]
-            self.output_shape = self.input_shape[:2]+self.crop_shape
-        else:
-            self.images_shape = self.input_shape
-            self.output_shape = [self.input_shape[0]]+self.crop_shape\
-                            +[self.input_shape[-1]]
-        if np.isscalar(crop_shape):
-            self.crop_shape = [crop_shape,crop_shape]
-        else:
-            assert(len(crop_shape)==2)
-            self.crop_shape = list(crop_shape)
+        self.spatial_shape = input.get_shape().as_list()[2:]
 
-        # Number of patches of crop_shape shape in the input in Height and Width
-        self.n_H = np.int32((self.images_shape[1]-self.crop_shape[0]+1)//2)
-        self.n_W = np.int32((self.images_shape[2]-self.crop_shape[1]+1)//2)
+        # Number of patches of crop_shape shape in the input in H and W
+        self.n_H = np.int64(self.spatial_shape[0]-self.crop_shape[0]+1)
+        self.n_W = np.int64(self.spatial_shape[1]-self.crop_shape[1]+1)
 
-        if self.given_input:
-            self.forward(incoming.output,deterministic=deterministic)
+        super().__init__(input, **kwargs)
 
-    def forward(self,input=None,deterministic=None, _input=None, **kwargs):
+    def forward(self,input, deterministic, **kwargs):
+
         # Random indices
-        random_H = tf.random_uniform((self.images_shape[0],),
-                                    maxval=np.float32(self.n_H))
-        random_W = tf.random_uniform((self.images_shape[0],),
-                                    maxval=np.float32(self.n_W))
-        self.indices_H = tf.cast(tf.floor(random_H),tf.int32)
-        self.indices_W = tf.cast(tf.floor(random_W),tf.int32)
-        if input is None:
-            input = self.incoming.forward(deterministic=deterministic,_input=_input)
-        if self.data_format=='NCHW':
-            input = tf.transpose(input,[0,2,3,1])
+        N,C,H,W = input.get_shape().as_list()
+        random_H = tf.random_uniform((N,),maxval=np.float32(self.n_H))
+        random_W = tf.random_uniform((N,),maxval=np.float32(self.n_W))
+        indices_H = tf.cast(tf.floor(random_H), tf.int32)
+        indices_W = tf.cast(tf.floor(random_W), tf.int32)
+        random_indices = tf.stack([tf.range(N), indices_H, indices_W],1)
+        # Deterministic (center) indices
+        center_indices = tf.stack([tf.range(N,dtype=tf.int64), 
+                        tf.fill((N,),self.n_H//2),
+                        tf.fill((N,),self.n_W//2)],1)
+
+        # need to transpose to extract patches
+        input_t = tf.transpose(input,[0,2,3,1])
 
         # Extract patches of the crop_shape shape
-        input_patches  = tf.extract_image_patches(input,[1]+self.crop_shape+[1],
-                            strides=[1,1,1,1],rates=[1,1,1,1],padding='VALID')
-        random_indices = tf.stack([tf.range(self.input_shape[0]),
-                                        self.indices_H,
-                                        self.indices_W],1)
+        input_patches  = tf.extract_image_patches(input_t,
+                                    [1]+self.crop_shape+[1],strides=[1,1,1,1],
+                                    rates=[1,1,1,1],padding='VALID')
         random_patches = tf.gather_nd(input_patches,random_indices)
-
-        # Now take the center parts
-        center_indices = tf.stack([tf.range(self.input_shape[0]),
-                        tf.fill((self.images_shape[0],),self.n_H),
-                        tf.fill((self.images_shape[0],),self.n_W)],1)
         center_patches = tf.gather_nd(input_patches,center_indices)
 
         # Set the patches to use depending if it is train or test time
         patches = tf.cond(deterministic, lambda :center_patches,
                                     lambda :random_patches)
-        output  = tf.reshape(patches, [self.output_shape[0]]+self.crop_shape\
-                                    +[self.images_shape[-1]])
+        output  = tf.reshape(patches, [N]+self.crop_shape+[C])
 
-        # Convert back to original data_format
-        if self.data_format=='NCHW':
-            self.output = tf.transpose(output,[0,3,1,2])
-        else:
-            self.output = output
-        return self.output
+        return tf.transpose(output,[0,3,1,2])
 
 
 class RandomAxisReverse(Op):

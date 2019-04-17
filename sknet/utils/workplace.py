@@ -20,7 +20,7 @@ class Workplace(object):
         self.dataset  = dataset
         self.network  = network
         # initialize the variables
-        ops = tf.global_variables_initializer()
+        ops = tf.group(tf.global_variables_initializer(),tf.local_variables_initializer())
         self.session.run(ops,feed_dict=dataset.init_dict)
 
     def execute_op(self,op,feed_dict,batch_size=None,deterministic=None):

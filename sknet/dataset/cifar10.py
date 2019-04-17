@@ -4,10 +4,12 @@ import urllib.request
 import numpy as np
 import tarfile
 import time
+from tqdm import tqdm
 
 from . import Dataset
 
-from ..utils import to_one_hot
+from ..utils import to_one_hot, DownloadProgressBar
+
 
 def load_cifar10(PATH=None):
     """Image classification.
@@ -47,11 +49,10 @@ def load_cifar10(PATH=None):
 
     # Check if file exists
     if not os.path.exists(PATH+'cifar10/cifar10.tar.gz'):
-        print('\tDownloading cifar10 Dataset...')
-        td = time.time()
         url = 'https://www.cs.toronto.edu/~kriz/cifar-10-python.tar.gz'
-        urllib.request.urlretrieve(url,PATH+'cifar10/cifar10.tar.gz')
-        print("\tDone in {:.2f} s.".format(time.time()-td))
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                            desc='Downloading Dataset') as t:
+            urllib.request.urlretrieve(url,PATH+'cifar10/cifar10.tar.gz')
 
     # Loading dataset
     tar = tarfile.open(PATH+'cifar10/cifar10.tar.gz', 'r:gz')
@@ -59,8 +60,9 @@ def load_cifar10(PATH=None):
     # Load training set
     train_images  = list()
     train_labels  = list()
-    for k in range(1,6):
-        f        = tar.extractfile('cifar-10-batches-py/data_batch_'+str(k)).read()
+    for k in tqdm(range(1,6),desc='Loading dataset'):
+        f        = tar.extractfile(
+                        'cifar-10-batches-py/data_batch_'+str(k)).read()
         data_dic = pickle.loads(f,encoding='latin1')
         train_images.append(data_dic['data'].reshape((-1,3,32,32)))
         train_labels.append(data_dic['labels'])

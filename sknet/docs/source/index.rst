@@ -76,7 +76,6 @@ neural networks, and how to contribute to the library as a developer.
   user/dataset
   user/preprocess
   user/network
-  user/layer
   user/schedule
   user/pipeline
 
@@ -90,8 +89,9 @@ If you are looking for information on a specific function:
 
   modules/base
   modules/dataset
+  modules/ops
+  modules/layers
   modules/network
-  modules/layer
   modules/optimize
 
 Quickstart

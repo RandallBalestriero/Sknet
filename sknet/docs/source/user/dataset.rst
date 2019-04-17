@@ -12,7 +12,7 @@ a :mod:`dict` object. That is, each dataset is a Python dictionnary with
 some key attributes s.a. :py:data:`datum_shape` or :py:data:`n_classes`.
 We provide a simple example using the MNIST dataset:
 
-.. literalinclude:: ../../../../quickstart_base.py
+.. literalinclude:: ../../../../examples/quickstart_base.py
    :lines: 60-94
 
 
@@ -59,7 +59,7 @@ Open a pre-loaded dataset
 Running the code _quickstart_data_loading.py
 
 
-.. literalinclude:: ../../../../quickstart_data_loading.py
+.. literalinclude:: ../../../../examples/quickstart_data_loading.py
     :encoding: latin-1
     :language: python
 
@@ -120,7 +120,7 @@ automate the data loading process and then set them as a dataset.
 Here is an example assuming the user has already loaded its dataset
 into the working python script
 
-.. literalinclude:: ../../../../quickstart_base.py
+.. literalinclude:: ../../../../examples/quickstart_base.py
    :lines: 95-129
 
 Dataset split
@@ -129,7 +129,7 @@ Dataset split
 A :class:`sknet.dataset.Dataset` object provides many convenient methods s.a.
 data splitting as
 
-.. literalinclude:: ../../../../quickstart_base.py
+.. literalinclude:: ../../../../examples/quickstart_base.py
    :lines: 131-160
 
 

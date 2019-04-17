@@ -29,7 +29,7 @@ class BatchNorm(Op):
     :type gamma_initializer: initializer or array
     :param name: name of the layer
     :type name: str
-    :param epsilon: (optional) the epsilon constant to add 
+    :param epsilon: (optional) the epsilon constant to add
                     to the renormalization
     :type epsilon: scalar
     :param decay: the decay to use for the exponential
@@ -37,7 +37,10 @@ class BatchNorm(Op):
                   moments form the training batches ones
     :type decay: scalar
     """
+
     name='BatchNorm'
+    deterministic_behavior = True
+
     def __init__(self,incoming,axis,deterministic=None, b = tf.zeros,
                 W=tf.ones, W_func=tf.identity, b_func=tf.identity,
                 name='bn_layer', epsilon=1e-4, decay=0.9, **kwargs):
@@ -50,39 +53,37 @@ class BatchNorm(Op):
                 self.axis = [axis]
             else:
                 self.axis = axis
-    
+
             # Infer the shape of the parameters, it is 1 for the axis that are
             # being normalized over and the same as the input shape for 
             # the others
             in_shape = incoming.shape.as_list()
-            shape_= [s if i not in self.axis else 1 
+            shape_= [s if i not in self.axis else 1
                                         for i,s in enumerate(in_shape)]
-    
-     
+
+
             # Initialization gamma
             if W is None:
-                self._W = None
-                self.W = 1
+                self._W = 1
+            elif callable(W):
+                self._W = Variable(W(shape_),name=name+'_beta')
             else:
-                if type(W)!=Variable:
-                    W = Variable(W,name=name+'_beta')
-                self._W = W(shape_)
-                self.W  = W_func(self._W)
-                self._params = [self._W]
-    
+                self._W  = W
+            self.W = W_func(self._W) if W is not None else self._W
+            self.add_param(self._W)
+
             # Initialization beta
             if b is None:
-                self._b = None
-                self.b  = 0
+                self._b = 0
+            elif callable(b):
+                self._b = Variable(b(shape_),name=name+'_beta')
             else:
-                if type(b)!=Variable:
-                    b = Variable(b,name=name+'_beta')
-                self._b = b(shape_)
-                self.b  = b_func(self._b)
-                self._params +=[self._b]
-    
+                self._b = b
+            self.b  = b_func(self._b) if b is not None else self._b
+            self.add_param(self._b)
+
             self.ema  = tf.train.ExponentialMovingAverage(decay=decay)
-    
+
             super().__init__(incoming,deterministic)
 
     def forward(self,input, deterministic, **kwargs):

@@ -5,7 +5,8 @@ import numpy as np
 import time
 from . import Dataset
 
-from ..utils import to_one_hot
+from ..utils import to_one_hot, DownloadProgressBar
+
 
 def load_mnist(PATH=None):
     """Grayscale digit classification.
@@ -44,11 +45,11 @@ def load_mnist(PATH=None):
 
     # Check if file exists
     if not os.path.exists(PATH+'mnist/mnist.pkl.gz'):
-        print('\tDownloading mnist Dataset...')
         td  = time.time()
         url = 'http://deeplearning.net/data/mnist/mnist.pkl.gz'
-        urllib.request.urlretrieve(url,PATH+'mnist/mnist.pkl.gz')
-        print("\tDone in {:.2f}".format(time.time()-td))
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                                    desc='DL dataset') as t:
+            urllib.request.urlretrieve(url,PATH+'mnist/mnist.pkl.gz')
 
     # Loading the file
     f = gzip.open(PATH+'mnist/mnist.pkl.gz', 'rb')

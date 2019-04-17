@@ -7,7 +7,8 @@ import time
 
 from . import Dataset
 
-from ..utils import to_one_hot
+from ..utils import to_one_hot, DownloadProgressBar
+
 
 def load_svhn(PATH=None):
     """Street number classification.
@@ -44,18 +45,16 @@ def load_svhn(PATH=None):
         print('\tCreating svhn Directory')
 
     if not os.path.exists(PATH+'svhn/train_32x32.mat'):
-        print('\tDownloading svhn Train Set')
-        td = time.time()
         url = 'http://ufldl.stanford.edu/housenumbers/train_32x32.mat'
-        urllib.request.urlretrieve(url,PATH+'svhn/train_32x32.mat')
-        print("\tDone in {:.2f} s.".format(time.time()-td))
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                        desc='Downloading train set') as t:
+            urllib.request.urlretrieve(url,PATH+'svhn/train_32x32.mat')
 
     if not os.path.exists(PATH+'svhn/test_32x32.mat'):
-        print('\tDownloading svhn Test Set')
-        td = time.time()
         url = 'http://ufldl.stanford.edu/housenumbers/test_32x32.mat'
-        urllib.request.urlretrieve(url,PATH+'svhn/test_32x32.mat')
-        print("\tDone in {:.2f} s.".format(time.time()-td))
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                        desc='Downloading test set') as t:
+            urllib.request.urlretrieve(url,PATH+'svhn/test_32x32.mat')
 
     train_set = sio.loadmat(PATH+'svhn/train_32x32.mat')
     train_set = [train_set['X'].transpose([3,2,0,1]).astype('float32'),
@@ -65,12 +64,10 @@ def load_svhn(PATH=None):
                     np.squeeze(test_set['y']).astype('int32')-1]
 
 
-    dataset.add_variable({'images':[{'train_set':train_set[0],
+    dataset.add_variable({'images':{'train_set':train_set[0],
                                     'test_set':test_set[0]},
-                                    (3,32,32),'float32'],
-                        'labels':[{'train_set':train_set[1],
-                                    'test_set':test_set[1]},
-                                    (),'int32']})
+                        'labels':{'train_set':train_set[1],
+                                    'test_set':test_set[1]}})
 
     print('Dataset svhn loaded in','{0:.2f}'.format(time.time()-t),'s.')
     return dataset

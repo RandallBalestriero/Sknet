@@ -6,7 +6,8 @@ import time
 
 from . import Dataset
 
-from ..utils import to_one_hot
+from ..utils import to_one_hot, DownloadProgressBar
+
 
 
 def load_fashionmnist(PATH=None):
@@ -44,34 +45,30 @@ def load_fashionmnist(PATH=None):
     if not os.path.isdir(PATH+'fashionmnist'):
         print('\tCreating Directory')
         os.mkdir(PATH+'fashionmnist')
-
+    base_url = 'http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/'
     if not os.path.exists(PATH+'fashionmnist/train-images.gz'):
-        print('\tDownloading fashionmnist Train Images...')
-        td  = time.time() 
-        url = 'http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-images-idx3-ubyte.gz'
-        urllib.request.urlretrieve(url,PATH+'fashionmnist/train-images.gz')
-        print("\tDone in {:.2f} s.".format(time.time()-td))
+        url = base_url+'train-images-idx3-ubyte.gz'
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                        desc='Downloading train images') as t:
+            urllib.request.urlretrieve(url,PATH+'fashionmnist/train-images.gz')
 
     if not os.path.exists(PATH+'fashionmnist/train-labels.gz'):
-        print('\tDownloading fashionmnist Train Labels...')
-        td = time.time()
-        url = 'http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/train-labels-idx1-ubyte.gz'
-        urllib.request.urlretrieve(url,PATH+'fashionmnist/train-labels.gz')
-        print("\tDone in {:.2f} s.".format(time.time()-td))
+        url = base_url+'train-labels-idx1-ubyte.gz'
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                        desc='Downloading train labels') as t:
+            urllib.request.urlretrieve(url,PATH+'fashionmnist/train-labels.gz')
 
     if not os.path.exists(PATH+'fashionmnist/test-images.gz'):
-        print('\tDownloading fashionmnist Test Images...')
-        td = time.time()
-        url = 'http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-images-idx3-ubyte.gz'
-        urllib.request.urlretrieve(url,PATH+'fashionmnist/test-images.gz')
-        print("\tDone in {:.2f} s.".format(time.time()-td))
+        url = base_url+'t10k-images-idx3-ubyte.gz'
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                        desc='Downloading test images') as t:
+            urllib.request.urlretrieve(url,PATH+'fashionmnist/test-images.gz')
 
     if not os.path.exists(PATH+'fashionmnist/test-labels.gz'):
-        print('\tDownloading fashionmnist Test Labels...')
-        td = time.time()
-        url = 'http://fashion-mnist.s3-website.eu-central-1.amazonaws.com/t10k-labels-idx1-ubyte.gz'
-        urllib.request.urlretrieve(url,PATH+'fashionmnist/test-labels.gz')
-        print("\tDone in {:.2f} s.".format(time.time()-td))
+        url = base_url+'t10k-labels-idx1-ubyte.gz'
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                        desc='Downloading test labels') as t:
+            urllib.request.urlretrieve(url,PATH+'fashionmnist/test-labels.gz')
 
     # Loading the file
 
@@ -79,21 +76,21 @@ def load_fashionmnist(PATH=None):
         train_labels = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
 
     with gzip.open(PATH+'fashionmnist/train-images.gz', 'rb') as lbpath:
-        train_images = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=16).reshape((-1,1,28,28))
+        train_images = np.frombuffer(lbpath.read(), 
+                                dtype=np.uint8, offset=16).reshape((-1,1,28,28))
 
     with gzip.open(PATH+'fashionmnist/test-labels.gz', 'rb') as lbpath:
         test_labels = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
 
     with gzip.open(PATH+'fashionmnist/test-images.gz', 'rb') as lbpath:
-        test_images = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=16).reshape((-1,1,28,28))
+        test_images = np.frombuffer(lbpath.read(), 
+                            dtype=np.uint8, offset=16).reshape((-1,1,28,28))
 
 
-    dataset.add_variable({"images":[{'train_set':train_images,
+    dataset.add_variable({"images":{'train_set':train_images,
                                     'test_set':test_images},
-                                    (1,28,28),'float32'],
-                        "labels":[{'train_set':train_labels,
-                                    'test_set':test_labels},
-                                    (),'int32']})
+                        "labels":{'train_set':train_labels,
+                                    'test_set':test_labels}})
 
     print('Dataset fashionmnist loaded in','{0:.2f}'.format(time.time()-t),'s.')
     return dataset

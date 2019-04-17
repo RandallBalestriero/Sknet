@@ -8,8 +8,10 @@ import io
 from scipy.io.wavfile import read as wav_read
 
 from . import Dataset
+from tqdm import tqdm
 
-from ..utils import to_one_hot
+from ..utils import to_one_hot, DownloadProgressBar
+
 
 def load_warblr(PATH=None):
     """Binary audio classification, presence or absence of a bird.
@@ -47,18 +49,20 @@ def load_warblr(PATH=None):
         os.mkdir(PATH+'warblr')
 
     if not os.path.exists(PATH+'warblr/warblrb10k_public_wav.zip'):
-        print('\tDownloading Wav Files')
-        td  = time.time()
         url = 'https://archive.org/download/warblrb10k_public/warblrb10k_public_wav.zip'
-        urllib.request.urlretrieve(url,PATH+'warblr/warblrb10k_public_wav.zip')
-        print("\tDone in {:.2f} s.".format(time.time()-td))
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                        desc='Downloading dataset') as t:
+
+            urllib.request.urlretrieve(url,PATH+\
+                                'warblr/warblrb10k_public_wav.zip')
         
     if not os.path.exists(PATH+'warblr/warblrb10k_public_metadata.csv'):
-        print('\tDownloading Metadata')
-        td  = time.time()
         url = 'https://ndownloader.figshare.com/files/6035817'
-        urllib.request.urlretrieve(url,PATH+'warblr/warblrb10k_public_metadata.csv')  
-        print("\tDone in {:.2f} s.".format(time.time()-td))
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                            desc='Downloading metadata') as t:
+
+            urllib.request.urlretrieve(url,PATH+\
+                                'warblr/warblrb10k_public_metadata.csv')  
 
     #Loading Labels
     labels = np.loadtxt(PATH+'warblr/warblrb10k_public_metadata.csv',
@@ -67,7 +71,7 @@ def load_warblr(PATH=None):
     f    = zipfile.ZipFile(PATH+'warblr/warblrb10k_public_wav.zip')
     N    = labels.shape[0]
     wavs = list()
-    for i,files_ in enumerate(labels):
+    for i,files_ in tqdm(enumerate(labels),ascii=True):
         wavfile   = f.read('wav/'+files_[0]+'.wav')
         byt       = io.BytesIO(wavfile)
         wavs.append(np.expand_dims(wav_read(byt)[1].astype('float32'),0))

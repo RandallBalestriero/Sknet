@@ -88,62 +88,36 @@ class exponential:
         self.lrs.append(self.lr-self.step**kwargs['epoch'])
 
 
-class stepwise:
-    """stepwise learning rate strategy.
-    This method allows to have stepwise learning rate
-    It is done by using a given dictionnary containing the epochs
-    at which the learning rate changes (starting at 0).
-    
+class PiecewiseConstant:
+    """Piecewise constant value that act when called
+    with a :class:`tf.Variable`
+
     Example of use::
 
-        stepwise({0:0.1,50:0.01,100:0.0005})
-
+        value = PiecewiseConstant(0.1,{50:0.01,100:0.0005})
+        time = tf.placeholder(tf.int32)
+        # as time will evolve, as the value_pc will change based
+        # on the above steps
+        value_pc = value(time)
 
     """
-    def __init__(self,dict_lr):
-        """initialize the class
 
-        :param lr:dictionnary mapping epoch with learning 
-                  rate change -> new learning rate
-        :type lr: dict
-        """
-        self.dict_lr = dict_lr
-        # get epoch and values
-        epochs = np.asarray(list(dict_lr.keys())).astype('int32')
-        values = np.asarray(list(dict_lr.values())).astype('float32')
-        # sort them
-        arg = np.argsort(epochs)
-        print(arg,epochs,values)
-        epochs=epochs[arg]
-        values=values[arg]
-        # set up tf variables
-        self.epochs = [tf.constant(e) for e in epochs]
-        self.values = [tf.constant(v) for v in values]
-        self.description = 'stepwise'+str(dict_lr).replace(' ','')
+    name = 'PiecewiseConstant'
 
-    def __call__(self,epoch,*args,**kwargs):
-        return 0.01 
-        epoch = tf.cast(epoch,tf.int32)
-        pairs =[(tf.logical_and(tf.greater_equal(epoch,e),tf.less(epoch,ep)),lambda :v) 
-            for e,ep,v in zip(self.epochs[:-1],self.epochs[1:],self.values[:-1])]
+    def __init__(self,initial,steps):
 
-        lr = tf.case(pairs,default=lambda :self.values[-1], exclusive=True, strict=False, 
-                                    name='case_learningrate')
-        return lr
-        self.lr   = dict_lr
-        self.reset()
-        self.name = '-schedule(stepwise,dict='+str(dict_lr).replace(' ','')+')'
-    def reset(self):
-        """Reset the class
-        """
-        self.lrs = [self.lr[0]]
-    def update(self,**kwargs):
-        if kwargs['epoch']==0:
-            self.reset()
-        if 'epoch' in self.lr.keys():
-            self.lrs.append(self.lr[epoch])
-        else:
-            self.lrs.append(self.lrs[-1])
+        self.initial    = initial
+        # ensure that the steps are in order
+        argsort         = np.argsort(list(steps.keys()))
+        self.boundaries = list(np.asarray(
+                                  list(steps.keys()))[argsort].astype('int32'))
+        self.values     = list(np.concatenate([[initial],np.asarray(
+                              list(steps.keys()))[argsort]]).astype('float32'))
+        self.description = type(self).name+str(initial)\
+                                    +str(steps).replace(' ','')
+
+    def __call__(self,t):
+        return tf.train.piecewise_constant(t,self.boundaries,self.values)
 
 
 

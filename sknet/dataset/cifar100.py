@@ -6,7 +6,8 @@ import pickle
 import time
 
 from . import Dataset
-from ..utils import to_one_hot
+from ..utils import to_one_hot, DownloadProgressBar
+
 
 from . import Dataset
 
@@ -61,11 +62,10 @@ def load_cifar100(PATH=None):
         os.mkdir(PATH+'cifar100')
 
     if not os.path.exists(PATH+'cifar100/cifar100.tar.gz'):
-        print('\tDownloading cifar100 Dataset...')
-        td = time.time()
         url = 'https://www.cs.toronto.edu/~kriz/cifar-100-python.tar.gz'
-        urllib.request.urlretrieve(url,PATH+'cifar100/cifar100.tar.gz')
-        print("\tDone in {:.2f}".format(time.time()-td))
+        with DownloadProgressBar(unit='B', unit_scale=True, miniters=1, 
+                                        desc='Downloading dataset') as t:
+            urllib.request.urlretrieve(url,PATH+'cifar100/cifar100.tar.gz')
 
     # Loading the file
     tar = tarfile.open(PATH+'cifar100/cifar100.tar.gz', 'r:gz')
@@ -85,15 +85,12 @@ def load_cifar100(PATH=None):
                     np.array(data_dic['coarse_labels']),
                     np.array(data_dic['fine_labels'])]
 
-    dataset.add_variable({'images':[{'train_set':train_set[0],
+    dataset.add_variable({'images':{'train_set':train_set[0],
                                     'test_set':test_set[0]},
-                                    (3,32,32),'float32'],
-                        'labels':[{'train_set':train_set[2],
+                        'labels':{'train_set':train_set[2],
                                     'test_set':test_set[2]},
-                                    (),'int32'],
-                        'coarse_labels':[{'train_set':train_set[1],
-                                        'test_set':test_set[1]},
-                                        (),'int32']})
+                        'coarse_labels':{'train_set':train_set[1],
+                                        'test_set':test_set[1]}})
 
     print('Dataset cifar100 loaded in','{0:.2f}'.format(time.time()-t),'s.')
     return dataset

@@ -123,24 +123,28 @@ class Op(Tensor):
         this allows the user to feed directly a tensorflow variable as input
 
     """
-    def __init__(self,input, deterministic=None, deterministic_behavior=True,
-                            **kwargs):
-        
-        # Link this tensor to its input
+    def __init__(self,input, deterministic=None):
+
         self._input = input
 
-        # set deterministic
-        if deterministic_behavior:
+        if type(self).deterministic_behavior:
             if deterministic is None:
                 self.deterministic = tf.placeholder(tf.bool,
-                                                name='deterministic')
+                                             name='deterministic')
             else:
                 self.deterministic = deterministic
-        # compute the layer output based on the layer forward method
-        output = self.forward(input,self.deterministic)
-        # initialize the variable
+            output = self.forward(input,self.deterministic)
+        else:
+            output = self.forward(input)
+
         super().__init__(output)
 
+    def add_param(self,param):
+        if not hasattr(self,'_params'):
+            self._params = []
+        if hasattr(param,'trainable'):
+            if param.trainable:
+                self._params.append(param)
 
     @property
     def input(self):
@@ -152,12 +156,12 @@ class Op(Tensor):
             return self._params
         else:
             return []
+
     @property
     def updates(self):
         if hasattr(self,'_updates'):
             return self._updates
         else:
             return []
-
 
 

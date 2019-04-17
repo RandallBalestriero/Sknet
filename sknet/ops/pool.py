@@ -40,6 +40,10 @@ class Pool(Op):
         The stride of the pooling
 
     """
+
+    name = 'Pool'
+    deterministic_behavior = False
+
     def __init__(self, incoming, window_shape, strides=None, pool_type='MAX',
                     padding='VALID', *args, **kwargs):
         with tf.variable_scope("Pool") as scope:
@@ -80,7 +84,6 @@ class Pool(Op):
                     strides=self.strides, pooling_type=self.pool_type,
                     padding=self.padding, data_format=data_format)[:,0]
         else:
-            print(self.window_shape,self.strides)
             data_format = data_format[len(input.shape)-3]
             output = tf.nn.pool(input,window_shape=self.window_shape[1:],
                     strides=self.strides[1:], pooling_type=self.pool_type, 

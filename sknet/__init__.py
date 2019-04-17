@@ -35,7 +35,8 @@ def get_tensor_dependencies(tensor):
 
 def get_layers(tensor):
     layers = list()
-    ops = tf.contrib.graph_editor.get_backward_walk_ops(tensor,control_inputs=True)
+    ops = tf.contrib.graph_editor.get_backward_walk_ops(tensor,
+                                                    control_inputs=True)
     for op in ops:
         print(op.outputs,isinstance(op.outputs[0],layer.Layer))
         if isinstance(op.outputs[0],layer.Layer):
@@ -332,29 +333,39 @@ def Parser(instruction):
 
 
 
-class Variable(object):
+class Variable(tf.Variable):
     """Analog to :class:`tf.Variable` used for initialization
-    with additional inplace option.
+    with additional inplace option. There are two behaviors for this class
+        - the option :data:`trainable` is a boolean: this variable will be
+          a :class:`tf.Variable` initialized with the given input or
+          function, and with trainable flag set as the given one.
+        - the option :data:`trainable` is :data:`None`: this variable will
+          just be a :class:`tf.Tensor` with value given by the given input
+          or function. This option is usefull when using tied weights
+          between different layers, the tied layers should simply use the
+          original layer weights in place, and not create fixed or
+          independent parameters.
 
     Example of use ::
 
-        # The layer (or other object) will call later in the
-        # construction ``w(some_shape)`` and the output will be
-        # ``tf.Variable(tf.zeros(some_shape),trainable=True)``
-        w=sknet.Variable(tf.zeros,trainable=True)
-        # When setting trainable=False, the same occurs but with
-        # a non trainable variable as output
-            
-        # It is also possible to give an already instanciated
-        # parameter as 
-        w=sknet.Variable(tf.zeros(known_shape),trainable=True)
-
+        # Let's demonstrate the behavior of this class which can then be
+        # used with layers, ops or other objects.
+        # By default, trainable is set to True. When called, the following 
+        zero_init = sknet.Variable(tf.zeros)
+        # Create one trainable variable initialized with 0s
+        var1 = zero_init((32,32))
+        # When setting trainable=False, the same occurs but returns
+        # a fixed (non trainable variable)
+        zero_init = sknet.Variable(tf.zeros,trainable=False)
+        # the below is equivalent to tf.zeros((32,32))
+        var1 = zero_init((32,32))
         # Finally, it is often required to use inplace the given
         # parameter (for example in the reconstruction part of an
-        # autoencoder, we wish to use the encoder weights, inplace.
-        # And not as initialization of a trainable or not 
-        # tf.Variable. To do so, simply set trainable=None as in
-        w=sknet.Variable(encoder.W,trainable=None)
+        # autoencoder, we wish to use the encoder weights inplace,
+        # And not as initialization of a :class:`tf.Variable`.
+        # To do so, set trainable=None as
+        w_t = sknet.Variable(tf.transpose(encoder.W),trainable=None)
+        # this is equivalent to w_t = tf.transpose(encoder.W)
 
     Parameters
     ----------
@@ -362,7 +373,7 @@ class Variable(object):
     var_or_func : tf.Tensor or func
         The :class:`tf.Tensor` or :class:`np.ndarray` to use, or
         the function to use, if a function, it will be given
-        the shape and should return a :class:`tf.Tensor` or 
+        the shape and should return a :class:`tf.Tensor` or
         :class:`np.ndarray`.
 
     trainable : bool or None
@@ -373,40 +384,20 @@ class Variable(object):
         should not be used as an initializer of a :class:`tf.Variable`
         but as the parameter itself (inplace).
     """
-    def __init__(self,var_or_func,trainable=True, name=None):
-
-        self._var_or_func = var_or_func
-        self._trainable   = trainable
-        self._name        = name
-        self._var         = None
-
-    def __call__(self,var_shape):
-        if type(self.trainable)==bool:
-            if callable(self.var_or_func):
-                self._var = tf.Variable(self.var_or_func(var_shape),
-                        name=self.name,trainable=self.trainable)
-            else:
-                self._var = tf.Variable(self.var_or_func,
-                        name=self.name,trainable=self.trainable)
+    def __new__(cls,*args,**kwargs):
+        obj = tf.Variable.__new__(cls)
+        if 'trainable' in kwargs:
+            obj._trainable = kwargs['trainable']
         else:
-            if callable(self.var_or_func):
-                self._var = self.var_or_func(var_shape)
+            if len(args)>1:
+                obj._trainable = args[0]
             else:
-                self._var = self.var_or_func
-        return self.var
+                obj._trainable = True
+        return obj
 
-    @property
-    def var(self):
-        return self._var
-    @property
-    def name(self):
-        return self._name
     @property
     def trainable(self):
         return self._trainable
-    @property
-    def var_or_func(self):
-        return self._var_or_func
 
 
 

@@ -7,4 +7,5 @@ __all__ = [
 
 from . import *
 from .optimizer import *
+from .schedule import *
 

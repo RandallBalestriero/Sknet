@@ -65,6 +65,8 @@ class Dense(Op):
 
     """
     name = 'Dense'
+    deterministic_behavior = False
+
     def __init__(self, incoming, units, W = tfl.xavier_initializer(), 
                 b = tf.zeros, W_func = tf.identity, 
                 b_func = tf.identity, name='',*args, **kwargs):
@@ -77,24 +79,25 @@ class Dense(Op):
             else:
                 self._flatten_input = False
                 flat_dim  = incoming.shape.as_list()[1]
-    
+
             # Initialize W
-            if type(W)!=Variable:
-                W = Variable(W,name='dense_W_'+name)
-            self._W = W((flat_dim,units))
-            self.W  = W_func(self._W)
+            if callable(W):
+                self._W = Variable(W((flat_dim,units)),name='dense_W_'+name)
+            else:
+                self._W = W
+            self.W = W_func(self._W)
+            self.add_param(self._W)
             # Initialize b
             if b is None:
-                self._b = None
                 self.b  = None
-                self._params = [self._W]
             else:
-                if type(b)!=Variable:
-                    b = Variable(b,name='dense_b_'+name)
-                self._b = b((1,units))
+                if callable(b):
+                    self._b = Variable(b((1,units)),name='dense_b_'+name)
+                else:
+                    self._b = b
                 self.b  = b_func(self._b)
-                self._params = [self._W,self._b]
-    
+                self.add_param(self._b)
+
             super().__init__(incoming)
 
     def forward(self, input, *args, **kwargs):
