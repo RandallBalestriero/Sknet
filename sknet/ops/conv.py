@@ -29,7 +29,9 @@ class Conv2D(Op):
                     b_func = tf.identity,*args,**kwargs):
         with tf.variable_scope("Conv2DOp") as scope:
             self.scope_name = scope.original_name_scope
-            self.mode = mode
+            self.mode       = mode
+            self.strides    = strides
+            self.pad        = pad
             if np.isscalar(strides):
                 self.strides = [strides,strides]
             else:
@@ -83,6 +85,10 @@ class Conv2D(Op):
             return Wx
         else:
             return Wx+self.b
+    def backward(self,input):
+        return tf.nn.conv2d_backprop_input(self.input.get_shape().as_list(),
+                filter = self.W, out_backprop = input, strides=self.strides,
+                data_format='NCHW',padding='VALID')
 
 
 

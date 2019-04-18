@@ -39,11 +39,11 @@ class Adam:
         op_v = ema_v.apply(gradients_square)
 
         with tf.control_dependencies([op_m,op_v]):
-            for param, grad, grad_s in zip(params, gradients, gradients_square):
+            for param, grad, grad_s in zip(params,gradients,gradients_square):
                 std  = tf.sqrt(ema_v.average(grad_s)) + epsilon
                 step = learning_rate * a_t * ema_m.average(grad)/std
                 updates.append(tf.assign_sub(param, step))
-    
+
         updates.append(t)
         self.updates = updates
 

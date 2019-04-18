@@ -113,3 +113,6 @@ class BatchNorm(Op):
         self.A = self.W/use_std
         return output
 
+    def backward(self,input):
+        return input*self.A
+

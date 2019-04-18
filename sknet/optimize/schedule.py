@@ -112,7 +112,7 @@ class PiecewiseConstant:
         self.boundaries = list(np.asarray(
                                   list(steps.keys()))[argsort].astype('int32'))
         self.values     = list(np.concatenate([[initial],np.asarray(
-                              list(steps.keys()))[argsort]]).astype('float32'))
+                              list(steps.values()))[argsort]]).astype('float32'))
         self.description = type(self).name+str(initial)\
                                     +str(steps).replace(' ','')
 

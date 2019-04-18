@@ -222,7 +222,7 @@ class RandomCrop(Op):
         indices_W = tf.cast(tf.floor(random_W), tf.int32)
         random_indices = tf.stack([tf.range(N), indices_H, indices_W],1)
         # Deterministic (center) indices
-        center_indices = tf.stack([tf.range(N,dtype=tf.int64), 
+        center_indices = tf.stack([tf.range(N,dtype=tf.int64),
                         tf.fill((N,),self.n_H//2),
                         tf.fill((N,),self.n_W//2)],1)
 
@@ -275,25 +275,24 @@ class RandomAxisReverse(Op):
         the state of the model, can be omited if the layer is not computing
         its output with the constructor
     """
-    def __init__(self, incoming, axis, deterministic=None, **kwargs):
-        super().__init__(incoming, **kwargs)
-        self.output_shape = self.input_shape
+
+    name = 'RandomAxisReverse'
+    deterministic_behavior = True
+
+    def __init__(self, input, axis, deterministic=None, **kwargs):
         if np.isscalar(axis):
             self.axis = [axis]
         else:
             self.axis = axis
+        super().__init__(input,deterministic=deterministic, **kwargs)
 
-        if self.given_input:
-            self.forward(incoming.output,deterministic=deterministic)
-    def forward(self,input=None,deterministic=None,_input=None, **kwargs):
-        prob = tf.random_uniform((self.input_shape[0],))
-        self.to_reverse = tf.less(prob,0.5)
-        if input is None:
-            input = self.incoming.forward(deterministic=deterministic,_input=_input)
-        reverse_input = tf.where(self.to_reverse,
+    def forward(self,input,deterministic, *args, **kwargs):
+        N          = input.get_shape().as_list()[0]
+        prob       = tf.random_uniform((N,))
+        to_reverse = tf.less(prob,0.5)
+        reverse_input = tf.where(to_reverse,
                                 tf.reverse(input,self.axis),input)
-        self.output = tf.cond(deterministic,lambda :input,lambda :reverse_input)
-        return self.output
+        return tf.cond(deterministic,lambda :input, lambda :reverse_input)
 
 
 class RandomRot90(Op):

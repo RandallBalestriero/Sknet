@@ -95,6 +95,8 @@ class Pool(Op):
         else:
             self.VQ = tf.gradients(output,input,tf.ones_like(output))[0]
         return output
+    def backward(self,input):
+        return tf.gradient(self,self.input,input)[0]
 
 
 

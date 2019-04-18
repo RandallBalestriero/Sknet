@@ -165,3 +165,24 @@ class Op(Tensor):
             return []
 
 
+class Identity(Op):
+
+    name = 'Identity'
+    deterministic_behavior = False
+
+    def __init__(self, input):
+        super().__init__(input)
+
+    def forward(self,input,*args,**kwargs):
+        return input
+
+
+
+
+
+
+
+
+
+
+

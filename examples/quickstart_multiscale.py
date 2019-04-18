@@ -53,24 +53,24 @@ dnn.append(layers.Conv2D(dnn[-1],[(64,3,3),{'b':None,'pad':'same'}],[[0,2,3]],
                                             [0.01]))
 dnn.append(my_layer(dnn[-1],[10,{'b':None}],[0],[tf.identity]))
 
-dnn.append(layers.Conv2DPool(dnn[-2],[(192,3,3),{'b':None,'pad':'same'}],[[0,2,3]],
-                                                [0.01],[(1,2,2)]))
+dnn.append(layers.Conv2DPool(dnn[-2],[(192,3,3),{'b':None,'pad':'same'}],
+                                    [[0,2,3]],[0.01],[(1,2,2)]))
 dnn.append(my_layer(dnn[-1],[10,{'b':None}],[0],[tf.identity]))
 
 dnn.append(layers.Conv2D(dnn[-2],[(256,3,3),{'b':None,'pad':'same'}],[[0,2,3]],
                                                 [0.01]))
 dnn.append(my_layer(dnn[-1],[10,{'b':None}],[0],[tf.identity]))
 
-dnn.append(layers.Conv2DPool(dnn[-2],[(512,3,3),{'b':None,'pad':'same'}],[[0,2,3]],
-                                                [0.01],[(1,2,2)]))
+dnn.append(layers.Conv2DPool(dnn[-2],[(512,3,3),{'b':None,'pad':'same'}],
+                                    [[0,2,3]],[0.01],[(1,2,2)]))
 dnn.append(my_layer(dnn[-1],[10,{'b':None}],[0],[tf.identity]))
 
 dnn.append(layers.Conv2D(dnn[-2],[(512,3,3),{'b':None,'pad':'same'}],[[0,2,3]],
                                                 [0.01]))
 dnn.append(my_layer(dnn[-1],[10,{'b':None}],[0],[tf.identity]))
 
-dnn.append(layers.Conv2DPool(dnn[-2],[(712,3,3),{'b':None}],[[0,2,3]],
-                                                [0.01],[(1,2,2)]))
+dnn.append(layers.Conv2D(dnn[-2],[(712,3,3),{'b':None}],[[0,2,3]],
+                                                [0.01]))
 dnn.append(my_layer(dnn[-1],[10,{'b':None}],[0],[tf.identity]))
 
 
@@ -93,7 +93,7 @@ accus = [accuracy(dataset.labels,pred)
 optimizers    = list()
 B             = dataset.N('train_set')//64
 learning_rate = sknet.optimize.PiecewiseConstant(0.01,
-                                    {80*B:0.005,120*B:0.001,160*B:0.0001})
+                                    {100*B:0.005,200*B:0.001,300*B:0.0001})
 
 for i,l in enumerate(losses):
     optimizers.append(Adam(l,learning_rate,params=dnn[i*2+1:(i+1)*2+1].params))
@@ -122,20 +122,8 @@ queue1 = sknet.Queue((min1+loss1,accus1.alter(context='valid_set'),accus1))
 #---------
 workplace = sknet.utils.Workplace(dnn,dataset=dataset)
 
-workplace.execute_queue(queue1,repeat=200)
+workplace.execute_queue(queue1,repeat=400, filename='test123.h5',save_period=50)
 
-predictions = pred1.data[-1]
-
-
-#for i in range(5):
-#    fig = plt.figure(figsize=(12,4))
-#    ax  = fig.gca(projection='3d')
-#    ax.plot_trisurf(predictions[::16,0], predictions[::16,1], 
-#                predictions[::16,2+i],antialiased=True)
-
-#    ax.set_title(str(i))
-
-plt.show()
 
 
 #sknet.to_file(output,'test.h5','w')
