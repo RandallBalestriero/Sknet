@@ -13,9 +13,9 @@ from ..utils import to_one_hot, DownloadProgressBar
 
 from . import Dataset
 
-def load_DCLDE(subsample=1,PATH=None):
+def load_DCLDE(window_size=441000,PATH=None):
     """ToDo
-"""
+    """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
     dict_init = [('sampling_rate',44100),("n_classes",2),("path",PATH),
@@ -40,16 +40,18 @@ def load_DCLDE(subsample=1,PATH=None):
     # Loading the files
     f       = zipfile.ZipFile(PATH+'DCLDE/DCLDE_LF_Dev.zip')
     wavs    = list()
-    labels  = list()
+#    labels  = list()
     for zipf in tqdm(f.filelist,ascii=True):
-        if '.wav' in zipf.filename:
+        if '.wav' in zipf.filename and '.d100.' in zipf.filename:
             wavfile   = f.read(zipf)
             byt       = io.BytesIO(wavfile)
-            wavs.append(wav_read(byt)[1].astype('float32')[::subsample])
-            labels.append(zipf.filename.split('/')[2])
-    return wavs,labels
-    dataset.add_variable({'signals':{'train_set':wavs},
-                        'labels':{'train_set':labels}})
+            wav       = wav_read(byt)[1].astype('float32')
+            for s in range(len(wav)//window_size):
+                wavs.append(wav[s*window_size:(s+1)*window_size])
+#            labels.append(zipf.filename.split('/')[2])
+#    return wavs,labels
+    wavs = np.expand_dims(np.asarray(wavs),1)
+    dataset.add_variable({'signals':{'train_set':wavs}})
 
     print('Dataset freefield1010 loaded in','{0:.2f}'.format(time.time()-t),'s.')
     return dataset

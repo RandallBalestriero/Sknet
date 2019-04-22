@@ -153,7 +153,10 @@ class Layer(Tensor):
 
         # initialize the Layer as a tf Variable
         super().__init__(self._inner_ops[-1])
-
+    def backward(self,input):
+        for op in self.inner_ops[::-1]:
+            input = op.backward(op)
+        return input
     @property
     def inner_ops(self):
         return self._inner_ops

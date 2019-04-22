@@ -142,6 +142,41 @@ class Activation(Op):
 
 
 
+class Inverse(Op):
+    """Inverse (backward) operator.
+    This operator implements the backward operator given a layer to
+    invert and the tensor to feed backward. The inverse term is often
+    coined in deep learning even though this simply corresponds to
+    standard backpropagation and not an actual inverse operator.
+    This operator is usefull when using deconvolutional or other type
+    of decoder layers with tied weights w.r.t. theur encoder counterparts.
+
+    Parameters
+    ----------
+
+    op_or_layer : sknet.Op or sknet.Layer
+        the operator or layer to backprop through
+
+    input : tf.Tensor or sknet.Op or sknet.Layer
+        the input to be backpropagated through the derived
+        formula obtained form the op_or_layer
+    """
+    name='Inverse'
+    deterministic_behavior=False
+    def __init__(self,op_or_layer, input, **kwargs):
+        self.op_or_layer = op_or_layer
+        super().__init__(input, **kwargs)
+    def forward(self,input,**kwargs):
+        # if the operator or layer to revert has an implemented
+        # backward operator, use it, otherwise
+        # use the gradient of it w.r.t. its input.
+        # No need to worry about this here as it is already
+        # taken care of in the op and layer methods
+        return self.op_or_layer.backward(input)
+
+
+
+
 
 class Identity(Op):
     """identity layer leaving its input intact

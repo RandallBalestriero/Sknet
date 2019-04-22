@@ -135,7 +135,7 @@ class SplineWaveletTransform(Op):
     deterministic_behavior = False
     name = 'SplineWaveletTransform'
 
-    def __init__(self, input, J, Q, K, strides=1, init='gabor',
+    def __init__(self, input, J, Q, K, strides=8, init='random',
                  trainable_scales=True, trainable_knots=True,
                  trainable_filter=True, hilbert=False, m=None,
                  p=None, padding='valid',n_conv=1, **kwargs):
@@ -201,7 +201,7 @@ class SplineWaveletTransform(Op):
             print(out_c//2)
             modulus    = tf.sqrt(tf.square(conv[:,:out_c])
                                         +tf.square(conv[:,out_c:]))
-            new_shape  = input_shape[:-1]+[out_c,input_shape[-1]]
+            new_shape  = input_shape[:-1]+[out_c,input_shape[-1]//self.strides]
             outputs.append(tf.reshape(modulus,new_shape))
         if len(self.W)>1:
             output = tf.concat(outputs,-2)
@@ -226,8 +226,8 @@ class SplineWaveletTransform(Op):
                 p_real = np.zeros(self.K)
                 p_imag = np.cos(np.arange(self.K) * np.pi)*window
             elif init=='random':
-                m_real = np.random.randn(self.K)/sqrt(self.K)
-                m_imag = np.random.randn(self.K)/sqrt(self.K)
+                m_real = np.random.randn(self.K)/np.sqrt(self.K)
+                m_imag = np.random.randn(self.K)/np.sqrt(self.K)
                 p_real = np.random.randn(self.K)
                 p_imag = np.random.randn(self.K)
             m = np.stack([m_real,m_imag]).astype('float32')

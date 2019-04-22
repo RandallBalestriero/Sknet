@@ -145,7 +145,8 @@ class Op(Tensor):
         if hasattr(param,'trainable'):
             if param.trainable:
                 self._params.append(param)
-
+    def backward(self,input):
+        return tf.gradients(self,self.input,input)[0]
     @property
     def input(self):
         return self._input
@@ -156,7 +157,6 @@ class Op(Tensor):
             return self._params
         else:
             return []
-
     @property
     def updates(self):
         if hasattr(self,'_updates'):
