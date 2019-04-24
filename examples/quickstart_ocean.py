@@ -25,6 +25,12 @@ from sknet import ops,layers
 
 dataset = sknet.dataset.load_DCLDE(window_size=1024*100)
 dataset['signals']['train_set']/=dataset['signals']['train_set'].max()
+
+for signal in dataset['signals']['train_set']:
+    plot(signal)
+    show()
+
+
 print(dataset['signals']['train_set'])
 dataset.split_set("train_set","test_set",0.20)
 #dataset.preprocess(sknet.dataset.Standardize,data="images",axis=[0])

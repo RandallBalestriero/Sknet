@@ -26,6 +26,10 @@ class Network:
                         couple.append((d,value))
         return dict(couple)
     @property
+    def shape(self):
+        s = [i.get_shape().as_list() for i in self]
+        return s
+    @property
     def params(self):
         params = []
         for layer in self.layers:

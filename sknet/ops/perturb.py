@@ -23,19 +23,16 @@ class Dropout(Op):
         the probability to keep the input values
 
     """
-    def __init__(self, incoming, p=0.5, deterministic=None, **kwargs):
-        super().__init__(incoming, **kwargs)
-
-        # Set attributes
+    def __init__(self, incoming, p=0.5, deterministic=None,seed=None,
+                     **kwargs):
+        self.seed = seed
         assert(np.isscalar(p))
         self.p = p
-        if self.given_input:
-            self.forward(incoming.output,deterministic=deterministic)
-    def forward(self,input=None, deterministic=None, _input=None, **kwargs):
+        super().__init__(incoming, **kwargs)
+
+    def forward(self,input=None, deterministic=None,**kwargs):
         # Random indices
-        if input is None:
-            input = self.incoming.forward(deterministic=deterministic,_input=_input)
-        random_values = tf.random_uniform(self.input_shape)
+        random_values = tf.random_uniform(self.input_shape,seed=self.seed)
         mask          = tf.cast(tf.less(random_values,self.p),input.dtype)
         self.output = tf.cond(deterministic,lambda :input,lambda :mask*input)
         return self.output
@@ -45,7 +42,7 @@ class UniformNoise(Op):
     """Applies an additive or multiplicative Uniform noise to the input
 
     This layer applies an additive or multiplicative perturbation
-    on its input by means of a Gaussian random variable. Each value
+    on its input by means of a Uniform random variable. Each value
     of the mask is sampled from a Normal distribution
     :math:`\mathcal{U}(lower,upper)` where :math:`lower` and
     :math:`upper` are the bounds of the uniform distirbution
@@ -131,31 +128,26 @@ class GaussianNoise(Op):
     deterministic_behavior = True
 
     def __init__(self, incoming, noise_type="additive", mu = np.float32(0),
-            sigma = np.float32(1), deterministic=None, **kwargs):
+            sigma = np.float32(1), deterministic=None, seed=None, **kwargs):
         """init
         """
-        super().__init__(incoming, **kwargs)
 
         # Set attributes
+        self.seed       = seed
         self.mu         = mu
         self.sigma      = sigma
         self.noise_type = noise_type
-        if self.given_input:
-            self.forward(incoming.output,deterministic=deterministic)
-    def forward(self,input=None, deterministic=None, _input=None, **kwargs):
+        super().__init__(incoming, **kwargs)
+
+    def forward(self,input, deterministic, **kwargs):
         # Random indices
-        random_values = tf.random_normal(self.input_shape)*self.sigma+self.mu
-        if input is None:
-            input = self.incoming.forward(deterministic=deterministic,_input=_input)
+        random_values = tf.random_normal(input.get_shape().as_list(),
+                      seed=self.seed)*self.sigma+self.mu
         if self.noise_type=="additive":
             output = input+random_values
         elif self.noise_type=="multiplicative":
             output = input*random_values
-        else:
-            print('error')
-            exit()
-        self.output = tf.cond(deterministic,lambda :input,lambda :output)
-        return self.output
+        return tf.cond(deterministic,lambda :input,lambda :output)
 
 
 
@@ -192,10 +184,12 @@ class RandomCrop(Op):
     name = 'RandomCrop'
     deterministic_behavior = True
 
-    def __init__(self, input, crop_shape, deterministic=None, **kwargs):
+    def __init__(self, input, crop_shape, deterministic=None,seed=None,
+                                 **kwargs):
         """init
         """
         # Set attributes
+        self.seed = seed
         if np.isscalar(crop_shape):
             self.crop_shape = [crop_shape,crop_shape]
         else:
@@ -216,8 +210,10 @@ class RandomCrop(Op):
 
         # Random indices
         N,C,H,W = input.get_shape().as_list()
-        random_H = tf.random_uniform((N,),maxval=np.float32(self.n_H))
-        random_W = tf.random_uniform((N,),maxval=np.float32(self.n_W))
+        random_H = tf.random_uniform((N,),maxval=np.float32(self.n_H),
+                                                seed=self.seed)
+        random_W = tf.random_uniform((N,),maxval=np.float32(self.n_W),
+                          seed=self.seed+1 if self.seed is not None else None)
         indices_H = tf.cast(tf.floor(random_H), tf.int32)
         indices_W = tf.cast(tf.floor(random_W), tf.int32)
         random_indices = tf.stack([tf.range(N), indices_H, indices_W],1)
@@ -279,16 +275,17 @@ class RandomAxisReverse(Op):
     name = 'RandomAxisReverse'
     deterministic_behavior = True
 
-    def __init__(self, input, axis, deterministic=None, **kwargs):
+    def __init__(self, input, axis, deterministic=None,seed=None, **kwargs):
         if np.isscalar(axis):
             self.axis = [axis]
         else:
             self.axis = axis
+        self.seed = seed
         super().__init__(input,deterministic=deterministic, **kwargs)
 
     def forward(self,input,deterministic, *args, **kwargs):
         N          = input.get_shape().as_list()[0]
-        prob       = tf.random_uniform((N,))
+        prob       = tf.random_uniform((N,),seed=self.seed)
         to_reverse = tf.less(prob,0.5)
         reverse_input = tf.where(to_reverse,
                                 tf.reverse(input,self.axis),input)
@@ -308,11 +305,10 @@ class RandomRot90(Op):
                      None in most cases
     :type deterministic: tf.bool
     """
-    def __init__(self, incoming, deterministic=None, **kwargs):
-        super().__init__(incoming, **kwargs)
+    def __init__(self, incoming, deterministic=None,seed=None, **kwargs):
         self.output_shape = self.input_shape
-        if self.given_input:
-            self.forward(incoming.output,deterministic=deterministic)
+        self.seed = seed
+        super().__init__(incoming, **kwargs)
     def forward(self,input=None,deterministic=None,_input=None, **kwargs):
         prob = tf.random_uniform((self.input_shape[0],),maxval=np.float32(3))
         self.rot_left = tf.less(prob,1)

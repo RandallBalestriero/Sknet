@@ -45,11 +45,12 @@ class Pool(Op):
     deterministic_behavior = False
 
     def __init__(self, incoming, window_shape, strides=None, pool_type='MAX',
-                    padding='VALID', *args, **kwargs):
+                    padding='VALID', keep_dims=True,*args, **kwargs):
         with tf.variable_scope("Pool") as scope:
             self.scope_name = scope.original_name_scope
             self.pool_type = pool_type
             self.padding   = padding
+            self.keep_dims = keep_dims
             assert(len(window_shape)==len(incoming.shape)-1)
             if strides is None:
                 strides = window_shape
@@ -94,7 +95,10 @@ class Pool(Op):
             self.VQ = None
         else:
             self.VQ = tf.gradients(output,input,tf.ones_like(output))[0]
-        return output
+        if self.keep_dims:
+            return output
+        else:
+            return tf.squeeze(output,axis=self.total_axis)
     def backward(self,input):
         return tf.gradient(self,self.input,input)[0]
 

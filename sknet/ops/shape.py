@@ -70,21 +70,18 @@ class Concat(Op):
     :param axis: the axis to concatenate over with
     :type axis: int
     """
+    name = 'Concat'
+    deterministic_behavior = False
     def __init__(self,incomings,axis,**kwargs):
-        super().__init__(incomings[0])
         N              = len(incomings)
-        self.incomings = incomings
-        self.out_shape = [s if i not in axis else N*s for i,s in enumerate(self.in_shape)]
         self.axis      = axis
-        self.concat    = lambda xs:tf.concat(xs,axis)
-        if self.given_input:
-            self.forward([incoming.output for incoming in incomings])
-    def forward(self,inputs=None, training=None, **kwargs):
-        if inputs is None:
-            inputs = [incoming.forward(training=training) 
-                            for incoming in self.incomings]
-        self.output = self.concat(inputs)
-        return self.output
+        self.incomings = incomings
+        sh_in          = incomings[0].get_shape().as_list()
+        self.out_shape = [s if i!=self.axis else N*s
+                                for i,s in enumerate(sh_in)]
+        super().__init__(incomings)
+    def forward(self,inputs, *args, **kwargs):
+        return tf.concat(inputs,axis=self.axis)
 
 
 

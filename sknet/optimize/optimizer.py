@@ -19,7 +19,6 @@ class Adam:
             gradients = loss_or_grads
         else:
             gradients = tf.gradients(loss_or_grads,params)
-
         # Perform Adam
         t_prev  = tf.Variable(np.int32(0), trainable=False, name='t_Adam')
         updates = list()

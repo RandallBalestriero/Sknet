@@ -2,10 +2,9 @@
 # -*- coding: utf-8 -*-
 
 
-__all__ = [
-    'cnn']
 
 from .base import *
+from .cnn import *
 from . import *
 
 
