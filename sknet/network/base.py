@@ -36,6 +36,9 @@ class Network:
             params+=layer.params
         return params
     @property
+    def parameters(self):
+        return self.params
+    @property
     def updates(self):
         updates = []
         for layer in self.layers:

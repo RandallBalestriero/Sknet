@@ -51,11 +51,11 @@ class Layer(Tensor):
     pass any arbitrary function to be applied onto any of the variables of the
     layer, the only requirements is that the induces parameter has the required
     shape for the forward pass. For example, if one simply wants to impose
-    nonnegative weights for the slope of a :py:class:`sknet.layer.Dense` 
+    nonnegative weights for the slope of a :py:class:`sknet.layer.Dense`
     layer ::
-    
-        layer = sknet.layer.Dense(previous_layer,units=20, W_func=tf.nn.relu) 
-        
+
+        layer = sknet.layer.Dense(previous_layer,units=20, W_func=tf.nn.relu)
+
     or with a more conventional case of imposing unit
     norm (exact, not as a penalty) to the weights ::
 
@@ -68,7 +68,7 @@ class Layer(Tensor):
     The _variables are initialized by the layer based on the values given
     for :py:data:`W` and :py:data:`b` during initialization or created is
     none is passed. In ALL cases, if
-    the passed argument is an actual variable with values, s.a. a 
+    the passed argument is an actual variable with values, s.a. a
     :py:class:`np.ndarray`, a :py:class:`tf.Tensor` etc, then it is considered
     as a given value and not an initialization to the learnable parameter. If a
     function is given, then the constructor calls it with the shape of the
@@ -82,7 +82,7 @@ class Layer(Tensor):
         # Random normal weights that won't be learned, the passed value
         # is used as the actual parameter without any transformation
         sknet.layer.Dense(previous_layer,units=10,W=tf.random_normal((764,10)))
-        # this allow to use the following case where one pre-determines a 
+        # this allow to use the following case where one pre-determines a
         # special form for the weights, and thus do not want this to be used
         # just as an initializer of a tf.Variable, but the actual weights to
         # be used by the layer
@@ -126,7 +126,7 @@ class Layer(Tensor):
 
     """
     def __init__(self, input, *args,deterministic=None):
-        
+
         # Link this tensor to its input
         self._input = input
         ops         = type(self)._ops
@@ -146,7 +146,7 @@ class Layer(Tensor):
 
         # set deterministic
         if deterministic is None:
-            self._deterministic = [op.deterministic 
+            self._deterministic = [op.deterministic
                     for op in self._inner_ops if hasattr(op,'deterministic')]
         else:
             self._deterministic = [deterministic]
@@ -172,6 +172,9 @@ class Layer(Tensor):
         for op in self.inner_ops:
             params+=op.params
         return params
+    @property
+    def parameters(self):
+        return self.params
     @property
     def updates(self):
         updates = []

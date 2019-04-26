@@ -7,31 +7,6 @@ import tensorflow as tf
 from .. import Tensor
 
 
-class l2_norm(Tensor):
-    """Cross entropy loss given that :math:`p` is sparse and
-    :math:`q` is the log-probability.
-
-    The formal definition given that :math:`p` is now an
-    index (of the Dirac) s.a. :math:`p\in \{1,\dots,D\}`
-    and :math:`q` is unormalized (log-proba)
-    is given by (for discrete variables)
-
-    .. math::
-        \mathcal{L}(p,q)=-q_{p}+\log(\sum_{d=1}^D \exp(q_d))
-    .. math::
-        \mathcal{L}(p,q)=-q_{p}+LogSumExp(q)
-    .. math::
-        \mathcal{L}(p,q)=-q_{p}+LogSumExp(q-\max_{d}q_d)
-
-    with :math:`p` the class index and :math:`q` the predicted one
-    (output of the network). This class takes two non sparse
-    vectors which should be nonnegative and sum to one.
-    """
-    def __init__(self,tensor):
-        loss = tf.nn.l2_loss(tensor)*2
-
-        super().__init__(loss)
-
 
 def MSE(target,prediction):
     N = np.float32(np.prod(target.shape.as_list()))
@@ -119,5 +94,4 @@ def accuracy(labels,predictions):
 
 
 
-      
 

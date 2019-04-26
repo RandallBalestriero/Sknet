@@ -33,9 +33,9 @@ class Conv2D(Op):
             self.strides    = strides
             self.pad        = pad
             if np.isscalar(strides):
-                self.strides = [strides,strides]
+                self.strides = [1,1,strides,strides]
             else:
-                self.strides = strides
+                self.strides = [1,1]+list(strides)
 
             # Define the padding function
             if pad=='valid' or (filters[1]==1 and filters[2]==1):
@@ -61,9 +61,9 @@ class Conv2D(Op):
 
             # Initialize b
             if b is None:
-                self._b  = 0
+                self._b  = None
             elif callable(b):
-                self._b = Variable(b((1,filters[0],1,1)),
+                self._b = Variable(b((filters[0],1,1)),
                                         name='conv2dlayer_b_'+name)
             else:
                 self._b = b
@@ -78,9 +78,8 @@ class Conv2D(Op):
                                 [self.p[1]]*2],mode=self.mode)
         else:
             padded = input
-        Wx = tf.nn.conv2d(padded,self.W,
-                strides=[1,self.strides[0],self.strides[1],1],padding='VALID',
-                data_format="NCHW")
+        Wx = tf.nn.conv2d(padded, self.W, strides=self.strides,
+                padding='VALID', data_format="NCHW")
         if self.b is None:
             return Wx
         else:

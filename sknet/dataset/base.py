@@ -34,42 +34,43 @@ class Dataset(dict):
         self.iterators  = iterators_dict
         self.init_dict  = dict()
         with tf.device(device):
-            self.current_set  = tf.Variable(np.int64(0),trainable=False,
-                                        name='current_set')
-            self.current_set_ = tf.placeholder(tf.int64,
-                                        name='current_set_ph')
-            self.assign_set = tf.assign(self.current_set,self.current_set_)
-            # Initialize iterators
-            for context in sets:
-                self.iterators[context].set_N(self.N(context))
-                self.iterators[context].set_batch_size(batch_size)
-            #
-            self.tf_variables = dict()
-            for varn in self.variables:
-                # ensure that there is not already a member with this name
-                assert(varn not in self.__dict__)
-                self.tf_variables[varn] = dict()
-                pairs = list()
-                for s in sets:
-                    # cast also to int64 for GPU support
-                    if self.dtype(varn)=='int32':
-                        hold = tf.placeholder('int64',shape=self[varn][s].shape,
-                                        name = varn+'_'+s+'_holder')
-                        var  = tf.Variable(hold,trainable=False)
-                        self.init_dict[hold]       = self[varn][s]
-                        self.tf_variables[varn][s] = (hold,var)
-                        batch = tf.cast(tf.gather(tf.cast(var,tf.float32),
-                                    self.iterators[s].i),tf.int32)
-                    else:
-                        hold  = tf.placeholder(self.dtype(varn),
-                                shape=self[varn][s].shape,name = varn+s+'holder')
-                        var   = tf.Variable(hold,trainable=False)
-                        self.init_dict[hold]      = self[varn][s]
-                        self.tf_variables[varn][s]=(hold,var)
-                        batch = tf.gather(var,self.iterators[s].i)
-                    pairs.append(tf.placeholder_with_default(batch,batch.shape))
-
-                self.__dict__[varn] = case(self.current_set,pairs)
+            with tf.variable_scope("dataset") as scope:
+                self.current_set  = tf.Variable(np.int64(0),trainable=False,
+                                            name='current_set')
+                self.current_set_ = tf.placeholder(tf.int64,
+                                            name='current_set_ph')
+                self.assign_set = tf.assign(self.current_set,self.current_set_)
+                # Initialize iterators
+                for context in sets:
+                    self.iterators[context].set_N(self.N(context))
+                    self.iterators[context].set_batch_size(batch_size)
+                #
+                self.tf_variables = dict()
+                for varn in self.variables:
+                    # ensure that there is not already a member with this name
+                    assert(varn not in self.__dict__)
+                    self.tf_variables[varn] = dict()
+                    pairs = list()
+                    for s in sets:
+                        # cast also to int64 for GPU support
+                        if self.dtype(varn)=='int32':
+                            hold = tf.placeholder('int64',shape=self[varn][s].shape,
+                                            name = varn+'_'+s+'_holder')
+                            var  = tf.Variable(hold,trainable=False)
+                            self.init_dict[hold]       = self[varn][s]
+                            self.tf_variables[varn][s] = (hold,var)
+                            batch = tf.cast(tf.gather(tf.cast(var,tf.float32),
+                                        self.iterators[s].i),tf.int32)
+                        else:
+                            hold  = tf.placeholder(self.dtype(varn),
+                                    shape=self[varn][s].shape,name = varn+s+'holder')
+                            var   = tf.Variable(hold,trainable=False)
+                            self.init_dict[hold]      = self[varn][s]
+                            self.tf_variables[varn][s]=(hold,var)
+                            batch = tf.gather(var,self.iterators[s].i)
+                        pairs.append(tf.placeholder_with_default(batch,batch.shape))
+    
+                    self.__dict__[varn] = case(self.current_set,pairs)
 
     def preprocess(self,method,data,fitting_sets="train_set",
                         inplace=True, **kwargs):
@@ -109,6 +110,8 @@ class Dataset(dict):
             for key in self[data].keys():
                 self[data][key]=self.preprocessing.transform(self[data][key])
     def split_set(self,set_,new_set_,ratio, stratify = None):
+        if new_set_ in self[self.variables[0]]:
+            error
         variables = self.variables
         if stratify is not None:
             assert(len(y)>1)

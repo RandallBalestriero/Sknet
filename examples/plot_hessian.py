@@ -13,7 +13,7 @@ for epsilon in ['0.01','0.1']:
         hessian = list()
         for i in f['test_set/accu']:
             if 'descr' not in i:
-                accu.append(f['test_set/accu/'+i][...])
+                accu.append(f['test_set/accu/'+i][...][1::2])
         for i in f['train_set/loss']:
             if 'descr' not in i:
                 loss.append(f['train_set/loss/'+i][...][:,0])

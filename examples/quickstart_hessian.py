@@ -27,7 +27,6 @@ import matplotlib.pyplot as plt
 # Data Loading
 #-------------
 dataset = sknet.dataset.load_cifar10()
-dataset.split_set("train_set","test_set",0.25)
 dataset.split_set("train_set","valid_set",0.15)
 
 dataset.preprocess(sknet.dataset.Standardize,data="images",axis=[0])

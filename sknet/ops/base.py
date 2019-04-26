@@ -140,6 +140,8 @@ class Op(Tensor):
         super().__init__(output)
 
     def add_param(self,param):
+        if param is None:
+            return
         if not hasattr(self,'_params'):
             self._params = []
         if hasattr(param,'trainable'):
@@ -157,6 +159,9 @@ class Op(Tensor):
             return self._params
         else:
             return []
+    @property
+    def parameters(self):
+        return self.params
     @property
     def updates(self):
         if hasattr(self,'_updates'):

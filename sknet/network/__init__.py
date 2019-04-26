@@ -5,6 +5,7 @@
 
 from .base import *
 from .cnn import *
+from .resnet import *
 from . import *
 
 

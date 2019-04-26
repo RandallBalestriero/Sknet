@@ -87,13 +87,13 @@ class Circle:
 
 
 
-def get_input_space_partition(states,N,M):
+def get_input_space_partition(states,N,M,duplicate=1):
     #the following should take as input a collection of points
     #in the input space and return a list of binary states, each 
     #element of the list is for 1 specific layer and it is a 2D array
     if states.ndim>1:
         states = states2values(states)
-    partitioning  = grad(states.reshape((N,M)))
+    partitioning  = grad(states.reshape((N,M)).astype('float32'),duplicate)
     return partitioning
 
 

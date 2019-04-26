@@ -112,16 +112,14 @@ class Merge(Op):
                  :py:data:`"AVG"`, :py:data:`"SUM"`
     :type func: func or str
     """
+    name = 'Merge'
+    deterministic_behavior = False
     def __init__(self,incomings,func,**kwargs):
-        super().__init__(incomings)
         self.func      = func
         self.N         = len(incomings)
-        if self.given_input:
-            self.forward([incoming.output for incoming in incomings])
-    def forward(self,inputs=None, training=None, **kwargs):
-#        if inputs is None:
-#            inputs = [incoming.forward(training=training) 
-#                            for incoming in self.incomings]
+        super().__init__(incomings)
+
+    def forward(self,inputs, *args, **kwargs):
         if type(self.func)==str:
             if self.func=='SUM':
                 return tf.add_n(inputs)

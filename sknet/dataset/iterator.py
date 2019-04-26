@@ -18,12 +18,13 @@ class BatchIterator:
     def __init__(self,sampling="continuous"):
         self.sampling = sampling
     def set_batch_size(self,bs):
-        self.batch_size = bs
-        self.i    = tf.Variable(np.zeros(bs).astype('int64'),trainable=False,
-                                    name='batchiterator')
-        self.i_   = tf.placeholder(tf.int64,shape=(bs,),
+        with tf.variable_scope("iterator") as scope:
+            self.batch_size = bs
+            self.i    = tf.Variable(np.zeros(bs).astype('int64'),
+                    trainable=False, name='batchiterator')
+            self.i_   = tf.placeholder(tf.int64,shape=(bs,),
                                     name='batchiterator_holder')
-        self.i_op = tf.assign(self.i,self.i_)
+            self.i_op = tf.assign(self.i,self.i_)
     def set_N(self,N):
         self.N = N
         self.reset()

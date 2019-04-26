@@ -10,8 +10,7 @@ class Conv2D(Layer):
     _ops = [ops.Conv2D,ops.BatchNorm,ops.Activation]
 
 class Conv2DPool(Layer):
-    _ops = [ops.Conv2D,ops.BatchNorm,ops.Activation,ops.Pool]
-
+    _ops = [ops.Conv2D,ops.BatchNorm,ops.Activation,ops.Pool2D]
 
 
 

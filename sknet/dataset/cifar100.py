@@ -55,7 +55,7 @@ def load_cifar100(PATH=None):
         
     print('Loading cifar100')
                 
-    t = time.time()
+    t0 = time.time()
 
     if not os.path.isdir(PATH+'cifar100'):
         print('\tCreating cifar100 Directory')
@@ -85,12 +85,12 @@ def load_cifar100(PATH=None):
                     np.array(data_dic['coarse_labels']),
                     np.array(data_dic['fine_labels'])]
 
-    dataset.add_variable({'images':{'train_set':train_set[0],
-                                    'test_set':test_set[0]},
-                        'labels':{'train_set':train_set[2],
-                                    'test_set':test_set[2]},
+    dataset.add_variable({'images':{'train_set':train_set[0].astype('float32'),
+                                    'test_set':test_set[0].astype('float32')},
+                        'labels':{'train_set':train_set[2].astype('int32'),
+                                    'test_set':test_set[2].astype('int32')},
                         'coarse_labels':{'train_set':train_set[1],
                                         'test_set':test_set[1]}})
 
-    print('Dataset cifar100 loaded in','{0:.2f}'.format(time.time()-t),'s.')
+    print('Dataset cifar100 loaded in','{0:.2f}'.format(time.time()-t0),'s.')
     return dataset

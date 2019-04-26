@@ -7,6 +7,152 @@ from . import Op
 # ToDo: PoolOp: optimize s.t. if it is just channel pooling you dont reshape
 
 
+class GlobalPool2D(Op):
+    """Pooling layer over spatial and/or channel dimensions.
+
+    Example of use::
+
+        # (3,3) max pooling with (3,3) stride
+        # All ther below are equivalent
+        PoolOp(previous_layer, window=(3,3), stride=(3,3))
+        PoolOp(previous_layer, window=(3,3))
+        PoolOp(previous_layer, window=(1,3,3), stride=(1,3,3))
+        PoolOp(previous_layer, window=(1,3,3))
+        # Channel pooling (only)
+        PoolOp(previous_layer, window=(4,1,1))
+        # Channel (with overlap) and Spatial Pooling
+        PoolOp(previous_layer, window=(4,2,2), stride=(2,2,2))
+
+
+    Each output position :math:'[z]_{n,i,j,c}' results form pooling 
+    over the corresponding region in the input
+
+    Parameters
+    ----------
+
+    incoming : tf.Tensor or sknet.Op
+        The incoming tensor or layer instance
+
+    window : list of int
+        The size of the pooling window
+
+    stride : list of int (default=window)
+        The stride of the pooling
+
+    """
+
+    name = 'GlobalPool2D'
+    deterministic_behavior = False
+
+    def __init__(self, incoming, pool_type='AVG',
+                            keepdims=False,*args, **kwargs):
+        with tf.variable_scope("Pool") as scope:
+            self.scope_name = scope.original_name_scope
+            self.pool_type = pool_type
+            self.keepdims = keepdims
+            super().__init__(incoming)
+
+    def forward(self, input, *args, **kwargs):
+        # This is the standard spatial pooling case
+        if self.pool_type=='AVG':
+            return tf.reduce_mean(input,[2,3],keepdims=self.keepdims)
+        elif self.pool_type=='MAX':
+            return tf.reduce_max(input,[2,3],keepdims=self.keepdims)
+        else:
+            return self.pool_type(input)
+    def backward(self,input):
+        return tf.gradient(self,self.input,input)[0]
+
+
+
+class Pool2D(Op):
+    """Pooling layer over spatial and/or channel dimensions.
+        
+    Example of use::
+
+        # (3,3) max pooling with (3,3) stride
+        # All ther below are equivalent
+        PoolOp(previous_layer, window=(3,3), stride=(3,3))
+        PoolOp(previous_layer, window=(3,3))
+        PoolOp(previous_layer, window=(1,3,3), stride=(1,3,3))
+        PoolOp(previous_layer, window=(1,3,3))
+        # Channel pooling (only)
+        PoolOp(previous_layer, window=(4,1,1))
+        # Channel (with overlap) and Spatial Pooling
+        PoolOp(previous_layer, window=(4,2,2), stride=(2,2,2))
+
+
+    Each output position :math:'[z]_{n,i,j,c}' results form pooling 
+    over the corresponding region in the input
+
+    Parameters
+    ----------
+
+    incoming : tf.Tensor or sknet.Op
+        The incoming tensor or layer instance
+
+    window : list of int
+        The size of the pooling window
+
+    stride : list of int (default=window)
+        The stride of the pooling
+
+    """
+
+    name = 'Pool'
+    deterministic_behavior = False
+
+    def __init__(self, incoming, window_shape, strides=None, pool_type='MAX',
+                    padding='VALID', keepdims=True,*args, **kwargs):
+        with tf.variable_scope("Pool") as scope:
+            self.scope_name = scope.original_name_scope
+            self.pool_type = pool_type
+            self.padding   = padding
+            self.keepdims = keepdims
+            assert(len(window_shape)==len(incoming.shape)-2)
+            if strides is None:
+                strides = window_shape
+            strides = list(strides)
+            for i,w in enumerate(window_shape):
+                if w==-1:
+                    strides[i]=1
+            # DO THE CASES WHERE -1 IS PRESENT
+            self.total_axis = [i+2 for i,w in enumerate(window_shape) if w==-1]
+            self.total      = len(self.total_axis)>0
+            if self.total:
+                self.total_func = tf.reduce_mean if pool_type=="AVG" else tf.reduce_max
+                self.window_shape = [1 if i in self.total_axis else w for
+                                            i,w in enumerate(window_shape)]
+                self.strides = [1 if i in self.total_axis else w for
+                                            i,w in enumerate(strides)]
+            else:
+                self.window_shape = window_shape
+                self.strides      = strides
+            super().__init__(incoming)
+
+    def forward(self,input,*args,**kwargs):
+        # This is the standard spatial pooling case
+        if self.total:
+            input = self.total_func(input,axis=self.total_axis,keepdims=True)
+        # pooling also occurs on channel axis
+        output = tf.nn.pool(input,window_shape=self.window_shape,
+                    strides=self.strides, pooling_type=self.pool_type,
+                    padding=self.padding, data_format='NCHW')
+
+        # Set-up the the VQ
+        if self.pool_type=='AVG':
+            self.VQ = None
+        else:
+            self.VQ = tf.gradients(output,input,tf.ones_like(output))[0]
+        if self.keepdims:
+            return output
+        else:
+            return tf.squeeze(output,axis=self.total_axis)
+    def backward(self,input):
+        return tf.gradient(self,self.input,input)[0]
+
+
+
 class Pool(Op):
     """Pooling layer over spatial and/or channel dimensions.
         
@@ -45,12 +191,12 @@ class Pool(Op):
     deterministic_behavior = False
 
     def __init__(self, incoming, window_shape, strides=None, pool_type='MAX',
-                    padding='VALID', keep_dims=True,*args, **kwargs):
+                    padding='VALID', keepdims=True,*args, **kwargs):
         with tf.variable_scope("Pool") as scope:
             self.scope_name = scope.original_name_scope
             self.pool_type = pool_type
             self.padding   = padding
-            self.keep_dims = keep_dims
+            self.keepdims = keepdims
             assert(len(window_shape)==len(incoming.shape)-1)
             if strides is None:
                 strides = window_shape
@@ -59,7 +205,7 @@ class Pool(Op):
                     if w==-1:
                         assert(strides[i]==1)
             # DO THE CASES WHERE -1 IS PRESENT
-            self.total_axis = [i for i,w in enumerate(window_shape) if w==-1]
+            self.total_axis = [i+1 for i,w in enumerate(window_shape) if w==-1]
             self.total      = len(self.total_axis)>0
             if self.total:
                 self.total_func = tf.reduce_mean if pool_type=="AVG" else tf.reduce_max
@@ -95,7 +241,7 @@ class Pool(Op):
             self.VQ = None
         else:
             self.VQ = tf.gradients(output,input,tf.ones_like(output))[0]
-        if self.keep_dims:
+        if self.keepdims:
             return output
         else:
             return tf.squeeze(output,axis=self.total_axis)

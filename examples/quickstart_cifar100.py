@@ -1,96 +1,93 @@
+import sys
+sys.path.insert(0, "../")
+
 import sknet
+from sknet.optimize import Adam
+from sknet.optimize.loss import *
+from sknet.optimize import schedule
 import matplotlib
 matplotlib.use('Agg')
 import os
 
 # Make Tensorflow quiet.
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
 
 import numpy as np
 import pylab as pl
 import time
 import tensorflow as tf
+from sknet.dataset import BatchIterator
+from sknet import ops,layers
 
+
+
+from mpl_toolkits.mplot3d import Axes3D
+import matplotlib.pyplot as plt
 
 # Data Loading
 #-------------
+dataset = sknet.dataset.load_cifar10()
+dataset.split_set("train_set","valid_set",0.15)
 
-dataset = sknet.dataset.load_mnist()
+dataset.preprocess(sknet.dataset.Standardize,data="images",axis=[0])
 
-# Pre-processing
+dataset.create_placeholders(batch_size=64,
+        iterators_dict={'train_set':BatchIterator("random_see_all"),
+                        'valid_set':BatchIterator('continuous'),
+                        'test_set':BatchIterator('continuous')},device="/cpu:0")
+
+# Create Network
 #---------------
 
-dataset.preprocess(sknet.dataset.Identity,data="images")
+# we use a batch_size of 64 and use the dataset.datum shape to
+# obtain the shape of 1 observation and create the input shape
 
-# Model
-#------
+dnn       = sknet.network.Network(name='simple_model')
 
-batch_size  = 64
-input_shape = [batch_size]+list(dataset.datum_shape)
+dnn.append(ops.RandomAxisReverse(dataset.images,axis=[-1]))
+dnn.append(ops.RandomCrop(dnn[-1],(28,28),seed=10))
+dnn.append(ops.GaussianNoise(dnn[-1],noise_type='additive',sigma=0.05))
 
+dnn = sknet.network.Resnet(dnn,dataset.n_classes,D=4,W=2)
+print(dataset.n_classes)
+prediction = dnn[-1]
 
+print(prediction.get_shape().as_list())
+loss    = crossentropy_logits(p=dataset.labels,q=prediction)
+accu    = accuracy(dataset.labels,prediction)
 
-with tf.device("/device:GPU:0"):
-    layers = [sknet.layer.Input(input_shape=input_shape,data_format=dataset.data_format)]
-    layers.append(sknet.layer.Dense(layers[-1],units=512))
-#    layers.append(tf.layers.dense(layers[-1],1225))
-#    layers.append(tf.layers.dense(layers[-1],1225))
-#    layers.append(tf.layers.dense(layers[-1],225))
-    layers.append(sknet.layer.Dense(layers[-1],units=512))
-    layers.append(sknet.layer.Activation(layers[-1],tf.nn.relu))
-    layers.append(sknet.layer.Dense(layers[-1],units=128))
-    layers.append(sknet.layer.Activation(layers[-1],tf.nn.relu))
-    layers.append(sknet.layer.Dense(layers[-1],units=10,data_format='NCHW'))
+B         = dataset.N('train_set')//64
+lr        = sknet.optimize.PiecewiseConstant(0.005,
+                                    {100*B:0.003,200*B:0.001,250*B:0.0005})
+optimizer = Adam(loss,lr,params=dnn.params)
+minimizer = tf.group(optimizer.updates+dnn.updates)
 
-    layers[-1].add_loss(sknet.optimize.loss.sparse_cross_entropy_logits(p=None,q=layers[-1]))
-
-    network = sknet.network.Network(layers,name='-model(cnn.base)')
-
-    # Loss and Optimizer
-    #-------------------
-
-    lr_schedule = sknet.optimize.schedule.stepwise({0:0.001,50:0.0001,100:0.00005})
-    test_loss   = network[-1].sparse_cross_entropy_logits0.accuracy
-    optimizer   = sknet.optimize.optimizer.Adam()
-
-    # Pipeline
-    #---------
-
-    pipeline    = sknet.utils.Pipeline(network,dataset,lr_schedule=lr_schedule,
-                    optimizer=optimizer,test_loss=test_loss)
-
-
-pipeline.link([[pipeline.network[0],"images"],
-                [pipeline.network[-1].sparse_cross_entropy_logits0.p,"labels"]])
-
-# Training
+# Workers
 #---------
 
-pipeline.fit(n_epochs=20)
+min1 = sknet.Worker(op_name='minimizer',context='train_set',op=minimizer,
+        instruction='execute every batch', deterministic=False)
 
-exit()
-# MANUAL
+loss_worker = sknet.Worker(op_name='loss',context='train_set',op= loss,
+        instruction='save & print every 100 batch', deterministic=False)
 
-pipeline._epoch_passive([
-            [pipeline.network[0],pipeline.dataset["train_set"][0]]])
+accu_worker = sknet.Worker(op_name='accu',context='test_set', op=accu,
+        instruction='execute every batch and save & print & average',
+        deterministic=True, description='standard classification accuracy')
 
-for _ in range(20):
-    pipeline._epoch_train()
-    print(pipeline._test())
+queue = sknet.Queue((min1+loss_worker,accu_worker.alter(context='valid_set'),
+                            accu_worker))
 
-
-#name       = dataset.cifar100.name+zca.name\
-#                    +lr_schedule.name+model.name
-
-
-# Training
+# Pipeline
 #---------
-t_ = time.time()
-train_loss,valid_accu,test_accu,lrs = trainer.fit(train_set,valid_set,test_set,n_epochs=120)
- 
-best_accu = test_accu[np.argmax(valid_accu)]
+workplace = sknet.utils.Workplace(dnn,dataset=dataset)
+workplace.execute_queue(queue,repeat=350,
+            filename='cifar100_classification.h5',
+            save_period=50)
 
-print('Finished Training '+name+'\n in {:1f}s. with test accuracy {}'.format(time.time()-t_,best_accu))
+
+
+#sknet.to_file(output,'test.h5','w')
 
 
 
