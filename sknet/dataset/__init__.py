@@ -13,7 +13,6 @@ from .fashionmnist import *
 from .freefield1010 import *
 from .warblr import *
 from .stl10 import *
-from .custom import *
 from .mini import *
 from .DCLDE import *
 

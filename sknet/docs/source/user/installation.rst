@@ -39,7 +39,7 @@ used as is to set up an environment.
 
 Install Anaconda::
 
-   wget https://repo.anaconda.com/archive/Anaconda3-2018.12-MacOSX-x86_64.sh #(python3.)
+   wget https://repo.anaconda.com/archive/Anaconda3-2018.12-Linux-x86_64.sh #(python3.)
    bash Anaconda-latest-Linux-x86_64.sh
 
 Install all dependencies along with _Python 3+.

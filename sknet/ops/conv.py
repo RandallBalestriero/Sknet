@@ -134,17 +134,19 @@ class SplineWaveletTransform(Op):
     deterministic_behavior = False
     name = 'SplineWaveletTransform'
 
-    def __init__(self, input, J, Q, K, strides=8, init='random',
-                 trainable_scales=True, trainable_knots=True,
-                 trainable_filter=True, hilbert=False, m=None,
-                 p=None, padding='valid',n_conv=1, **kwargs):
+    def __init__(self, input, J, Q, K, strides=1, init='random',
+                 trainable_scales=False, trainable_knots=False,
+                 trainable_filters=False, hilbert=False, m=None,
+                 p=None, padding='valid',n_conv=None, **kwargs):
         with tf.variable_scope("SplineWaveletTransformOp") as scope:
             # Attribution
+            if n_conv is None:
+                n_conv = J
             K                    += (K%2)-1
             self.J,self.Q,self.K  = J, Q, K
             self.trainable_scales = trainable_scales
             self.trainable_knots  = trainable_knots
-            self.trainable_filter = trainable_filter
+            self.trainable_filters = trainable_filters
             self.hilbert          = hilbert
             self.strides          = strides
 
@@ -190,11 +192,11 @@ class SplineWaveletTransform(Op):
             width,in_c,out_c = self.W[i].get_shape().as_list()
             print('W shape',width,in_c,out_c)
             amount_l = np.int32(np.floor((width-1)/2))
-            amount_r = np.int32(np.ceil((width-1)/2))
+            amount_r = np.int32(width-1-amount_l)
             x_pad    = tf.pad(input,paddings=[[0,0],[0,0],
                             [amount_l,amount_r]],mode='SYMMETRIC')
 
-            conv       = self.apply_filter_bank(x_pad,self.W[-1])
+            conv       = self.apply_filter_bank(x_pad,self.W[i])
             conv_shape = conv.shape.as_list()
             print('conv shape',conv_shape)
             print(out_c//2)
@@ -233,11 +235,11 @@ class SplineWaveletTransform(Op):
             p = np.stack([p_real,p_imag]).astype('float32')
 
             if self.hilbert:
-                self._m = tf.Variable(m[0], self.trainable_filter, name='m')
-                self._p = tf.Variable(p[0], self.trainable_filter, name='p')
+                self._m = tf.Variable(m[0], self.trainable_filters, name='m')
+                self._p = tf.Variable(p[0], self.trainable_filters, name='p')
             else:
-                self._m = tf.Variable(m, self.trainable_filter, name='m')
-                self._p = tf.Variable(p, self.trainable_filter, name='p')
+                self._m = tf.Variable(m, self.trainable_filters, name='m')
+                self._p = tf.Variable(p, self.trainable_filters, name='p')
 
         self.add_param(self._m)
         self.add_param(self._p)

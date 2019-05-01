@@ -15,8 +15,7 @@ __all__ = [
         "ops",
         "utils",
         "network",
-        "optimize",
-        "sampler"]
+        "optimize"]
 
 
 __version__ = 'alpha.1'
@@ -86,20 +85,17 @@ def from_file(filename):
 class Queue(tuple):
     def __new__(cls,*args,**kwargs):
         obj = super(Queue,cls).__new__(cls,*args,**kwargs)
-#        self.filename = filename
         return obj
-#    def __init__(self,*args,**kwargs):
-#        self.first_time_writting = True
     def dump(self,filename,flush=False):
         """Method to be called to save data from workers and empty them
         """
         while True:
-#            try:
-            to_file(self,filename,mode='a')
-#            except:
-#                print('Can not open file',filename,'... retrying in 5 sec')
-#                time.sleep(5)
-#                continue
+            try:
+                to_file(self,filename,mode='a')
+            except:
+                print('Can not open file',filename,'... retrying in 5 sec')
+                time.sleep(5)
+                continue
             break
         if flush:
             for worker in self:

@@ -15,6 +15,8 @@ class Network:
         return len(self.layers)
     def append(self,item):
         self.layers.append(item)
+    def as_list(self):
+        return [layer for layer in self]
     def deter_dict(self,value):
         couple = list()
         for layer in self.layers:
