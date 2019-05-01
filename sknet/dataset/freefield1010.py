@@ -77,8 +77,6 @@ def load_freefield1010(subsample=1,PATH=None):
     dataset.add_variable({'signals':{'train_set':wavs},
                         'labels':{'train_set':labels}})
 
-    print('Dataset freefield1010 loaded in',
-                            '{0:.2f}'.format(time.time()-t),'s.')
     return dataset
 
 
