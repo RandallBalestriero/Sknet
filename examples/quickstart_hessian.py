@@ -44,44 +44,32 @@ dataset.create_placeholders(batch_size=32,
 my_layer  = layers.custom_layer(ops.Dense,ops.BatchNorm,ops.Activation)
 
 dnn       = sknet.network.Network(name='simple_model')
-noise_l   = np.float32(sys.argv[-2])
-gamma     = np.float32(sys.argv[-1])
+data_augmentation = np.int32(sys.argv[-3])
+D = np.int32(sys.argv[-2])
+W = np.int32(sys.argv[-1])
 
-dnn.append(ops.RandomAxisReverse(dataset.images,axis=[-1]))
-dnn.append(ops.RandomCrop(dnn[-1],(28,28),seed=10))
-dnn.append(ops.GaussianNoise(dnn[-1],noise_type='additive',
-                        sigma=noise_l))
+if data_augmentation:
+    dnn.append(ops.RandomAxisReverse(dataset.images,axis=[-1]))
+    dnn.append(ops.RandomCrop(dnn[-1],(28,28),seed=10))
+    start = 2
+else:
+    dnn.append(dataset.images)
+    start = 1
 
-dnn.append(ops.Concat([dnn[-1],dnn[-2]],axis=0))
+noise = tf.random_normal(dnn[-1].get_shape().as_list())*0.00001
 
-dnn.append(layers.Conv2D(dnn[-1],[(64,3,3),{'b':None,'pad':'same'}],[[0,2,3]],
-                                            [0.01]))
-dnn.append(layers.Conv2D(dnn[-1],[(128,3,3),{'b':None,'pad':'same'}],
-                                    [[0,2,3]], [0.01]))
-dnn.append(layers.Conv2DPool(dnn[-1],[(128,3,3),{'b':None}],
-                                    [[0,2,3]],[0.01],[(1,2,2)]))
+dnn.append(ops.Concat([dnn[-1],dnn[-1]+noise],axis=0))
 
-dnn.append(layers.Conv2D(dnn[-1],[(192,3,3),{'b':None,'pad':'same'}],[[0,2,3]],
-                                                [0.01]))
-dnn.append(layers.Conv2D(dnn[-1],[(192,3,3),{'b':None}],[[0,2,3]],
-                                                [0.01]))
-dnn.append(layers.Conv2DPool(dnn[-1],[(192,3,3),{'b':None,'pad':'same'}],
-                                    [[0,2,3]],[0.01],[(1,2,2)]))
+sknet.network.Resnet(dnn,dataset.n_classes,D=D,W=W)
 
-dnn.append(layers.Conv2D(dnn[-1],[(192,3,3),{'b':None,'pad':'same'}],[[0,2,3]],
-                                                [0.01]))
-dnn.append(layers.Conv2D(dnn[-1],[(192,3,3),{'b':None,'pad':'same'}],[[0,2,3]],
-                                                [0.01]))
-dnn.append(layers.Conv2D(dnn[-1],[(192,1,1),{'b':None}],[[0,2,3]],
-                                                [0.01]))
-dnn.append(ops.Pool(dnn[-1],(1,-1,-1),pool_type='AVG'))
-dnn.append(ops.Dense(dnn[-1],10))
 
 # Quantities
 #-----------
 
-A = tf.gradients([dnn[-1]]*10,[dnn[3]]*10,
-                [tf.ones((64,1))*tf.one_hot(i,10) for i in range(10)])
+row_A = list()
+for i in range(dataset.n_classes):
+    grad = tf.gradients(dnn[-1],dnn[start], tf.ones((64,1))*tf.one_hot(i,10))
+    row_A.append(tf.reduce_sum(tf.square(grad[0][:32]-grad[0][32:]),[1,2,3]))
 
 prediction = dnn[-1]
 
@@ -89,41 +77,35 @@ prediction = dnn[-1]
 #-------------------
 
 loss    = crossentropy_logits(p=dataset.labels,q=prediction[:32])
-hessian = tf.add_n([sknet.optimize.loss.SSE(a[:32],a[32:])
-                        for a in A])#/np.float32(len(A))
+hessian = tf.stack(row_A,1) #(32,n_classes)
 accu    = accuracy(dataset.labels,prediction[:32])
 
 B         = dataset.N('train_set')//32
 lr        = sknet.optimize.PiecewiseConstant(0.005,
                                     {100*B:0.003,200*B:0.001,250*B:0.0005})
-optimizer = Adam(loss+hessian*gamma,lr,params=dnn.params)
+optimizer = Adam(loss,lr,params=dnn.params)
 minimizer = tf.group(optimizer.updates+dnn.updates)
 
 
 # Workers
 #---------
 
-min1 = sknet.Worker(op_name='minimizer',context='train_set',op=minimizer,
-        instruction='execute every batch', deterministic=False)
+minimize = sknet.Worker(name='loss',context='train_set',
+            op=[minimizer,loss,hessian,dataset.labels],
+            deterministic=False,period=[1,300,100,100],verbose=2)
 
-loss = tf.expand_dims(tf.stack([loss,hessian]),0)
-loss_worker = sknet.Worker(op_name='loss',context='train_set',op= loss,
-        instruction='save & print every 100 batch', deterministic=False)
 
-accu = tf.expand_dims(tf.stack([accu,hessian]),0)
-accu_worker = sknet.Worker(op_name='accu',context='test_set', op=accu,
-        instruction='execute every batch and save & print & average',
-        deterministic=True, description='standard classification accuracy')
+accu     = sknet.Worker(name='accu',context='test_set',
+            op=[accu,hessian,dataset.labels],
+            deterministic=True, transform_function=[np.mean,None,None])
 
-queue = sknet.Queue((min1+loss_worker,accu_worker.alter(context='valid_set'),
-                            accu_worker))
+queue = sknet.Queue((minimize, accu),filename='cifar10_'\
+                    +str(data_augmentation)+'_'+str(D)+'_'+str(W)+'.h5')
 
 # Pipeline
 #---------
 workplace = sknet.utils.Workplace(dnn,dataset=dataset)
-workplace.execute_queue(queue,repeat=350,
-            filename='cifar10_'+str(noise_l)+'_'+str(gamma)+'.h5',
-            save_period=20)
+workplace.execute_queue(queue,repeat=350, save_period=1)
 
 
 

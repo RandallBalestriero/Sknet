@@ -126,25 +126,16 @@ class Workplace(object):
         """
         # Loop over all the batches
         self.dataset.set_set(worker.context,session=self.session)
-        if worker.concurrent:
-            feed_dict.update(self.network.deter_dict(worker.deterministic))
+        feed_dict.update(self.network.deter_dict(worker.deterministic))
         batch_nb = 0
         while self.dataset.next(session=self.session):
             op = worker.get_op(batch_nb)
-            if worker.concurrent:
-                output = self.session.run(op,feed_dict=feed_dict)
-            else:
-                output = []
-                for op_,deterministic in zip(op,worker.deterministic_list):
-                    feed_dict.update(self.network.deter_dict(deterministic))
-                    output.append(self.session.run(op_,feed_dict=feed_dict))
-            worker.append(output)
+            worker.append(self.session.run(op,feed_dict=feed_dict))
             batch_nb+=1
         worker.epoch_done()
 
  
-    def execute_queue(self,queue, repeat=1,feed_dict={},filename=None,
-                        save_period=10):
+    def execute_queue(self,queue, repeat=1,feed_dict={}, save_period=10):
         """Apply multiple consecutive epochs of train test and valid
 
         Example of use ::
@@ -191,23 +182,14 @@ class Workplace(object):
 
 
         """
-        if filename is not None and os.path.isfile(filename):
-            os.remove(filename)
-            f=h5py.File(filename,'w')
-            f.close()
         for e in range(repeat):
             print("Repeat",e)
             for worker in queue:
-                n_epochs = worker.repeat
                 name     = worker.name
                 print("\trunning Worker:",name)
-                for epoch in range(n_epochs):
-                    if n_epochs>1:
-                        print("\t  Epoch",epoch,'...')
-                    self.execute_worker(worker,feed_dict=feed_dict)
-            if filename is not None and (e+1)%save_period==0:
-                queue.dump(filename,flush=True)
-        return queue
+                self.execute_worker(worker,feed_dict=feed_dict)
+            if (e+1)%save_period==0:
+                queue.dump()
 
 
 

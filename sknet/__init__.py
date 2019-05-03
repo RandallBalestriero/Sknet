@@ -8,7 +8,7 @@ import time
 import re
 import h5py
 import copy
-
+from tensorflow.contrib.graph_editor import get_backward_walk_ops
 __all__ = [
         "dataset",
         "layers",
@@ -26,7 +26,10 @@ __version__ = 'alpha.1'
 
 def get_tensor_dependencies(tensor):
     dependencies = list()
-    ops = tf.contrib.graph_editor.get_backward_walk_ops(tensor,control_inputs=True)
+    ops = list()
+    for t in tensor:
+        ops.append(get_backward_walk_ops(t,control_inputs=True, inclusive=False))
+    ops = list(set([o for op in ops for o in op]))
     for op in ops:
         if op.type == 'Placeholder' and 'deterministic' not in op.name:
             dependencies.append(op.outputs[0])
@@ -37,68 +40,54 @@ def get_layers(tensor):
     ops = tf.contrib.graph_editor.get_backward_walk_ops(tensor,
                                                     control_inputs=True)
     for op in ops:
-        print(op.outputs,isinstance(op.outputs[0],layer.Layer))
         if isinstance(op.outputs[0],layer.Layer):
             layers.append(op)
     return layers
 
 
 
-def to_file(value,filename,mode='w',compression_level=4):
-    """dump the content of a worker, workergroupe, or
-    list/tuple of them into h5 files
-    if given with mode='w' then dump everything,
-    if given with mode='a' then dump only the non present keys
-    """
-    # if given a single worker
-    if type(value)==Worker:
-        f = h5py.File(filename,mode)
-        try:
-            f[value.name+'/description']=value.description
-        except:
-            1
-            #already wrote it
-        data = value.get_concatenate()
-        name = value.name+'/'+str(value.start)
-        if np.isscalar(data):
-            f.create_dataset(name,shape)
-        else:
-            f.create_dataset(name,data.shape,compression='gzip',
-                    compression_opts=compression_level)
-        f[name][...] = data
-        f.close()
-    # given a workergroup
-    elif type(value)==WorkerGroup:
-        for worker in value.workers:
-            to_file(worker,filename,mode,compression_level=compression_level)
-    elif hasattr(value,'__len__'):
-        for item in value:
-            to_file(item,filename,mode,compression_level=compression_level)
-
-
-def from_file(filename):
-    f = h5py.File(filename,'r')
-    return f
-
 
 
 class Queue(tuple):
-    def __new__(cls,*args,**kwargs):
-        obj = super(Queue,cls).__new__(cls,*args,**kwargs)
+    def __new__(cls,*args,filename=None):
+        obj = super(Queue,cls).__new__(cls,*args)
+        obj._filename = filename
+        obj._file     = None
+        obj.count     = 0
         return obj
-    def dump(self,filename,flush=False):
+    def dump(self):
         """Method to be called to save data from workers and empty them
         """
-        while True:
-            try:
-                to_file(self,filename,mode='a')
-            except:
-                print('Can not open file',filename,'... retrying in 5 sec')
-                time.sleep(5)
-                continue
-            break
-        if flush:
+        self.count+=1
+        if self._file is None:
+            # create and open the file
+            self._file = h5py.File(self._filename, 'w', libver='latest')
+            # init the arrays, get shape and init
+            dataset = list()
             for worker in self:
+                worker_dataset = list()
+                for i,data in enumerate(worker.epoch_data):
+                    data = np.asarray(data)
+                    if data.dtype==object:
+                        data = data.astype('float32')
+                    new_shape = (None,)+data.shape
+                    data      = np.expand_dims(data,0)
+                    worker_dataset.append(self._file.create_dataset(worker.name+"/"\
+                     +str(i), maxshape=new_shape,compression='gzip',data=data))
+                dataset.append(worker_dataset)
+                worker.empty()
+            self.dataset = dataset
+            self._file.swmr_mode = True
+        else:
+            for i,worker in enumerate(self):
+                for j,data in enumerate(worker.epoch_data):
+                    data = np.asarray(data)
+                    if data.dtype==object:
+                        data = data.astype('float32')
+                    new_shape = (self.count,)+data.shape
+                    self.dataset[i][j].resize(new_shape)
+                    self.dataset[i][j][self.count-1]=data
+                    self.dataset[i][j].flush()
                 worker.empty()
 
 
@@ -273,62 +262,6 @@ class Tensor(tf.Tensor):
         self._id          = tensor_or_func._id
 
 
-
-# instruction
-def Parser(instruction):
-    """Parser to transform string into boolean variables.
-
-    command2 is applied at the end of the batche
-
-    command1 every time1 and command2 
-
-    time1 = - batch (same as 1 batch)
-            - (int) batch
-            - epoch
-
-    command1 = - (same as execute)
-               - save (will gather the output into list)
-               - print (will print the output)
-               - any combination of the above linked with &
-
-    command2 = same as command1 with extra possibility of giveing
-               - average or maximum (a function to be applied)
-
-    """
-    splitting = instruction.split('and')
-    part1     = splitting[0]
-    command1, periodicity = part1.split('every')
-    periodicity = periodicity.replace(' ','')
-    if periodicity[0].isdigit():
-        periodicity = re.findall(r'\d+', periodicity)[0]
-    else:
-        periodicity = 1
-    if len(splitting)>1:
-        command2 = splitting[1]
-    else:
-        command2 = ''
-    if 'average' in command2:
-        func = lambda x:np.mean(x,0)
-        transform = True
-    elif 'maximum' in command2:
-        func = lambda x:np.max(x,0)
-        transform = True
-    else:
-        func = lambda x:x
-        transform = False
-    # if we already save the results in batch pass, then
-    # do not save after
-    if 'save' in command1:
-        command2.replace('save','')
-    attr = dict([('batch_instr',command1),('epoch_instr',command2),
-                ('periodicity',int(periodicity)),('transform',transform),
-                ('func',func)])
-    return attr
-
-
-
-
-
 class Variable(tf.Variable):
     """Analog to :class:`tf.Variable` used for initialization
     with additional inplace option. There are two behaviors for this class
@@ -409,7 +342,7 @@ class Worker(object):
 
     Parameters
     ----------
-    
+
     op_name : str
         the name of the worker, used for saving and printing
 
@@ -418,7 +351,7 @@ class Worker(object):
         would be :py;data;`"train_set"` or :py:data:'"valid_set"'
 
     op : tf.Tensor or tf.operation
-        the tensorflow variable of the worker that will be executed 
+        the tensorflow variable of the worker that will be executed
         and monitored
 
     instruction : str
@@ -432,11 +365,11 @@ class Worker(object):
             # one can give multiple commands to do at the same time, they
             # are linked with a & a in
             instruction = "print 7 save every 30 batch"
-            # one can also use the instruction to specify a standard 
+            # one can also use the instruction to specify a standard
             # operation method to do after the epoch such as done with
             # accuracy where it is computed on each batch and then averaged
             instruction = "execute every batch and average & print"
-            # as an be seen, the commands to do after the epoch are 
+            # as an be seen, the commands to do after the epoch are
             # introduced via the and keyword. One can also do something like
             intruction = "execute every bath and save & print & average"
             # the order of the commands 9around the &) do not matter
@@ -450,72 +383,42 @@ class Worker(object):
         ``"average'`` or ``"maximize"``.
 
         deterministic : bool
-            the state of the network to execute the op in, for example 
-            it is common to set it to :data:`False` during training 
+            the state of the network to execute the op in, for example
+            it is common to set it to :data:`False` during training
             and :data:`True` during testing.
 
         description : str (optional)
-            the description of the worker, used for saving, 
+            the description of the worker, used for saving,
             it is added to the h5 file.
     """
-    def __init__(self,op_name,context,op, instruction, deterministic=False,
-                    repeat=1,description='',sampling='continuous'):
+    def __init__(self, name, context, op, deterministic=False, period=1,
+                    transform_function=None, verbose=0):
         self._dependencies  = get_tensor_dependencies(op)
-        self._op_name       = op_name
-        self._name          = context+"/"+op_name
-        self._repeat        = repeat
-        self._description   = description
-        self._instruction   = instruction
+        self.verbose        = verbose
+        if not hasattr(op,'__len__'):
+            self._op = [op]
+        else:
+            self._op = op
+        if np.isscalar(period):
+            self._period = [period]*len(self._op)
+        else:
+            self._period = period
+        if not hasattr(transform_function,'__len__'):
+            transform_function = [transform_function]*len(self._op)
+        else:
+            transform_function = transform_function
+        self._transform_function = [f if f is not None else lambda x:x
+                                    for f in transform_function]
+        self._name          = context+"/"+name
         self._deterministic = deterministic
-        self._sampling      = sampling
         self._context       = context
-        self._op            = op
-        self._epoch         = 0
-        self._start         = 0
-        # to gather all the epoch/batch data
-        self.data           = list()
-        # to gather data (batch) at each epoch
-        self.epoch_data     = list()
-        # specific to the saving and transformation
-        instr = Parser(instruction)
-        self.__dict__.update(instr)
-        self._concurrent = True
-    def alter(self,**kwargs):
-        init = {'op_name':self.op_name,
-                'context':self.context,
-                'op':self.op, 
-                'instruction':self.instruction, 
-                'deterministic':self.deterministic,
-                'repeat':self.repeat,
-                'description':self.description,
-                'sampling':self.sampling}
-        init.update(kwargs)
-        obj = Worker(**init)
-        return obj
+        self.empty()
     def empty(self):
-        self._start         = self.epoch
-        # to gather all the epoch/batch data
-        self.data           = list()
-        # to gather data (batch) at each epoch
-        self.epoch_data     = list()
-    @property
-    def instruction(self):
-        return self._instruction
-    @property
-    def sampling(self):
-        return self._sampling
-    @property
-    def description(self):
-        return self._description
-    @property
-    def op_name(self):
-        return self._op_name
+        self.batch_data     = [[] for i in range(len(self._op))]
+        self.epoch_data     = [[] for i in range(len(self._op))]
     @property
     def deterministic(self):
         return self._deterministic
-    @property
-    def concurrent(self):
-        return self._concurrent
     @property
     def dependencies(self):
         return self._dependencies
@@ -523,180 +426,29 @@ class Worker(object):
     def epoch(self):
         return self._epoch
     @property
-    def start(self):
-        return self._start
-    @property
     def op(self):
         return self._op
     @property
-    def repeat(self):
-        return self._repeat
-    @property 
     def name(self):
         return self._name
     @property
     def context(self):
         return self._context
     def get_op(self,batch_nb):
-        if batch_nb%self.periodicity==0:
-            return self.op
-        else:
-            return []
-    def append(self,data,print_=True):
-        if data==[]:
-            return ''
-        to_print = ''
-        if 'save' in self.batch_instr or self.transform:
-            self.epoch_data.append(data)
-        if 'print' in self.batch_instr:
-            to_print = self.name+':'+str(data)
-            if print_:
-                print(to_print)
-        return to_print
-    def get_concatenate(self):
-        try:
-            return np.concatenate(self.data)
-        except:
-            return np.asarray(self.data)
-    def epoch_done(self,print_ = True):
-        to_print=''
-        self._epoch +=1
-        if len(self.epoch_data)>0:
-            if hasattr(self.epoch_data[0],'__len__'):
-                self.epoch_data = np.concatenate(self.epoch_data,0)
-            else:
-                self.epoch_data = np.asarray(self.epoch_data)
-        # apply transform if needed
-        # then print if needed
-        # then save if needed
-        if self.transform:
-            transform = self.func(self.epoch_data)
-            if 'print' in self.epoch_instr:
-                to_print = self.name+':'+str(transform)
-                if print_:
-                    print(to_print)
-            if 'save' in self.epoch_instr:
-                self.data.append(transform)
-        # save into the main data collection
-        if 'save' in self.batch_instr:
-            self.data.append(self.epoch_data)
-        # reset epoch data
-        self.epoch_data = list()
-        return to_print
-    def __add__(self,other):
-        return WorkerGroup([self,other])
-
-    def __radd__(self,other):
-        return self.__add__(other)
-
-
-
-
-class WorkerGroup(Worker):
-    """Allow executing of multiple workers at once (similar to multi-threading).
-    it is common to need to monitor or execute multiple workers during the 
-    same process. Typical example would be to execute the weight update 
-    (learning) while monitoring (printing or saving) the loss. those two 
-    workers can thus be made parallel simply by using the 
-    :py:class:`sknet.WorkerGroup` class. To obtain a :class:`WorkerGroup`
-    one can do any of the followings ::
-
-        worker1 = sknet.Worker(...)
-        worker2 = sknet.Worker(...)
-        workergroup = sknet.WorkerGroup([worker1,worker2])
-        workergroup = worker1+worker2
-
-    Similarly, once given a :class:`WorkerGroup` instance, it is possible to add
-    workers (or evenwWorergroup) on the fly as follows ::
-        
-        extra_worker = sknet.Worker(...)
-        workergroup = workergroup+extra_worker
-        # or if adding an extra workergroup
-        workergroup=workergroup+other_workergroup
-
-    A typical example would be to do the following ::
-
-        worker1 = sknet.Worker(op_name="minimizer",op=minimizer,
-                    context="train_set",deterministic=False,
-                    instruction="execute every batch")
-        worker2 = sknet.Worker(op_name='loss',op=loss,context='train_set',
-                    deterministic=False, instruction="print every 30 batch")
-        train_worker = worker1+worker2
-        # then train
-        # ...
-
-    Parameters
-    ----------
-
-    worker : list of sknet.Worker
-        the list of workers that are to be run concurrently during an epoch
-
-    """
-    def __init__(self,workers,name=''):
-        self._workers      = [workers[0]]
-        self._dependencies = workers[0].dependencies
-        self._sampling     = workers[0].sampling
-        self._op           = [worker.op for worker in workers]
-        self._repeat       = workers[0].repeat
-        self._context      = workers[0].context
-        self._deterministic_list = [workers[0].deterministic]
-        self.set_deterministic()
-        self._name = workers[0].name
-        for worker in workers[1:]:
-            self.__add__(worker)
-    def empty(self):
-        for worker in self.workers:
-            worker.empty()
-    def __add__(self,other):
-#        assert(self.sampling==other.sampling)
-        assert(self.repeat==other.repeat)
-        assert(other.context==other.context)
-        self._dependencies = list(set(self._dependencies+other.dependencies))
-        if type(other)==WorkerGroup:
-            self._deterministic_list += list(other.deterministic)
-            self._workers            += other.workers
-            self._op                 += other.op 
-        else:
-            self._deterministic_list += [other.deterministic]
-            self._workers            += [other]
-            self._op                 += [other.op]
-        self.set_deterministic()
-        self._name = str(tuple([w.name for w in self.workers])).replace(' ','').replace('\'','')
-        return self
-    def __radd__(self,other):
-        return self.__add__(other)
-    def set_deterministic(self):
-        if len(set(self._deterministic_list))==1:
-            self._concurrent    = True
-            self._deterministic = self._deterministic_list[0]
-        else:
-            self._concurrent = False
-    @property
-    def deterministic_list(self):
-        return self._deterministic_list
-    @property
-    def workers(self):
-        return self._workers
-
-    def get_op(self,batch_nb):
-        ops = [worker.get_op(batch_nb) for worker in self.workers]
-        return ops
-
+        return [op if batch_nb%per==0 else []
+                                for per,op in zip(self._period,self._op)]
     def append(self,data):
-        to_print = ''
-        for datum,worker in zip(data,self.workers):
-            to_print+=worker.append(datum,print_=False)
-        if len(to_print)>0:
-            print(to_print)
-
+        for i,d in enumerate(data):
+            if type(d)==list:
+                if len(d)==0:
+                    continue
+            self.batch_data[i].append(d)
+        if self.verbose==2:
+            print(self.name+':'+str(data))
     def epoch_done(self):
-        to_print=''
-        for worker in self.workers:
-            to_print+=worker.epoch_done(print_=False)
-        if len(to_print)>0:
-            print(to_print)
-
-
+        for i,data in enumerate(self.batch_data):
+            self.epoch_data[i].append(
+                               self._transform_function[i](np.asarray(data)))
 
 
 

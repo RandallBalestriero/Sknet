@@ -35,7 +35,8 @@ class Network:
     def params(self):
         params = []
         for layer in self.layers:
-            params+=layer.params
+            if hasattr(layer,'params'):
+                params+=layer.params
         return params
     @property
     def parameters(self):
@@ -44,7 +45,8 @@ class Network:
     def updates(self):
         updates = []
         for layer in self.layers:
-            updates+=layer.updates
+            if hasattr(layer,'updates'):
+                updates+=layer.updates
         return updates
 
 
