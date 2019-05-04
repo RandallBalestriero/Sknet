@@ -16,7 +16,7 @@ def SSE(target,prediction):
     return tf.nn.l2_loss(target-prediction)*2
 
 def AUC(target,prediction):
-    return tf.metrics.auc(target,prediction)[0]
+    return tf.metrics.auc(target,prediction)[1]
 
 def crossentropy_logits(p,q,weights=None,p_sparse=True):
     """Cross entropy loss given that :math:`p` is sparse and

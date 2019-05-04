@@ -27,7 +27,7 @@ dataset = sknet.dataset.load_freefield1010(subsample=2)
 dataset['signals']['train_set']-=dataset['signals']['train_set'].mean(2,keepdims=True)
 dataset['signals']['train_set']/=dataset['signals']['train_set'].max(2,keepdims=True)
 
-dataset.split_set("train_set","valid_set",0.33)
+dataset.split_set("train_set","test_set",0.33)
 #dataset.preprocess(sknet.dataset.Standardize,data="images",axis=[0])
 
 
@@ -88,7 +88,8 @@ dnn.append(ops.Dense(dnn[-1],units=dataset.n_classes))
 loss     = crossentropy_logits(p=dataset.labels,q=dnn[-1])
 accuracy = accuracy(labels=dataset.labels,predictions=dnn[-1])
 auc      = AUC(dataset.labels,tf.nn.softmax(dnn[-1])[:,1])
-
+#print(auc)
+#input('try')
 
 # we aim at minimizing the loss, so we create the optimizer (Adam in this case)
 # with a stepwise learning rate, the minimizer is the operation that applies
@@ -101,24 +102,14 @@ minimizer = tf.group(optimizer.updates+dnn.updates)
 # Workers
 #---------
 
-work1 = sknet.Worker(op_name='minimizer',context='train_set',op=minimizer, 
-        instruction='execute every batch', deterministic=False,
-        description='minimize')
+work1 = sknet.Worker(name='minimizer',context='train_set',op=[minimizer,loss],
+        deterministic=False)
 
-work2 = sknet.Worker(op_name='loss',context='train_set',op=loss,
-        instruction='save & print every 30 batch', deterministic=False,
-        description='saving the loss every 30 batches',sampling='random')
+work2 = sknet.Worker(name='AUC',context='test_set',op=[accuracy,auc],
+        deterministic=True, transform_function=np.mean,verbose=2)
 
-work3 = sknet.Worker(op_name='AUC',context='train_set',op=auc,
-        instruction='execute every batch and save & print & average', 
-        deterministic=False, description='standard classification accuracy')
+queue = sknet.Queue((work1,work2),filename='test_bird.h5')
 
-work4 = work3.alter(op=accuracy,op_name='accuracy')
-
-
-
-queue = sknet.Queue((work1+work2+work3+work4,
-                work3.alter(context='valid_set',deterministic=True)))
 # Pipeline
 #---------
 
@@ -132,6 +123,6 @@ workplace = sknet.utils.Workplace(dnn,dataset=dataset)
 # will fit the model for 50 epochs and return the gathered op
 # outputs given the above definitions
 
-output = workplace.execute_queue(queue,repeat=2000,filename='test.h5',save_period=20)
+output = workplace.execute_queue(queue,repeat=200)
 
 

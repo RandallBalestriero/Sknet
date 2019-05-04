@@ -51,7 +51,7 @@ used as is to set up an environment.
 Download and execute the last version of anaconda as follows::
 
    wget https://repo.anaconda.com/archive/Anaconda3-2018.12-Linux-x86_64.sh #(python3.)
-   bash Anaconda-latest-Linux-x86_64.sh
+   bash Anaconda3-2018.12-Linux-x86_64.sh
 
 
 where the last version of anaconda can be obtained online. Now install all the

@@ -184,13 +184,11 @@ class SplineWaveletTransform(Op):
         input_shape = input.get_shape().as_list()
         n_channels  = np.prod(input_shape[:-1])
         x_reshape   = tf.reshape(input,[n_channels,1,input_shape[-1]])
-        print('input shape',x_reshape.get_shape().as_list())
 
         outputs = list()
         for i in range(len(self.W)):
             # shape of W is (width,inchannel,outchannel)
             width,in_c,out_c = self.W[i].get_shape().as_list()
-            print('W shape',width,in_c,out_c)
             amount_l = np.int32(np.floor((width-1)/2))
             amount_r = np.int32(width-1-amount_l)
             x_pad    = tf.pad(input,paddings=[[0,0],[0,0],
@@ -198,8 +196,6 @@ class SplineWaveletTransform(Op):
 
             conv       = self.apply_filter_bank(x_pad,self.W[i])
             conv_shape = conv.shape.as_list()
-            print('conv shape',conv_shape)
-            print(out_c//2)
             modulus    = tf.sqrt(tf.square(conv[:,:out_c])
                                         +tf.square(conv[:,out_c:]))
             new_shape  = input_shape[:-1]+[out_c,input_shape[-1]//self.strides]
