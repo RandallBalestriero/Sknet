@@ -159,7 +159,7 @@ class SplineWaveletTransform(Op):
             # sort them to have an interpretable time/frequency plot and to 
             # have coherency in case this is followed by 2D conv.
             scales = 2**(tf.range(self.J,delta=1./self.Q,dtype=tf.float32))
-            delta_scales = tf.Variable(tf.zeros(self.J*self.Q),
+            delta_scales = Variable(tf.zeros(self.J*self.Q),
                                 trainable=self.trainable_scales, name='scales')
             self.scales  = tf.contrib.framework.sort(scales+delta_scales)
             self._scales = np.arange(0,J,1./Q)
@@ -167,7 +167,7 @@ class SplineWaveletTransform(Op):
             # We initialize the knots  with uniform spacing 
             start = (self.K//2)
             grid  = tf.lin_space(np.float32(-start),np.float32(start), self.K)
-            self.knots = tf.Variable(grid, self.trainable_knots, name='knots')
+            self.knots = Variable(grid, self.trainable_knots, name='knots')
             self.all_knots = tf.einsum('i,j->ij',self.scales,self.knots)
 
             # initialize m and p

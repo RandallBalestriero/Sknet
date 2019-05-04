@@ -97,7 +97,7 @@ auc      = AUC(dataset.labels,tf.nn.softmax(dnn[-1])[:,1])
 # the changes to the model parameters, we also specify that this process
 # should also include some possible network dependencies present in UPDATE_OPS
 
-optimizer = sknet.optimize.Adam(loss,0.0501,params=dnn.params)
+optimizer = sknet.optimize.Adam(loss,0.0101,params=dnn.params)
 minimizer = tf.group(optimizer.updates+dnn.updates)
 
 # Workers
