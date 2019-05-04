@@ -188,8 +188,9 @@ class Workplace(object):
                 name     = worker.name
                 print("\trunning Worker:",name)
                 self.execute_worker(worker,feed_dict=feed_dict)
-            if (e+1)%save_period==0:
+            if e%save_period==0:
                 queue.dump()
+        queue.close()
 
 
 

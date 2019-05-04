@@ -92,7 +92,7 @@ minimizer = tf.group(optimizer.updates+dnn.updates)
 
 minimize = sknet.Worker(name='loss',context='train_set',
             op=[minimizer,loss,hessian,dataset.labels],
-            deterministic=False,period=[1,300,100,100],verbose=2)
+            deterministic=False,period=[1,300,100,100])
 
 
 accu     = sknet.Worker(name='accu',context='test_set',

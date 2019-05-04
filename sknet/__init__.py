@@ -55,10 +55,15 @@ class Queue(tuple):
         obj._file     = None
         obj.count     = 0
         return obj
+    def close(self):
+        if self._file is not None:
+            self._file.close()
     def dump(self):
         """Method to be called to save data from workers and empty them
         """
         self.count+=1
+        if self._filename is None:
+            return
         if self._file is None:
             # create and open the file
             self._file = h5py.File(self._filename, 'w', libver='latest')
@@ -70,6 +75,7 @@ class Queue(tuple):
                     data = np.asarray(data)
                     if data.dtype==object:
                         data = data.astype('float32')
+                    data = worker._transform_function[i](data)
                     new_shape = (None,)+data.shape
                     data      = np.expand_dims(data,0)
                     worker_dataset.append(self._file.create_dataset(worker.name+"/"\
@@ -84,6 +90,7 @@ class Queue(tuple):
                     data = np.asarray(data)
                     if data.dtype==object:
                         data = data.astype('float32')
+                    data = worker._transform_function[j](data)
                     new_shape = (self.count,)+data.shape
                     self.dataset[i][j].resize(new_shape)
                     self.dataset[i][j][self.count-1]=data
@@ -415,7 +422,7 @@ class Worker(object):
         self.empty()
     def empty(self):
         self.batch_data     = [[] for i in range(len(self._op))]
-        self.epoch_data     = [[] for i in range(len(self._op))]
+        self.epoch_data     = list()
     @property
     def deterministic(self):
         return self._deterministic
@@ -447,7 +454,7 @@ class Worker(object):
             print(self.name+':'+str(data))
     def epoch_done(self):
         for i,data in enumerate(self.batch_data):
-            self.epoch_data[i].append(
+            self.epoch_data.append(
                                self._transform_function[i](np.asarray(data)))
 
 
