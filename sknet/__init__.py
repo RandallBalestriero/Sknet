@@ -411,11 +411,11 @@ class Worker(object):
         else:
             self._period = period
         if not hasattr(transform_function,'__len__'):
-            transform_function = [transform_function]*len(self._op)
+            self.transform_function = [transform_function]*len(self._op)
         else:
-            transform_function = transform_function
+            self.transform_function = transform_function
         self._transform_function = [f if f is not None else lambda x:x
-                                    for f in transform_function]
+                                    for f in self.transform_function]
         self._name          = context+"/"+name
         self._deterministic = deterministic
         self._context       = context
@@ -453,9 +453,15 @@ class Worker(object):
         if self.verbose==2:
             print(self.name+':'+str(data))
     def epoch_done(self):
+        if self.verbose:
+            print(self.name+':',end='')
         for i,data in enumerate(self.batch_data):
             self.epoch_data.append(
                                self._transform_function[i](np.asarray(data)))
+            if self.transform_function[i] is not None and self.verbose:
+                print(self.epoch_data[-1],end=' ')
+        if self.verbose:
+            print('')
 
 
 

@@ -106,7 +106,7 @@ work1 = sknet.Worker(name='minimizer',context='train_set',op=[minimizer,loss],
         deterministic=False)
 
 work2 = sknet.Worker(name='AUC',context='test_set',op=[accuracy,auc],
-        deterministic=True, transform_function=np.mean,verbose=2)
+        deterministic=True, transform_function=np.mean,verbose=1)
 
 queue = sknet.Queue((work1,work2),filename='test_bird.h5')
 
