@@ -28,10 +28,6 @@ dataset['signals/train_set']-=dataset['signals/train_set'].mean(2,keepdims=True)
 dataset['signals/train_set']/=dataset['signals/train_set'].max(2,keepdims=True)
 
 dataset.split_set("train_set","test_set",0.33)
-print(dataset.sets,dataset.variables)
-print(dataset.keys())
-input()
-#dataset.preprocess(sknet.dataset.Standardize,data="images",axis=[0])
 
 
 dataset.create_placeholders(batch_size=16,
@@ -105,8 +101,8 @@ minimizer = tf.group(optimizer.updates+dnn.updates)
 # Workers
 #---------
 
-work1 = sknet.Worker(name='minimizer',context='train_set',op=[minimizer,loss],
-        deterministic=False)
+work1 = sknet.Worker(name='minimizer',context='train_set',op=[minimizer,loss,dnn[0].W[0]],
+        deterministic=False,period=[1,100,100])
 
 work2 = sknet.Worker(name='AUC',context='test_set',op=[accuracy,auc],
         deterministic=True, transform_function=np.mean,verbose=1)
