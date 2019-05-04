@@ -400,12 +400,12 @@ class Worker(object):
     """
     def __init__(self, name, context, op, deterministic=False, period=1,
                     transform_function=None, verbose=0):
-        self._dependencies  = get_tensor_dependencies(op)
         self.verbose        = verbose
         if not hasattr(op,'__len__'):
             self._op = [op]
         else:
             self._op = op
+        self._dependencies  = get_tensor_dependencies(self._op)
         if np.isscalar(period):
             self._period = [period]*len(self._op)
         else:

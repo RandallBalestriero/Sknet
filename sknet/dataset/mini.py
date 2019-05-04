@@ -24,9 +24,8 @@ def load_mini(N=1000):
                     ("name","mini"),('classes',[str(u) for u in range(4)])]
 
     dataset= Dataset(**dict(dict_init))
-    images = {'train_set':X}
-    labels = {'train_set':y}
-    dataset.add_variable({'inputs':images,'labels':labels})
+    dataset['inputs/train_set']=X
+    dataset['outputs/train_set']=y
 
     return dataset
 
