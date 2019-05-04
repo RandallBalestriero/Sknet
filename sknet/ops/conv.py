@@ -231,11 +231,11 @@ class SplineWaveletTransform(Op):
             p = np.stack([p_real,p_imag]).astype('float32')
 
             if self.hilbert:
-                self._m = tf.Variable(m[0], self.trainable_filters, name='m')
-                self._p = tf.Variable(p[0], self.trainable_filters, name='p')
+                self._m = Variable(m[0], trainable=self.trainable_filters, name='m')
+                self._p = Variable(p[0], trainable=self.trainable_filters, name='p')
             else:
-                self._m = tf.Variable(m, self.trainable_filters, name='m')
-                self._p = tf.Variable(p, self.trainable_filters, name='p')
+                self._m = Variable(m, trainable=self.trainable_filters, name='m')
+                self._p = Variable(p, trainable=self.trainable_filters, name='p')
 
         self.add_param(self._m)
         self.add_param(self._p)
