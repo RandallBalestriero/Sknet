@@ -72,7 +72,7 @@ class Queue(tuple):
             for worker in self:
                 worker_dataset = list()
                 for i,data in enumerate(worker.epoch_data):
-                    data = np.asarray(data)
+                    data = np.asarray(data[0])
                     if data.dtype==object:
                         data = data.astype('float32')
                     data = worker._transform_function[i](data)
@@ -87,7 +87,7 @@ class Queue(tuple):
         else:
             for i,worker in enumerate(self):
                 for j,data in enumerate(worker.epoch_data):
-                    data = np.asarray(data)
+                    data = np.asarray(data[0])
                     if data.dtype==object:
                         data = data.astype('float32')
                     data = worker._transform_function[j](data)
@@ -421,8 +421,8 @@ class Worker(object):
         self._context       = context
         self.empty()
     def empty(self):
-        self.batch_data     = [[] for i in range(len(self._op))]
-        self.epoch_data     = list()
+        self.batch_data = [[] for i in range(len(self._op))]
+        self.epoch_data = [[] for i in range(len(self._op))]
     @property
     def deterministic(self):
         return self._deterministic
@@ -456,10 +456,10 @@ class Worker(object):
         if self.verbose:
             print(self.name+':',end='')
         for i,data in enumerate(self.batch_data):
-            self.epoch_data.append(
+            self.epoch_data[i].append(
                                self._transform_function[i](np.asarray(data)))
             if self.transform_function[i] is not None and self.verbose:
-                print(self.epoch_data[-1],end=' ')
+                print(self.epoch_data[i][-1],end=' ')
         if self.verbose:
             print('')
 

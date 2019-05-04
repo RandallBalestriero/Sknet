@@ -74,8 +74,8 @@ def load_freefield1010(subsample=1,PATH=None):
     labels = labels[:,1]
     wavs   = np.expand_dims(wavs,1)
 
-    dataset.add_variable({'signals':{'train_set':wavs},
-                        'labels':{'train_set':labels}})
+    dataset['signals/train_set']=wavs
+    dataset['labels/train_set']=labels
 
     return dataset
 

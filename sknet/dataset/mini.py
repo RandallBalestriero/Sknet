@@ -7,9 +7,9 @@ from . import Dataset
 from sklearn.datasets import make_moons, make_circles
 from sklearn.model_selection import train_test_split
 
-def load_mini():
-    X,y   = make_moons(10000,noise=0.035,random_state=20)
-    x_,y_ = make_circles(10000,noise=0.02,random_state=20)
+def load_mini(N=1000):
+    X,y   = make_moons(N,noise=0.035,random_state=20)
+    x_,y_ = make_circles(N,noise=0.02,random_state=20)
     x_[:,1]+= 2.
     y_   += 2
     X     = np.concatenate([X,x_],axis=0)
@@ -24,12 +24,9 @@ def load_mini():
                     ("name","mini"),('classes',[str(u) for u in range(4)])]
 
     dataset= Dataset(**dict(dict_init))
-
     images = {'train_set':X}
-
     labels = {'train_set':y}
-
-    dataset.add_variable({'images':images,'labels':labels})
+    dataset.add_variable({'inputs':images,'labels':labels})
 
     return dataset
 
