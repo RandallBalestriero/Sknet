@@ -167,7 +167,8 @@ class SplineWaveletTransform(Op):
             # We initialize the knots  with uniform spacing 
             start = (self.K//2)
             grid  = tf.lin_space(np.float32(-start),np.float32(start), self.K)
-            self.knots = Variable(grid, self.trainable_knots, name='knots')
+            self.knots = Variable(grid, trainable= self.trainable_knots, 
+						name='knots')
             self.all_knots = tf.einsum('i,j->ij',self.scales,self.knots)
 
             # initialize m and p

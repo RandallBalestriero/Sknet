@@ -9,7 +9,7 @@ class Identity:
     def __init__(self,eps=0.0001, name=''):
         self.name = name+'preprocessing(identity)'
     def fit(self,x,axis=[0],**kwargs):
-        pass
+        return self
     def fit_transform(self,x,**kwargs):
         return x
     def transform(self,x,**kwargs):
@@ -27,6 +27,7 @@ class Standardize:
         self.mean = x.mean(axis=tuple(self.axis),keepdims=True)
         self.std  = x.std(axis=tuple(self.axis),keepdims=True)+self.eps
         print(self.name+" done in {0:.2f} s.".format(time.time()-t))
+        return self
     def transform(self,x,**kwargs):
         return (x-self.mean)/self.std
     def fit_transform(self,x,**kwargs):
@@ -49,7 +50,7 @@ class ZCAWhitening:
         self.mean     = flatx.mean(0,keepdims=True)
         self.S,self.U = _spectral_decomposition(flatx-self.mean,self.eps)
         print(self.name+" done in {0:.2f} s.".format(time.time()-t))
-        return _zca_whitening(flatx,self.U,self.S).reshape(x.shape)
+        return self
     def transform(self,x):
         flatx         = np.reshape(x, (x.shape[0], -1))-self.mean
         return _zca_whitening(flatx,self.U,self.S).reshape(x.shape)

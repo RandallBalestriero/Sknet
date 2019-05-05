@@ -47,7 +47,7 @@ dnn = sknet.network.Network(name='model_base')
 
 dnn.append(ops.SplineWaveletTransform(dataset.signals,J=5,Q=16,K=15,
 			trainable_scales=True, trainable_knots=True,
-                 	trainable_filters=True))
+                 	trainable_filters=True,init='gabor'))
 dnn.append(ops.Pool2D(tf.log(dnn[-1]+0.001),(1,1024),strides=(1,512),pool_type='AVG'))
 dnn.append(ops.BatchNorm(dnn[-1],[0,3]))
 
@@ -97,7 +97,7 @@ auc      = AUC(dataset.labels,tf.nn.softmax(dnn[-1])[:,1])
 # the changes to the model parameters, we also specify that this process
 # should also include some possible network dependencies present in UPDATE_OPS
 
-optimizer = sknet.optimize.Adam(loss,0.0101,params=dnn.params)
+optimizer = sknet.optimize.Adam(loss,0.05,params=dnn.params)
 minimizer = tf.group(optimizer.updates+dnn.updates)
 
 # Workers

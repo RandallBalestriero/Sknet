@@ -460,6 +460,7 @@ class Worker(object):
                                self._transform_function[i](np.asarray(data)))
             if self.transform_function[i] is not None and self.verbose:
                 print(self.epoch_data[i][-1],end=' ')
+        self.batch_data = [[] for i in range(len(self._op))]
         if self.verbose:
             print('')
 

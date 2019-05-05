@@ -81,10 +81,15 @@ class BatchNorm(Op):
                 self._b = b
             self.b  = b_func(self._b) if b is not None else self._b
             self.add_param(self._b)
-
-            self.ema  = tf.train.ExponentialMovingAverage(decay=decay)
+            if decay=='AVG':
+                decay_ = tf.Variable(np.float32(1.),trainable=False,name='t')
+                self.ema  = tf.train.ExponentialMovingAverage(decay=1/decay_)
+            else:
+                self.ema  = tf.train.ExponentialMovingAverage(decay=decay)
 
             super().__init__(incoming,deterministic)
+            if decay=='AVG':
+                self._updates.append(tf.assign_add(decay_,1.))
 
     def forward(self,input, deterministic, **kwargs):
 

@@ -101,6 +101,7 @@ class Dataset(dict):
                         else [s[i] for i in train_indices]
                         for s in self["train_set"]]
         else:
+            print(set_,self.N(set_))
             indices = np.random.permutation(self.N(set_))
             N = int(self.N(set_)*ratio)
             for var in self.variables:
@@ -120,6 +121,6 @@ class Dataset(dict):
 
     def N(self,context):
         for var in self:
-            if context in var:
+            if context in var and len(var.split('/'))==2:
                 return len(self[var])
 

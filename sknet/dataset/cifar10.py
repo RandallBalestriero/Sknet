@@ -67,20 +67,13 @@ def load_cifar10(PATH=None):
         train_images.append(data_dic['data'].reshape((-1,3,32,32)))
         train_labels.append(data_dic['labels'])
 
-    train_set = [np.concatenate(train_images,0),
-                np.concatenate(train_labels,0)]
+    dataset['images/train_set'] = np.concatenate(train_images,0).astype('float32')
+    dataset['labels/train_set'] = np.concatenate(train_labels,0).astype('int32')
 
-    # Load testing set
-    test_images = list()
-    test_labels = list()
     f        = tar.extractfile('cifar-10-batches-py/test_batch').read()
     data_dic = pickle.loads(f,encoding='latin1')
-    test_set = [data_dic['data'].reshape((-1,3,32,32)),np.array(data_dic['labels'])]
-
-    dataset.add_variable({'images':{'train_set':train_set[0].astype('float32'),
-                                    'test_set':test_set[0].astype('float32')},
-                        'labels':{'train_set':train_set[1].astype('int32'),
-                                    'test_set':test_set[1].astype('int32')}})
+    dataset['images/test_set'] = data_dic['data'].reshape((-1,3,32,32)).astype('float32')
+    dataset['labels/test_set'] = np.array(data_dic['labels']).astype('int32')
 
     print('Dataset cifar10 loaded in','{0:.2f}'.format(time.time()-t),'s.')
 
