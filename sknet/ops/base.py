@@ -125,7 +125,10 @@ class Op(Tensor):
     """
     def __init__(self,input, deterministic=None):
 
-        self._input = input
+        self._input   = input
+        self._params  = list()
+        self._updates = list()
+        self._reset_params_op = list()
 
         if type(self).deterministic_behavior:
             if deterministic is None:
@@ -142,32 +145,35 @@ class Op(Tensor):
     def add_param(self,param):
         if param is None:
             return
-        if not hasattr(self,'_params'):
-            self._params = []
+        assert(type(param)==tf.Variable)
+        assert(param not in self._params)
+        self._reset_params_op.append(tf.assign(param,param.initial_value))
         if hasattr(param,'trainable'):
             if param.trainable:
                 self._params.append(param)
+
     def backward(self,input):
         return tf.gradients(self,self.input,input)[0]
+
+    @property
+    def reset_params_op(self):
+        return self._reset_params_op
+
     @property
     def input(self):
         return self._input
 
     @property
     def params(self):
-        if hasattr(self,'_params'):
-            return self._params
-        else:
-            return []
+        return self._params
+
     @property
     def parameters(self):
         return self.params
+
     @property
     def updates(self):
-        if hasattr(self,'_updates'):
-            return self._updates
-        else:
-            return []
+        return self._updates
 
 
 class Identity(Op):
