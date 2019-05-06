@@ -36,7 +36,8 @@ class Network:
     def variables(self,trainable=True):
         var = []
         for layer in self.layers:
-            var+=layer.variables(trainable)
+            if hasattr(layer,'variables'):
+                var+=layer.variables(trainable)
         return var
 
     @property

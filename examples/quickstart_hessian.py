@@ -29,7 +29,10 @@ import matplotlib.pyplot as plt
 dataset = sknet.dataset.load_cifar10()
 dataset.split_set("train_set","valid_set",0.15)
 
-dataset.preprocess(sknet.dataset.Standardize,data="images",axis=[0])
+preprocess = sknet.dataset.Standardize().fit(dataset['images/train_set'])
+dataset['images/train_set'] = preprocess.transform(dataset['images/train_set'])
+dataset['images/test_set']  = preprocess.transform(dataset['images/test_set'])
+dataset['images/valid_set'] = preprocess.transform(dataset['images/valid_set'])
 
 dataset.create_placeholders(batch_size=32,
         iterators_dict={'train_set':BatchIterator("random_see_all"),
@@ -56,7 +59,7 @@ else:
     dnn.append(dataset.images)
     start = 1
 
-noise = tf.random_normal(dnn[-1].get_shape().as_list())*0.00001
+noise = tf.random_normal(dnn[-1].get_shape().as_list())*0.0001
 
 dnn.append(ops.Concat([dnn[-1],dnn[-1]+noise],axis=0))
 
@@ -83,7 +86,7 @@ accu    = accuracy(dataset.labels,prediction[:32])
 B         = dataset.N('train_set')//32
 lr        = sknet.optimize.PiecewiseConstant(0.005,
                                     {100*B:0.003,200*B:0.001,250*B:0.0005})
-optimizer = Adam(loss,lr,params=dnn.params)
+optimizer = Adam(loss,lr,params=dnn.variables(trainable=True))
 minimizer = tf.group(optimizer.updates+dnn.updates)
 
 
@@ -92,8 +95,7 @@ minimizer = tf.group(optimizer.updates+dnn.updates)
 
 minimize = sknet.Worker(name='loss',context='train_set',
             op=[minimizer,loss,hessian,dataset.labels],
-            deterministic=False,period=[1,300,100,100])
-
+            deterministic=False,period=[1,100,100,100])
 
 accu     = sknet.Worker(name='accu',context='test_set',
             op=[accu,hessian,dataset.labels],
@@ -105,11 +107,8 @@ queue = sknet.Queue((minimize, accu),filename='cifar10_'\
 # Pipeline
 #---------
 workplace = sknet.utils.Workplace(dnn,dataset=dataset)
-workplace.execute_queue(queue,repeat=350, save_period=1)
+workplace.execute_queue(queue,repeat=350)
 
-
-
-#sknet.to_file(output,'test.h5','w')
 
 
 
