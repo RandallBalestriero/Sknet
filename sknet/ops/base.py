@@ -3,7 +3,7 @@
 
 import tensorflow as tf
 
-from .. import Tensor
+from .. import Tensor, Variable
 
 class Op(Tensor):
     """Op class used as parent of any implemented layer.
@@ -123,16 +123,18 @@ class Op(Tensor):
         this allows the user to feed directly a tensorflow variable as input
 
     """
+    def __new__(cls,*args,**kwargs):
+        obj = super().__new__(cls)
+        obj._updates   = list()
+        obj._reset_variables_op = list()
+        return obj
     def __init__(self,input, deterministic=None):
 
         self._input   = input
-        self._params  = list()
-        self._updates = list()
-        self._reset_params_op = list()
 
         if type(self).deterministic_behavior:
             if deterministic is None:
-                self.deterministic = tf.placeholder(tf.bool,
+                self.deterministic = tf.placeholder(tf.bool,shape=(),
                                              name='deterministic')
             else:
                 self.deterministic = deterministic
@@ -142,15 +144,14 @@ class Op(Tensor):
 
         super().__init__(output)
 
-    def add_param(self,param):
-        if param is None:
-            return
-        assert(type(param)==tf.Variable)
-        assert(param not in self._params)
-        self._reset_params_op.append(tf.assign(param,param.initial_value))
-        if hasattr(param,'trainable'):
-            if param.trainable:
-                self._params.append(param)
+    def add_variable(self,var):
+        if var is None:
+            raise AssertionError('given var was None in',self)
+        if type(var)!=tf.Variable:
+            raise AssertionError('not a tf.Variable, skipping...')
+        if var in tf.global_variables(self.name):
+            raise AssertionError('var already added, skipping...')
+        self._reset_variables_op.append(tf.assign(var,var.initial_value))
 
     def backward(self,input):
         return tf.gradients(self,self.input,input)[0]
@@ -163,18 +164,19 @@ class Op(Tensor):
     def input(self):
         return self._input
 
-    @property
-    def params(self):
-        return self._params
-
-    @property
-    def parameters(self):
-        return self.params
+    def variables(self,trainable=True):
+        if trainable:
+            return tf.trainable_variables(scope=self.name)
+        else:
+            return tf.global_variables(scope=self.name)
 
     @property
     def updates(self):
         return self._updates
 
+    @property
+    def name(self):
+        return self._name
 
 class Identity(Op):
 

@@ -21,17 +21,17 @@ class Conv2D(Op):
     :type nonlinearity_c: scalar
 
     """
-    name = 'Conv2D'
+    _name_ = 'Conv2DOp'
     deterministic_behavior = False
     def __init__(self,incoming,filters,W = tfl.xavier_initializer(),
                     b = tf.zeros, strides=1, pad='valid',
                     mode='CONSTANT', name='', W_func = tf.identity,
                     b_func = tf.identity,*args,**kwargs):
-        with tf.variable_scope("Conv2DOp") as scope:
-            self.scope_name = scope.original_name_scope
-            self.mode       = mode
-            self.strides    = strides
-            self.pad        = pad
+        with tf.variable_scope(self._name_) as scope:
+            self._name   = scope.original_name_scope
+            self.mode    = mode
+            self.strides = strides
+            self.pad     = pad
             if np.isscalar(strides):
                 self.strides = [1,1,strides,strides]
             else:
@@ -53,22 +53,19 @@ class Conv2D(Op):
                                 incoming.shape.as_list()[1],filters[0])
             # Initialize W
             if callable(W):
-                self._W = Variable(W(w_shape), name='conv2dlayer_W_'+name)
+                self._W = tf.Variable(W(w_shape), name='W')
             else:
                 self.W  = W
             self.W  = W_func(self._W)
-            self.add_param(self._W)
 
             # Initialize b
             if b is None:
                 self._b  = None
             elif callable(b):
-                self._b = Variable(b((filters[0],1,1)),
-                                        name='conv2dlayer_b_'+name)
+                self._b = tf.Variable(b((filters[0],1,1)), name='b')
             else:
                 self._b = b
             self.b  = b_func(self._b) if b is not None else self._b
-            self.add_param(self._b)
 
             super().__init__(incoming)
 
@@ -84,6 +81,7 @@ class Conv2D(Op):
             return Wx
         else:
             return Wx+self.b
+
     def backward(self,input):
         return tf.nn.conv2d_backprop_input(self.input.get_shape().as_list(),
                 filter = self.W, out_backprop = input, strides=self.strides,
@@ -132,23 +130,24 @@ class SplineWaveletTransform(Op):
         learned
     """
     deterministic_behavior = False
-    name = 'SplineWaveletTransform'
+    _name_ = 'SplineWaveletTransformOp'
 
     def __init__(self, input, J, Q, K, strides=1, init='random',
                  trainable_scales=False, trainable_knots=False,
                  trainable_filters=False, hilbert=False, m=None,
                  p=None, padding='valid',n_conv=None, **kwargs):
-        with tf.variable_scope("SplineWaveletTransformOp") as scope:
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
             # Attribution
             if n_conv is None:
                 n_conv = J
-            K                    += (K%2)-1
-            self.J,self.Q,self.K  = J, Q, K
-            self.trainable_scales = trainable_scales
-            self.trainable_knots  = trainable_knots
+            K                     += (K%2)-1
+            self.J,self.Q,self.K   = J, Q, K
+            self.trainable_scales  = trainable_scales
+            self.trainable_knots   = trainable_knots
             self.trainable_filters = trainable_filters
-            self.hilbert          = hilbert
-            self.strides          = strides
+            self.hilbert           = hilbert
+            self.strides           = strides
 
             # ------ SCALES
             # we start with scale 1 for the nyquist and then increase 
@@ -159,7 +158,7 @@ class SplineWaveletTransform(Op):
             # sort them to have an interpretable time/frequency plot and to 
             # have coherency in case this is followed by 2D conv.
             scales = 2**(tf.range(self.J,delta=1./self.Q,dtype=tf.float32))
-            delta_scales = Variable(tf.zeros(self.J*self.Q),
+            delta_scales = tf.Variable(tf.zeros(self.J*self.Q),
                                 trainable=self.trainable_scales, name='scales')
             self.scales  = tf.contrib.framework.sort(scales+delta_scales)
             self._scales = np.arange(0,J,1./Q)
@@ -167,8 +166,8 @@ class SplineWaveletTransform(Op):
             # We initialize the knots  with uniform spacing 
             start = (self.K//2)
             grid  = tf.lin_space(np.float32(-start),np.float32(start), self.K)
-            self.knots = Variable(grid, trainable= self.trainable_knots, 
-						name='knots')
+            self.knots = tf.Variable(grid, trainable= self.trainable_knots, 
+						               name='knots')
             self.all_knots = tf.einsum('i,j->ij',self.scales,self.knots)
 
             # initialize m and p
@@ -232,14 +231,15 @@ class SplineWaveletTransform(Op):
             p = np.stack([p_real,p_imag]).astype('float32')
 
             if self.hilbert:
-                self._m = Variable(m[0], trainable=self.trainable_filters, name='m')
-                self._p = Variable(p[0], trainable=self.trainable_filters, name='p')
+                self._m = tf.Variable(m[0], trainable=self.trainable_filters, 
+                                                                    name='m')
+                self._p = tf.Variable(p[0], trainable=self.trainable_filters, 
+                                                                    name='p')
             else:
-                self._m = Variable(m, trainable=self.trainable_filters, name='m')
-                self._p = Variable(p, trainable=self.trainable_filters, name='p')
-
-        self.add_param(self._m)
-        self.add_param(self._p)
+                self._m = tf.Variable(m, trainable=self.trainable_filters, 
+                                                                    name='m')
+                self._p = Variable(p, trainable=self.trainable_filters, 
+                                                                    name='p')
 
         # Boundary Conditions and centering
         mask    = np.ones(self.K, dtype=np.float32)

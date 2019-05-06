@@ -20,22 +20,25 @@ class Dropout(Op):
         the incoming layer or input shape
 
     p : scalar :math:`0\leq p \leq 1`
-        the probability to keep the input values
+        the probability to drop the input values
 
     """
+    _name_ = 'DropoutOp'
+    deterministic_behavior = True
     def __init__(self, incoming, p=0.5, deterministic=None,seed=None,
                      **kwargs):
-        self.seed = seed
-        assert(np.isscalar(p))
-        self.p = p
-        super().__init__(incoming, **kwargs)
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
+            self.seed = seed
+            assert(np.isscalar(p))
+            self.p = p
+            super().__init__(incoming, **kwargs)
 
-    def forward(self,input=None, deterministic=None,**kwargs):
-        # Random indices
-        random_values = tf.random_uniform(self.input_shape,seed=self.seed)
-        mask          = tf.cast(tf.less(random_values,self.p),input.dtype)
-        self.output = tf.cond(deterministic,lambda :input,lambda :mask*input)
-        return self.output
+    def forward(self,input, deterministic, *args, **kwargs):
+        r_values = tf.random_uniform(input.shape.as_list(), seed=self.seed)
+        mask     = tf.cast(tf.greater(r_values, self.p), input.dtype)
+        output   = tf.cond(deterministic, lambda :input, lambda :mask*input)
+        return output
 
 
 class UniformNoise(Op):
@@ -66,34 +69,30 @@ class UniformNoise(Op):
 
     """
 
-    name = 'UniformNoise'
+    _name_ = 'UniformNoiseOp'
     deterministic_behavior = True
 
     def __init__(self, incoming, noise_type="additive", lower = np.float32(0),
-            upper = np.float32(1), deterministic=None, **kwargs):
-        super().__init__(incoming, **kwargs)
+            upper = np.float32(1), deterministic=None, seed=None, **kwargs):
 
-        # Set attributes
-        self.lower = lower
-        self.upper = upper
-        self.noise_type = noise_type
-        if self.given_input:
-            self.forward(incoming.output,deterministic=deterministic)
-    def forward(self,input=None, deterministic=None, _input=None, **kwargs):
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
+            # Set attributes
+            self.lower = lower
+            self.upper = upper
+            self.seed  = seed
+            self.noise_type = noise_type
+            super().__init__(incoming, deterministic=deterministic)
+    def forward(self,input, deterministic, *args, **kwargs):
         # Random indices
-        random_values = tf.random_uniform(self.input_shape)\
-                                *(self.upper-self.lower)-self.lower
-        if input is None:
-            input = self.incoming.forward(deterministic=deterministic,_input=_input)
+        r_values = tf.random_uniform(self.input_shape,minval=self.lower,
+                                     maxval=self.upper,seed=self.seed)
         if self.noise_type=="additive":
-            output = input+random_values
+            output = input+r_values
         elif self.noise_type=="multiplicative":
-            output = input*random_values
-        else:
-            print('error')
-            exit()
-        self.output = tf.cond(deterministic,lambda :input,lambda :output)
-        return self.output
+            output = input*r_values
+        output = tf.cond(deterministic, lambda :input, lambda :output)
+        return output
 
 
 class GaussianNoise(Op):
@@ -124,30 +123,29 @@ class GaussianNoise(Op):
 
     """
 
-    name = 'GaussianNoise'
+    _name_ = 'GaussianNoiseOp'
     deterministic_behavior = True
 
     def __init__(self, incoming, noise_type="additive", mu = np.float32(0),
             sigma = np.float32(1), deterministic=None, seed=None, **kwargs):
-        """init
-        """
+        with tf.variable_scope(self._name_) as scope:
+            self._name      = scope.original_name_scope
+            self.seed       = seed
+            self.mu         = mu
+            self.sigma      = sigma
+            self.noise_type = noise_type
+            super().__init__(incoming, **kwargs)
 
-        # Set attributes
-        self.seed       = seed
-        self.mu         = mu
-        self.sigma      = sigma
-        self.noise_type = noise_type
-        super().__init__(incoming, **kwargs)
-
-    def forward(self,input, deterministic, **kwargs):
+    def forward(self,input, deterministic, *args, **kwargs):
         # Random indices
-        random_values = tf.random_normal(input.get_shape().as_list(),
-                      seed=self.seed)*self.sigma+self.mu
+        r_values = tf.random_normal(input.get_shape().as_list(), mean=self.mu,
+                                         stddev=self.sigma, seed=self.seed)
         if self.noise_type=="additive":
-            output = input+random_values
+            output = input+r_values
         elif self.noise_type=="multiplicative":
-            output = input*random_values
-        return tf.cond(deterministic,lambda :input,lambda :output)
+            output = input*r_values
+        output = tf.cond(deterministic, lambda :input, lambda :output)
+        return output
 
 
 
@@ -181,35 +179,41 @@ class RandomCrop(Op):
 
     """
 
-    name = 'RandomCrop'
+    _name_ = 'RandomCropOp'
     deterministic_behavior = True
 
-    def __init__(self, input, crop_shape, deterministic=None,seed=None,
-                                 **kwargs):
-        """init
-        """
-        # Set attributes
-        self.seed = seed
-        if np.isscalar(crop_shape):
-            self.crop_shape = [crop_shape,crop_shape]
-        else:
-            assert(len(crop_shape)==2)
-            self.crop_shape = list(crop_shape)
+    def __init__(self, input, crop_shape, deterministic=None, seed=None, 
+                                                                 **kwargs):
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
+            # Set attributes
+            self.seed = seed
+            if np.isscalar(crop_shape):
+                self.crop_shape = [crop_shape,crop_shape]
+            else:
+                assert(len(crop_shape)==2)
+                self.crop_shape = list(crop_shape)
+    
+            self.spatial_shape = input.shape.as_list()[2:]
 
-        # Set shape after transpose as this function needs
-        # data_format='NHWC' always
-        self.spatial_shape = input.get_shape().as_list()[2:]
+            # Number of patches of crop_shape shape in the input in H and W
+            self.n_H = np.int64(self.spatial_shape[0]-self.crop_shape[0]+1)
+            self.n_W = np.int64(self.spatial_shape[1]-self.crop_shape[1]+1)
+    
+            super().__init__(input, deterministic=deterministic)
 
-        # Number of patches of crop_shape shape in the input in H and W
-        self.n_H = np.int64(self.spatial_shape[0]-self.crop_shape[0]+1)
-        self.n_W = np.int64(self.spatial_shape[1]-self.crop_shape[1]+1)
+    def forward(self, input, deterministic, *args, **kwargs):
 
-        super().__init__(input, **kwargs)
+        # Patches form the input:
+        # need to transpose to extract patches
+        input_t = tf.transpose(input,[0,2,3,1])
+        # Extract patches of the crop_shape shape
+        input_patches  = tf.extract_image_patches(input_t,
+                                    [1]+self.crop_shape+[1],strides=[1,1,1,1],
+                                    rates=[1,1,1,1],padding='VALID')
 
-    def forward(self,input, deterministic, **kwargs):
-
-        # Random indices
-        N,C,H,W = input.get_shape().as_list()
+        # Random indices and patches
+        N,C,H,W = input.shape.as_list()
         random_H = tf.random_uniform((N,),maxval=np.float32(self.n_H),
                                                 seed=self.seed)
         random_W = tf.random_uniform((N,),maxval=np.float32(self.n_W),
@@ -217,26 +221,20 @@ class RandomCrop(Op):
         indices_H = tf.cast(tf.floor(random_H), tf.int32)
         indices_W = tf.cast(tf.floor(random_W), tf.int32)
         random_indices = tf.stack([tf.range(N), indices_H, indices_W],1)
-        # Deterministic (center) indices
+        random_patches = tf.gather_nd(input_patches,random_indices)
+
+        # Deterministic (center) indices and patches
         center_indices = tf.stack([tf.range(N,dtype=tf.int64),
                         tf.fill((N,),self.n_H//2),
                         tf.fill((N,),self.n_W//2)],1)
-
-        # need to transpose to extract patches
-        input_t = tf.transpose(input,[0,2,3,1])
-
-        # Extract patches of the crop_shape shape
-        input_patches  = tf.extract_image_patches(input_t,
-                                    [1]+self.crop_shape+[1],strides=[1,1,1,1],
-                                    rates=[1,1,1,1],padding='VALID')
-        random_patches = tf.gather_nd(input_patches,random_indices)
         center_patches = tf.gather_nd(input_patches,center_indices)
 
-        # Set the patches to use depending if it is train or test time
+        # Output
         patches = tf.cond(deterministic, lambda :center_patches,
                                     lambda :random_patches)
+        # need to reshape as the patches are still flattened
         output  = tf.reshape(patches, [N]+self.crop_shape+[C])
-
+        # transpose back to the original NCHW format
         return tf.transpose(output,[0,3,1,2])
 
 
@@ -272,24 +270,23 @@ class RandomAxisReverse(Op):
         its output with the constructor
     """
 
-    name = 'RandomAxisReverse'
+    _name_ = 'RandomAxisReverseOp'
     deterministic_behavior = True
 
-    def __init__(self, input, axis, deterministic=None,seed=None, **kwargs):
-        if np.isscalar(axis):
-            self.axis = [axis]
-        else:
-            self.axis = axis
-        self.seed = seed
-        super().__init__(input,deterministic=deterministic, **kwargs)
+    def __init__(self, input, axis, deterministic=None, seed=None, **kwargs):
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
+            self.axis  = [axis] if np.isscalar(axis) else axis
+            self.seed  = seed
+            super().__init__(input, deterministic=deterministic)
 
-    def forward(self,input,deterministic, *args, **kwargs):
-        N          = input.get_shape().as_list()[0]
-        prob       = tf.random_uniform((N,),seed=self.seed)
+    def forward(self, input, deterministic, *args, **kwargs):
+        N          = input.shape.as_list()[0]
+        prob       = tf.random_uniform((N,), seed=self.seed)
         to_reverse = tf.less(prob,0.5)
-        reverse_input = tf.where(to_reverse,
-                                tf.reverse(input,self.axis),input)
-        return tf.cond(deterministic,lambda :input, lambda :reverse_input)
+        reverse_input = tf.where(to_reverse, tf.reverse(input,self.axis),input)
+        output     = tf.cond(deterministic,lambda :input, lambda :reverse_input)
+        return output
 
 
 class RandomRot90(Op):
@@ -305,30 +302,24 @@ class RandomRot90(Op):
                      None in most cases
     :type deterministic: tf.bool
     """
-    def __init__(self, incoming, deterministic=None,seed=None, **kwargs):
-        self.output_shape = self.input_shape
-        self.seed = seed
-        super().__init__(incoming, **kwargs)
-    def forward(self,input=None,deterministic=None,_input=None, **kwargs):
-        prob = tf.random_uniform((self.input_shape[0],),maxval=np.float32(3))
-        self.rot_left = tf.less(prob,1)
-        self.rot_right = tf.greater(prob,2)
-        if input is None:
-            input = self.incoming.forward(deterministic=deterministic,_input=_input)
-        if self.data_format=='NCHW':
-            left_rot    = tf.transpose(input,[0,1,3,2])
-            left_images = tf.where(self.rot_left,left_rot,input)
-            output      = tf.where(self.rot_right,tf.reverse(left_rot,[-1]),
-                                                        left_images)
-        else:
-            left_rot    = tf.transpose(incoming.output,[0,2,1,3])
-            left_images = tf.where(self.rot_left,left_rot,input)
-            output      = tf.where(self.rot_right,tf.reverse(left_rot,[2]),
-                                                        left_images)
-        self.output = tf.cond(deterministic,lambda :input,lambda :output)
-        return self.output
+    _name_ = 'RandomRot90Op'
+    deterministic_behavior = True
+    def __init__(self, incoming, deterministic=None, seed=None, **kwargs):
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
+            self.output_shape = self.input_shape
+            self.seed = seed
+            super().__init__(incoming, deterministic=deterministic)
+    def forward(self,input, deterministic, **kwargs):
+        N = input.shape.as_list()[0]
+        r_values = tf.random_uniform((N,), maxval=np.float32(3), seed=self.seed)
+        rot_left  = tf.less(r_values,1)
+        rot_right = tf.greater(r_values,2)
+        left_rot    = tf.transpose(input,[0,1,3,2])
+        right_rot   = tf.reverse(left_rot,[-1])
 
-
-
-
+        left_images = tf.where(self.rot_left,left_rot,input)
+        output      = tf.where(self.rot_right,right_rot, left_images)
+        output      = tf.cond(deterministic, lambda :input, lambda :output)
+        return output
 

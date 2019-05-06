@@ -27,20 +27,18 @@ class Network:
                     for d in layer.deterministic:
                         couple.append((d,value))
         return dict(couple)
+
     @property
     def shape(self):
         s = [i.get_shape().as_list() for i in self]
         return s
-    @property
-    def params(self):
-        params = []
+
+    def variables(self,trainable=True):
+        var = []
         for layer in self.layers:
-            if hasattr(layer,'params'):
-                params+=layer.params
-        return params
-    @property
-    def parameters(self):
-        return self.params
+            var+=layer.variables(trainable)
+        return var
+
     @property
     def updates(self):
         updates = []

@@ -64,14 +64,14 @@ class Dense(Op):
         same as func_W but for the :math:`b` parameter
 
     """
-    name = 'Dense'
+    _name_ = 'DenseOp'
     deterministic_behavior = False
 
     def __init__(self, incoming, units, W = tfl.xavier_initializer(), 
                 b = tf.zeros, W_func = tf.identity, 
                 b_func = tf.identity, name='',*args, **kwargs):
-        with tf.variable_scope("dense_layer") as scope:
-            self.scope_name = scope.original_name_scope
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
             # Set up the input, flatten if needed
             if len(incoming.shape.as_list())>2:
                 self._flatten_input = True
@@ -82,21 +82,19 @@ class Dense(Op):
 
             # Initialize W
             if callable(W):
-                self._W = Variable(W((flat_dim,units)),name='dense_W_'+name)
+                self._W = tf.Variable(W((flat_dim,units)),name='W')
             else:
                 self._W = W
             self.W = W_func(self._W)
-            self.add_param(self._W)
             # Initialize b
             if b is None:
                 self.b  = None
             else:
                 if callable(b):
-                    self._b = Variable(b((1,units)),name='dense_b_'+name)
+                    self._b = tf.Variable(b((1,units)),name=name+'b')
                 else:
                     self._b = b
                 self.b  = b_func(self._b)
-                self.add_param(self._b)
 
             super().__init__(incoming)
 

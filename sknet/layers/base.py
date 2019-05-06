@@ -153,28 +153,30 @@ class Layer(Tensor):
 
         # initialize the Layer as a tf Variable
         super().__init__(self._inner_ops[-1])
+
     def backward(self,input):
         for op in self.inner_ops[::-1]:
             input = op.backward(op)
         return input
+
     @property
     def inner_ops(self):
         return self._inner_ops
+
     @property
     def deterministic(self):
         return self._deterministic
+
     @property
     def input(self):
         return self._input
-    @property
-    def params(self):
-        params = []
+
+    def variables(self,trainable=True):
+        var = []
         for op in self.inner_ops:
-            params+=op.params
-        return params
-    @property
-    def parameters(self):
-        return self.params
+            var+=op.variables(trainable)
+        return var
+
     @property
     def updates(self):
         updates = []

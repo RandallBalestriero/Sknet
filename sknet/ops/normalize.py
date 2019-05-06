@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from . import Op
-from .. import Variable
+from .. import Variable, EMA
 
 class BatchNorm(Op):
     """applies batch-normalization onto the input
@@ -38,16 +38,16 @@ class BatchNorm(Op):
     :type decay: scalar
     """
 
-    name = 'BatchNormOp'
+    _name_ = 'BatchNormOp'
     deterministic_behavior = True
 
-    def __init__(self,incoming,axis,deterministic=None, b = tf.zeros,
-                W=tf.ones, W_func=tf.identity, b_func=tf.identity,
-                name='bn_layer', epsilon=1e-4, decay=0.9, trainable_W = True,
-                trainable_b = True, **kwargs):
+    def __init__(self, incoming, axis, deterministic=None, epsilon=1e-4, 
+                decay=0.9, W=tf.ones, b=tf.zeros, W_func=tf.identity, 
+                b_func=tf.identity, trainable_W=True, trainable_b=True, 
+                **kwargs):
 
-        with tf.variable_scope(type(self).name) as scope:
-            self.name    = scope.original_name_scope
+        with tf.variable_scope(self._name_) as scope:
+            self._name    = scope.original_name_scope
             self.epsilon = epsilon
             self.decay   = decay
             self.axis    = [axis] if np.isscalar(axis) else axis
@@ -59,26 +59,22 @@ class BatchNorm(Op):
             shape_   = [s if i not in self.axis else 1
                                         for i,s in enumerate(in_shape)]
 
-
             # Initialization W (a.k.a gamma)
             if callable(W):
-                self._W = Variable(W(shape_), trainable=trainable_W, name='W')
+                self._W = tf.Variable(W(shape_), trainable=trainable_W,name='W')
             else:
-                self._W = Variable(W, trainable=trainable_W, name='W')
-            self.add_param(self._W)
+                self._W = tf.Variable(W, trainable=trainable_W, name='W')
             self.W = W_func(self._W)
 
             # Initialization b (a.k.a beta)
             if callable(b):
-                self._b = Variable(b(shape_), trainable=trainable_b, name='b')
+                self._b = tf.Variable(b(shape_), trainable=trainable_b,name='b')
             else:
-                self._b = Variable(b, trainable=trainable_b, name='b')
-            self.add_param(self._b)
-            self.b  = b_func(self._b)
+                self._b = tf.Variable(b, trainable=trainable_b, name='b')
+            self.b = b_func(self._b)
 
             # Steps
-            self.steps = Variable(tf.zeros((1,)),trainable=False,name='step')
-            self.add_param(self.steps)
+            self.steps = tf.Variable(np.float32(0),trainable=False,name='step')
             self._updates.append(tf.assign_add(self.steps,1.))
 
             super().__init__(incoming,deterministic)
@@ -90,19 +86,18 @@ class BatchNorm(Op):
 
         # update of the moving averages and updates/params collection
         if self.decay=='AVG':
-            mean_ema,mean_ema_op=EMA(mean_, self.steps)
-            var_ema,var_ema_op  =EMA(var_, self.steps)
+            mean_ema,mean_ema_op=EMA(mean_, self.steps+1)
+            var_ema,var_ema_op  =EMA(var_, self.steps+1)
         else:
             mean_ema,mean_ema_op=EMA(mean_, self.decay, self.steps)
             var_ema,var_ema_op  =EMA(var_, self.decay, self.steps)
         self._updates.append(mean_ema_op)
         self._updates.append(var_ema_op)
-        self.add_param(mean_ema)
-        self.add_param(var_ema)
 
         # function, context dependent to get stat to use
-        use_mean,use_var = tf.cond(deterministic,lambda :mean_,var_,
-                                                 lambda :mean_ema,var_ema)
+        use_mean,use_var = tf.cond(deterministic,
+                                             lambda :[mean_ema_op,var_ema_op],
+                                             lambda :[mean_,var_])
         use_std = tf.sqrt(use_var)+self.epsilon
 
         # we also compute those quantities that allow to rewrite the output as

@@ -52,21 +52,18 @@ dnn       = sknet.network.Network(name='simple_model')
 
 dnn.append(ops.RandomAxisReverse(dataset.images,axis=[-1]))
 dnn.append(ops.RandomCrop(dnn[-1],(28,28),seed=10))
-dnn.append(ops.GaussianNoise(dnn[-1],noise_type='additive',sigma=0.05))
+dnn.append(ops.GaussianNoise(dnn[-1],noise_type='additive',sigma=0.01))
 
 sknet.network.ConvLarge(dnn,dataset.n_classes)
-##Resnet(dnn,dataset.n_classes,D=4,W=2)
-print(dataset.n_classes)
 prediction = dnn[-1]
 
-print(prediction.get_shape().as_list())
 loss    = crossentropy_logits(p=dataset.labels,q=prediction)
 accu    = accuracy(dataset.labels,prediction)
 
 B         = dataset.N('train_set')//32
 lr        = sknet.optimize.PiecewiseConstant(0.01,
                                     {100*B:0.002,200*B:0.001,250*B:0.0005})
-optimizer = Adam(loss,lr,params=dnn.params)
+optimizer = Adam(loss,lr,params=dnn.variables(trainable=True))
 minimizer = tf.group(optimizer.updates+dnn.updates)
 
 # Workers

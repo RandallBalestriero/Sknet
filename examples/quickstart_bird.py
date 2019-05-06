@@ -30,7 +30,7 @@ dataset['signals/train_set']/=dataset['signals/train_set'].max(2,keepdims=True)
 dataset.split_set("train_set","test_set",0.33)
 
 
-dataset.create_placeholders(batch_size=16,
+dataset.create_placeholders(batch_size=20,
        iterators_dict={'train_set':BatchIterator("random_see_all"),
                        'valid_set':BatchIterator('continuous'),
                        'test_set':BatchIterator('continuous')},device="/cpu:0")
@@ -46,37 +46,28 @@ my_layer = layers.custom_layer(ops.Dense,ops.BatchNorm,ops.Activation)
 dnn = sknet.network.Network(name='model_base')
 
 dnn.append(ops.SplineWaveletTransform(dataset.signals,J=5,Q=16,K=15,
-			trainable_scales=True, trainable_knots=True,
-                 	trainable_filters=True,init='gabor'))
+			trainable_scales=False, trainable_knots=False,
+                 	trainable_filters=False,init='gabor'))
 dnn.append(ops.Pool2D(tf.log(dnn[-1]+0.001),(1,1024),strides=(1,512),pool_type='AVG'))
 dnn.append(ops.BatchNorm(dnn[-1],[0,3]))
 
 
-dnn.append(layers.Conv2DPool(dnn[-1],[(32,3,5),{'b':None}],
-                                [[0,2,3]],[0.1],[(1,3)]))
+dnn.append(layers.Conv2DPool(dnn[-1],[(32,3,3),{'b':None}],
+                                [[0,2,3]],[0.1],[(3,3)]))
 
-dnn.append(layers.Conv2DPool(dnn[-1],[(64,5,1),{'b':None}],
-                                [[0,2,3]],[0.1],[(3,1)]))
 
-dnn.append(layers.Conv2D(dnn[-1],[(64,1,1),{'b':None}],
-                                [[0,2,3]],[0.1]))
+dnn.append(layers.Conv2DPool(dnn[-1],[(64,3,3),{'b':None}],
+                                  [[0,2,3]],[0.1],[(3,3)]))
 
-dnn.append(layers.Conv2DPool(dnn[-1],[(64,3,5),{'b':None}],
+dnn.append(layers.Conv2DPool(dnn[-1],[(64,3,3),{'b':None}],
                                   [[0,2,3]],[0.1],[(1,3)]))
 
-dnn.append(layers.Conv2DPool(dnn[-1],[(64,5,1),{'b':None}],
-                                  [[0,2,3]],[0.1],[(3,1)]))
 
-dnn.append(layers.Conv2D(dnn[-1],[(128,1,1),{'b':None}],
-                                  [[0,2,3]],[0.1]))
-
-dnn.append(layers.Conv2DPool(dnn[-1],[(128,1,3),{'b':None}],
-                                  [[0,2,3]],[0.1],[(1,3)]))
+dnn.append(my_layer(dnn[-1],[512,{'b':None}],
+                                    [[0]],[0]))
+dnn.append(ops.Dropout(dnn[-1],0.5))
 
 dnn.append(my_layer(dnn[-1],[256,{'b':None}],
-                                    [[0]],[0]))
-
-dnn.append(my_layer(dnn[-1],[128,{'b':None}],
                                     [[0]],[0]))
 
 dnn.append(ops.Dense(dnn[-1],units=dataset.n_classes))
@@ -97,7 +88,7 @@ auc      = AUC(dataset.labels,tf.nn.softmax(dnn[-1])[:,1])
 # the changes to the model parameters, we also specify that this process
 # should also include some possible network dependencies present in UPDATE_OPS
 
-optimizer = sknet.optimize.Adam(loss,0.05,params=dnn.params)
+optimizer = sknet.optimize.Adam(loss,0.05,params=dnn.variables(trainable=True))
 minimizer = tf.group(optimizer.updates+dnn.updates)
 
 # Workers

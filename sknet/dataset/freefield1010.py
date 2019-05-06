@@ -13,7 +13,7 @@ from ..utils import to_one_hot, DownloadProgressBar
 
 from . import Dataset
 
-def load_freefield1010(subsample=1,PATH=None):
+def load_freefield1010(subsample=1,n_samples=-1,PATH=None):
     """Audio binary classification, presence or absence of bird songs.
     `freefield1010 <http://machine-listening.eecs.qmul.ac.uk/bird-audio-detection-challenge/#downloads>`_. 
     is a collection of over 7,000 excerpts from field recordings 
@@ -22,11 +22,20 @@ def load_freefield1010(subsample=1,PATH=None):
     and for the BAD Challenge we have newly annotated it for the 
     presence/absence of birds.
 
-    :param data_format: (optional, default 'NCHW')
-    :type data_format: 'NCHW' or 'NHWC'
-    :param path: (optional, default $DATASET_PATH), the path to look for the data and 
-                 where the data will be downloaded if not present
-    :type path: str
+    Parameters
+    ----------
+
+    subsample : int (optional)
+        the amount of subsample ot apply. No low-pass filtering is applied 
+        before-hand; too much subsample will create aliasing. Default value
+        does not subsample the signals.
+
+    n_samples : int (optional)
+        The number of samples to load. By default, load the whole dataset.
+
+    PATH : str (optional)
+        The path to use for dataset loading (downloading if needed). By
+        default use the environment variable :envvar:`DATASET_PATH`.
     """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
@@ -61,6 +70,8 @@ def load_freefield1010(subsample=1,PATH=None):
     #Loading Labels
     labels = np.loadtxt(PATH+'freefield1010/ff1010bird_metadata.csv',
             delimiter=',',skiprows=1,dtype='int32')
+    if n_samples<len(labels):
+        labels = labels[np.random.permutation(len(labels))[:n_samples]]
     # Loading the files
     f       = zipfile.ZipFile(PATH+'freefield1010/ff1010bird_wav.zip')
     # Init. the wavs matrix

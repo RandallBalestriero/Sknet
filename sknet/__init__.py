@@ -17,19 +17,17 @@ __all__ = [
         "network",
         "optimize"]
 
-
 __version__ = 'alpha.1'
 
 
-
 def EMA(tensor, decay, step=None):
-    moving_average = Variable(tf.zeros_like(tensor),trainable=False,name='ma')
-    ma = moving_average*decay+tensor*(1-decay)
+    moving_average = Variable(tf.zeros_like(tensor), trainable=False, name='ma')
+    ma = (moving_average-tensor)*(1-decay)
     if step is not None:
-        update = tf.assign(moving_average,tf.cond(tf.greater(step,0),
-                                 lambda :ma, lambda :tensor))
+        update = tf.assign_sub(moving_average,tf.cond(tf.greater(step,0),
+                                 lambda :ma, lambda :-tensor))
     else:
-        update = tf.assign(moving_average,ma)
+        update = tf.assign_sub(moving_average,ma)
     return moving_average,update
 
 def get_tensor_dependencies(tensor):
