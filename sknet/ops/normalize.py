@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from . import Op
-from .. import Variable, EMA
+from .. import Variable, EMA, ONE_INT32, ZERO_INT32
 
 class BatchNorm(Op):
     """applies batch-normalization onto the input
@@ -47,9 +47,9 @@ class BatchNorm(Op):
                 **kwargs):
 
         with tf.variable_scope(self._name_) as scope:
-            self._name    = scope.original_name_scope
-            self.epsilon = epsilon
-            self.decay   = decay
+            self._name   = scope.original_name_scope
+            self.epsilon = tf.constant(epsilon)
+            self.decay   = tf.constant(decay)
             self.axis    = [axis] if np.isscalar(axis) else axis
 
             # Infer the shape of the parameters, it is 1 for the axis that are
@@ -74,30 +74,31 @@ class BatchNorm(Op):
             self.b = b_func(self._b)
 
             # Steps
-            self.steps = tf.Variable(np.float32(0),trainable=False,name='step')
-            self._updates.append(tf.assign_add(self.steps,1.))
-
+            self.steps = tf.Variable(-ONE_INT32, trainable=False, name='step')
+            
             super().__init__(incoming,deterministic)
 
-    def forward(self,input, deterministic, **kwargs):
+    def forward(self,input, deterministic, *args, **kwargs):
+
+        step = tf.assign_add(self.steps, ONE_INT32)
+        self._updates.append(step)
 
         # batch statistics
-        mean_,var_ = tf.nn.moments(input,axes=self.axis,keep_dims=True)
+        mean_,var_ = tf.nn.moments(input, axes=self.axis, keep_dims=True)
 
         # update of the moving averages and updates/params collection
         if self.decay=='AVG':
-            mean_ema,mean_ema_op=EMA(mean_, self.steps+1)
-            var_ema,var_ema_op  =EMA(var_, self.steps+1)
+            m_ema, mean_ema_op = EMA(mean_, tf.cast(step+ONE_INT32, tf.float32))
+            v_ema, var_ema_op  = EMA(var_, tf.cast(step+ONE_INT32, tf.float32))
         else:
-            mean_ema,mean_ema_op=EMA(mean_, self.decay, self.steps)
-            var_ema,var_ema_op  =EMA(var_, self.decay, self.steps)
+            m_ema, mean_ema_op = EMA(mean_, self.decay, step)
+            v_ema, var_ema_op  = EMA(var_, self.decay, step)
         self._updates.append(mean_ema_op)
         self._updates.append(var_ema_op)
 
         # function, context dependent to get stat to use
-        use_mean,use_var = tf.cond(deterministic,
-                                             lambda :[mean_ema_op,var_ema_op],
-                                             lambda :[mean_,var_])
+        use_mean,use_var = tf.cond(deterministic, lambda :[m_ema,v_ema],
+                                                  lambda :[mean_,var_])
         use_std = tf.sqrt(use_var)+self.epsilon
 
         # we also compute those quantities that allow to rewrite the output as

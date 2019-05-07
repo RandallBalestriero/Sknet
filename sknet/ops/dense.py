@@ -2,7 +2,7 @@ import tensorflow as tf
 import tensorflow.contrib.layers as tfl
 from .normalize import BatchNorm as bn
 from .special import Activation as sa
-from .special import Identity
+#from .special import Identity
 import numpy as np
 
 from . import Op

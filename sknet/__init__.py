@@ -9,6 +9,7 @@ import re
 import h5py
 import copy
 from tensorflow.contrib.graph_editor import get_backward_walk_ops
+
 __all__ = [
         "dataset",
         "layers",
@@ -19,13 +20,18 @@ __all__ = [
 
 __version__ = 'alpha.1'
 
+ZERO_INT32   = tf.constant(np.int32(0))
+ZERO_FLOAT32 = tf.constant(np.float32(0))
+ONE_INT32    = tf.constant(np.int32(1))
+ONE_FLOAT32  = tf.constant(np.float32(1))
+
 
 def EMA(tensor, decay, step=None):
     moving_average = Variable(tf.zeros_like(tensor), trainable=False, name='ma')
     ma = (moving_average-tensor)*(1-decay)
     if step is not None:
-        update = tf.assign_sub(moving_average,tf.cond(tf.greater(step,0),
-                                 lambda :ma, lambda :-tensor))
+        value  = tf.cond(tf.greater(step,ZERO_INT32),lambda :ma,lambda :-tensor)
+        update = tf.assign_sub(moving_average,value)
     else:
         update = tf.assign_sub(moving_average,ma)
     return moving_average,update
@@ -34,7 +40,7 @@ def get_tensor_dependencies(tensor):
     dependencies = list()
     ops = list()
     for t in tensor:
-        ops.append(get_backward_walk_ops(t,control_inputs=True, inclusive=False))
+        ops.append(get_backward_walk_ops(t,control_inputs=True,inclusive=False))
     ops = list(set([o for op in ops for o in op]))
     for op in ops:
         if op.type == 'Placeholder' and 'deterministic' not in op.name:
@@ -462,14 +468,13 @@ class Worker(object):
         if self.verbose:
             print(self.name+':',end='')
         for i,data in enumerate(self.batch_data):
-            self.epoch_data[i].append(
-                               self._transform_function[i](np.asarray(data)))
+            self.epoch_data[i].append(self._transform_function[i](
+                                                          np.asarray(data)))
             if self.transform_function[i] is not None and self.verbose:
                 print(self.epoch_data[i][-1],end=' ')
         self.batch_data = [[] for i in range(len(self._op))]
         if self.verbose:
             print('')
-
 
 
 

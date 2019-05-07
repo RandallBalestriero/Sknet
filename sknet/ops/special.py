@@ -178,25 +178,6 @@ class Inverse(Op):
 
 
 
-class Identity(Op):
-    """identity layer leaving its input intact
-
-    This layer is implemented for ocnvenience to allow identity
-    transformation
-
-    :param incoming: the input shape or incoming layer
-    :type incoming: list of ints or :class:`Op`
-    """
-    def __init__(self,incoming, **kwargs):
-        super().__init__(incoming, **kwargs)
-        self.output_shape      = self.input_shape
-        if self.given_input:
-            self.forward(input)
-    def forward(self,input,**kwargs):
-        self.output = input
-        return self.output
-
-
 
 class LambdaFunction(Op):
     """Apply a lambda function onto the input

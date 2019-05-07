@@ -123,46 +123,37 @@ class Op(Tensor):
         this allows the user to feed directly a tensorflow variable as input
 
     """
-    def __new__(cls,*args,**kwargs):
-        obj = super().__new__(cls)
-        obj._updates   = list()
+    def __new__(cls, *args, **kwargs):
+        obj                     = super().__new__(cls)
+        obj._updates            = list()
         obj._reset_variables_op = list()
         return obj
     def __init__(self,input, deterministic=None):
 
-        self._input   = input
-
+#        self._input   = input
         if type(self).deterministic_behavior:
             if deterministic is None:
                 self.deterministic = tf.placeholder(tf.bool,shape=(),
-                                             name='deterministic')
+                                                        name='deterministic')
             else:
                 self.deterministic = deterministic
             output = self.forward(input,self.deterministic)
         else:
             output = self.forward(input)
-
+        for var in tf.global_variables(self.name):
+            self._reset_variables_op.append(tf.assign(var,var.initial_value))
         super().__init__(output)
 
-    def add_variable(self,var):
-        if var is None:
-            raise AssertionError('given var was None in',self)
-        if type(var)!=tf.Variable:
-            raise AssertionError('not a tf.Variable, skipping...')
-        if var in tf.global_variables(self.name):
-            raise AssertionError('var already added, skipping...')
-        self._reset_variables_op.append(tf.assign(var,var.initial_value))
+    @property
+    def reset_variables_op(self):
+        return self._reset_variables_op
 
     def backward(self,input):
         return tf.gradients(self,self.input,input)[0]
 
-    @property
-    def reset_params_op(self):
-        return self._reset_params_op
-
-    @property
-    def input(self):
-        return self._input
+#    @property
+#    def input(self):
+#        return self._input
 
     def variables(self,trainable=True):
         if trainable:
@@ -179,12 +170,12 @@ class Op(Tensor):
         return self._name
 
 class Identity(Op):
-
-    name = 'Identity'
+    _name_ = 'IdentityOp'
     deterministic_behavior = False
-
     def __init__(self, input):
-        super().__init__(input)
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
+            super().__init__(input)
 
     def forward(self,input,*args,**kwargs):
         return input

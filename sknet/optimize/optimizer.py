@@ -4,7 +4,7 @@
 import numpy as np
 import tensorflow as tf
 from . import schedule as sch
-from .. import EMA,Variable
+from .. import EMA,Variable,ONE_INT32
 
 class Adam:
     def __init__(self, loss_or_grads, learning_rate, beta1=0.9,
@@ -24,23 +24,23 @@ class Adam:
                 gradients = tf.gradients(loss_or_grads,params)
 
             # Perform Adam
-            t = Variable(np.int32(0), trainable=False, name='t')
-            self.params = [t]
-
+            self.step = Variable(-ONE_INT32, trainable=False, name='step')
+            step = tf.assign_add(self.step, ONE_INT32)
             # get the learning rate
             if not np.isscalar(learning_rate):
-                learning_rate = learning_rate(t)
+                learning_rate = learning_rate(step)
             else:
                 learning_rate = tf.constant(learning_rate)
 
             eps     = tf.constant(epsilon)
-            updates = [tf.assign_add(t, 1)]
+            b1,b2   = tf.constant(beta1), tf.constant(beta2)
+            updates = [step]
 
             for param, grad in zip(params,gradients):
-                ema_m,m_op = EMA(grad,beta1,t)
-                ema_v,v_op = EMA(tf.square(grad),beta2,t)
-                step = learning_rate*m_op/(tf.sqrt(v_op)+eps)
-                updates.append(tf.assign_sub(param, step))
+                _, m_op = EMA(grad, b1, step)
+                _, v_op = EMA(tf.square(grad), b2, step)
+                update  = learning_rate*m_op/(tf.sqrt(v_op)+eps)
+                updates.append(tf.assign_sub(param, update))
                 updates.append(m_op)
                 updates.append(v_op)
             self.updates = updates
