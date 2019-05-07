@@ -1,6 +1,6 @@
 import sys
 sys.path.insert(0, "../")
-
+import h5py
 import sknet
 from sknet.optimize import Adam
 from sknet.optimize.loss import *
@@ -23,6 +23,25 @@ from sknet import ops,layers
 
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+import os
+
+if os.path.isfile('./save_reset.h5'):
+    f = h5py.File('save_reset.h5','r')
+    plt.figure(figsize=(6,6))
+    plt.subplot(211)
+    plt.plot(f['train_set/minimizer/1'][...].flatten())
+    plt.title('Cross-Entropy loss during training, every 100 batch')
+    plt.xticks([])
+    plt.ylabel('cross entropy')
+    plt.subplot(212)
+    plt.plot(f['test_set/accu/0'][...].flatten()*100)
+    plt.title('Average classification accuracy on test set per epoch')
+    plt.ylabel(r'accuracy in $\%$')
+    plt.xlabel('epoch')
+    plt.suptitle('Network reset every 30 epochs, 10 times, CIFAR10, LargeConv')
+    plt.savefig('save_reset.pdf')
+    exit()
+
 
 # Data Loading
 #-------------
