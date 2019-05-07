@@ -18,11 +18,94 @@ import time
 import tensorflow as tf
 from sknet.dataset import BatchIterator
 from sknet import ops,layers
-
-
-
 from mpl_toolkits.mplot3d import Axes3D
 import matplotlib.pyplot as plt
+import h5py
+import glob
+
+PLOT = 0
+if PLOT:
+    for data_augmentation in [0,1]:
+        for D in [1,3,5]:
+            for W in [1]:
+                filename = 'cifar10_'+str(data_augmentation)+'_'+str(D)+'_'\
+                                                  +str(W)+'.h5'
+                if not os.path.isfile(filename):
+                    continue
+                f = h5py.File(filename,'r',swmr=True)
+
+                train_loss  =f['train_set/loss/1'][...].flatten()
+                train_labels=f['train_set/loss/3'][...].flatten()
+                train_A     =f['train_set/loss/2'][...]
+                train_A     = train_A.reshape((len(train_labels),10))
+
+                test_loss   =f['test_set/accu/0'][...].flatten()
+                test_labels =f['test_set/accu/2'][...].flatten()
+                test_A      =f['test_set/accu/1'][...]
+                test_A      =test_A.reshape((len(test_labels),10))
+
+                plt.figure(figsize=(10,6))
+                plt.subplot(321)
+                plt.plot(train_loss)
+                plt.title('Train set, every 100 batch')
+                plt.xticks([])
+                plt.ylabel('cross entropy')
+
+                plt.subplot(323)
+                rows = range(len(train_labels))
+                plt.plot(train_A[rows,train_labels],alpha=0.3)
+                plt.plot((train_A.sum(1)-train_A[rows,train_labels])/9,
+                                                                     alpha=0.3)
+                plt.title('Correct and Wrong class rows')
+                plt.xticks([])
+
+                plt.subplot(325)
+                for k in range(10):
+                    plt.semilogy(train_A[:,k],alpha=0.5)
+                plt.title('Individual rows')
+                plt.suptitle('Train CIFAR10, augmentation:'\
+                     +str(data_augmentation)+'_depth:'+str(D)+'_width:'+str(W))
+
+                plt.subplot(322)
+                plt.plot(test_loss*100)
+                plt.title('Test set, every epoch')
+                plt.xticks([])
+                plt.ylabel(r'accuracy in $\%$')
+
+                plt.subplot(324)
+                rows = range(len(test_labels))
+                plt.semilogy(test_A[rows,test_labels], alpha=0.3)
+                plt.semilogy((test_A.sum(1)-test_A[rows,test_labels])/9,
+                                                                    alpha=0.3)
+                plt.title('Correct and Wrong class rows')
+                plt.legend(['True class','Other classes'],loc='upper left')
+                plt.xticks([])
+
+                plt.subplot(326)
+                for k in range(10):
+                    plt.semilogy(test_A[:,k],alpha=0.5)
+                plt.title('Individual rows')
+                plt.suptitle('Test CIFAR10, options:'+str(data_augmentation)\
+                                                     +'_'+str(D)+'_'+str(W))
+                plt.savefig('images/save_hessian'+str(data_augmentation)+'_'\
+                                           +str(D)+'_'+str(W)+'_summary.pdf')
+                plt.close()
+                f.close()
+    exit()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # Data Loading
 #-------------
@@ -75,13 +158,9 @@ for i in range(dataset.n_classes):
     row_A.append(tf.reduce_sum(tf.square(grad[0][:32]-grad[0][32:]),[1,2,3]))
 
 prediction = dnn[-1]
-
-# Loss and Optimizer
-#-------------------
-
-loss    = crossentropy_logits(p=dataset.labels,q=prediction[:32])
-hessian = tf.stack(row_A,1) #(32,n_classes)
-accu    = accuracy(dataset.labels,prediction[:32])
+loss       = crossentropy_logits(p=dataset.labels,q=prediction[:32])
+hessian    = tf.stack(row_A,1) #(32,n_classes)
+accu       = accuracy(dataset.labels,prediction[:32])
 
 B         = dataset.N('train_set')//32
 lr        = sknet.optimize.PiecewiseConstant(0.005,

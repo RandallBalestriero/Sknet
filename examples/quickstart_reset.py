@@ -39,7 +39,7 @@ if os.path.isfile('./save_reset.h5'):
     plt.ylabel(r'accuracy in $\%$')
     plt.xlabel('epoch')
     plt.suptitle('Network reset every 30 epochs, 10 times, CIFAR10, LargeConv')
-    plt.savefig('save_reset.pdf')
+    plt.savefig('images/save_reset.pdf')
     exit()
 
 

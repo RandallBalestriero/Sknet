@@ -78,7 +78,13 @@ class Queue(tuple):
             return
         if self._file is None:
             # create and open the file
-            self._file = h5py.File(self._filename, 'w', libver='latest')
+            while 1:
+                try:
+                    self._file = h5py.File(self._filename, 'w',libver='latest')
+                    break
+                except:
+                    print('Could not open file ',self._filename)
+                    print('\tRetrying in 10 sec. ...')
             # init the arrays, get shape and init
             dataset = list()
             for worker in self:
