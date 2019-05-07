@@ -11,9 +11,22 @@ from sklearn.model_selection import train_test_split
 
 
 
-def load_path(N=1000, std=0.1, opt=0):
-    X  = np.random.rand(N)*9
-    X  = np.stack([X,np.cos(X)+np.random.randn(N)*std],1)
+def load_path(N=1000, std=0.05, option=0, seed=None):
+    X  = np.linspace(0,1,N)
+    if option==0:
+        # simple cosine
+        X  = np.stack([X*9,np.cos(X*9)],1)
+    elif option==1:
+        # circle
+        X -= 0.5
+        X *= 2
+        Y  = np.concatenate([np.sqrt(1-X[::2]**2),-np.sqrt(1-X[::2]**2)],0)
+        X  = np.concatenate([X[::2],X[::2]],0)
+        X  = np.stack([X,Y],1)
+    elif option==2:
+        t  = np.linspace(0,2,N)
+        X  = np.stack([t*np.cos(2*3.14*t),t*np.sin(2*3.14*t)],1)
+    X += np.random.RandomState(seed).randn(N,2)*std
     X -= X.mean(0,keepdims=True)
     X /= X.max(0,keepdims=True)
 
