@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 from ..ops import Op
+import tensorflow as tf
 
 class Network:
     def __init__(self, layers=[], name = 'model',**kwargs):
@@ -32,6 +33,14 @@ class Network:
     def shape(self):
         s = [i.get_shape().as_list() for i in self]
         return s
+
+    @property
+    def reset_variables_op(self):
+        var = []
+        for layer in self.layers:
+            if hasattr(layer,'variables'):
+                var.append(layer.reset_variables_op)
+        return tf.group(*var)
 
     def variables(self,trainable=True):
         var = []

@@ -171,6 +171,11 @@ class Layer(Tensor):
     def input(self):
         return self._input
 
+    @property
+    def reset_variables_op(self):
+        return tf.group(*[op for internal in self.inner_ops 
+                                       for op in internal.reset_variables_op])
+
     def variables(self,trainable=True):
         var = []
         for op in self.inner_ops:

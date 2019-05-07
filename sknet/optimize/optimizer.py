@@ -9,7 +9,8 @@ from .. import EMA,Variable,ONE_INT32
 class Adam:
     def __init__(self, loss_or_grads, learning_rate, beta1=0.9,
                     beta2=0.999, epsilon=1e-8, params=None):
-        with tf.variable_scope("adam"):
+        with tf.variable_scope("AdamOptimizer") as scope:
+            self.name = scope.original_name_scope
             # Parameters
             # if no parameters are given then we get them and
             # compute the gradients
@@ -44,5 +45,7 @@ class Adam:
                 updates.append(m_op)
                 updates.append(v_op)
             self.updates = updates
-
+        self.reset_variables_op = list()
+        for var in tf.global_variables(self.name):
+            self.reset_variables_op.append(tf.assign(var,var.initial_value))
 

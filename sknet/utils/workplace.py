@@ -135,7 +135,7 @@ class Workplace(object):
         worker.epoch_done()
 
  
-    def execute_queue(self,queue, repeat=1,feed_dict={}, save_period=1):
+    def execute_queue(self,queue, repeat=1,feed_dict={}, close_file=True):
         """Apply multiple consecutive epochs of train test and valid
 
         Example of use ::
@@ -189,7 +189,8 @@ class Workplace(object):
                 print("\trunning Worker:",name)
                 self.execute_worker(worker,feed_dict=feed_dict)
             queue.dump()
-        queue.close()
+        if close_file:
+            queue.close()
 
 
 
