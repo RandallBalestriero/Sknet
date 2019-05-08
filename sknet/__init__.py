@@ -92,7 +92,7 @@ class Queue(tuple):
                     data = np.asarray(data[0])
                     if data.dtype==object:
                         data = data.astype('float32')
-                    data = worker._transform_function[i](data)
+                    data      = worker._transform_function[i](data)
                     new_shape = (None,)+data.shape
                     data      = np.expand_dims(data,0)
                     worker_dataset.append(self._file.create_dataset(worker.name+"/"\
@@ -417,69 +417,81 @@ class Worker(object):
     """
     def __init__(self, name, context, op, deterministic=False, period=1,
                     transform_function=None, verbose=0):
-        self.verbose        = verbose
-        if not hasattr(op,'__len__'):
-            self._op = [op]
-        else:
-            self._op = op
-        self._dependencies  = get_tensor_dependencies(self._op)
-        if np.isscalar(period):
-            self._period = [period]*len(self._op)
-        else:
-            self._period = period
-        if not hasattr(transform_function,'__len__'):
-            self.transform_function = [transform_function]*len(self._op)
-        else:
-            self.transform_function = transform_function
+        self._op      = [op] if type(op)!=list else op
+        self.n_ops    = len(self._op)
+
+        # Verbose
+        self._verbose= [verbose]*self.n_ops if type(verbose)!=list else verbose
+        assert(len(self._verbose)==self.n_ops)
+
+        # Period
+        self._period  = [period]*self.n_ops if type(period)!=list else period
+        assert(len(self._period)==self.n_ops)
+
+        # Transform function
+        self._transform_function = [transform_function]*self.n_ops\
+                       if type(transform_function)!=list else transform_function
+        assert(len(self._transform_function)==self.n_ops)
         self._transform_function = [f if f is not None else lambda x:x
-                                    for f in self.transform_function]
+                                    for f in self._transform_function]
+
+        self._dependencies  = get_tensor_dependencies(self._op)
         self._name          = context+"/"+name
         self._deterministic = deterministic
         self._context       = context
         self.empty()
+
     def empty(self):
         self.batch_data = [[] for i in range(len(self._op))]
         self.epoch_data = [[] for i in range(len(self._op))]
+
     @property
     def deterministic(self):
         return self._deterministic
+
     @property
     def dependencies(self):
         return self._dependencies
-    @property
-    def epoch(self):
-        return self._epoch
+
     @property
     def op(self):
         return self._op
+
     @property
     def name(self):
         return self._name
+
     @property
     def context(self):
         return self._context
+
     def get_op(self,batch_nb):
         return [op if batch_nb%per==0 else []
-                                for per,op in zip(self._period,self._op)]
+                           for per,op in zip(self._period,self._op)]
+
     def append(self,data):
+        print_string =''
         for i,d in enumerate(data):
             if type(d)==list:
                 if len(d)==0:
                     continue
+            elif d is None:
+                continue
             self.batch_data[i].append(d)
-        if self.verbose==2:
-            print(self.name+':'+str(data))
+            if self._verbose[i]>1:
+                print_string+='Op'+str(i)+':'+str(d)+', '
+        if len(print_string)>0:
+            print('\t\t'+self.name+':: '+print_string[:-2])
     def epoch_done(self):
-        if self.verbose:
-            print(self.name+':',end='')
+        print_string = ''
         for i,data in enumerate(self.batch_data):
             self.epoch_data[i].append(self._transform_function[i](
                                                           np.asarray(data)))
-            if self.transform_function[i] is not None and self.verbose:
-                print(self.epoch_data[i][-1],end=' ')
+            if self._verbose[i]==1 or self._verbose[i]==3:
+                print_string+= 'Op'+str(i)+':'+str(self.epoch_data[i][-1])+', '
         self.batch_data = [[] for i in range(len(self._op))]
-        if self.verbose:
-            print('')
+        if len(print_string)>0:
+            print('\tEpoch Done:: '+print_string[:-2])
 
 
 
