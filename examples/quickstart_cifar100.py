@@ -2,9 +2,6 @@ import sys
 sys.path.insert(0, "../")
 
 import sknet
-from sknet.optimize import Adam
-from sknet.optimize.loss import *
-from sknet.optimize import schedule
 import matplotlib
 matplotlib.use('Agg')
 import os
@@ -57,13 +54,13 @@ dnn.append(ops.GaussianNoise(dnn[-1],noise_type='additive',sigma=0.01))
 sknet.network.ConvLarge(dnn,dataset.n_classes)
 prediction = dnn[-1]
 
-loss    = crossentropy_logits(p=dataset.labels,q=prediction)
-accu    = accuracy(dataset.labels,prediction)
+loss    = sknet.losses.crossentropy_logits(p=dataset.labels,q=prediction)
+accu    = sknet.losses.accuracy(dataset.labels,prediction)
 
 B         = dataset.N('train_set')//32
-lr        = sknet.optimize.PiecewiseConstant(0.01,
+lr        = sknet.schedules.PiecewiseConstant(0.01,
                                     {100*B:0.002,200*B:0.001,250*B:0.0005})
-optimizer = Adam(loss,lr,params=dnn.variables(trainable=True))
+optimizer = sknet.optimizers.Adam(loss,lr,params=dnn.variables(trainable=True))
 minimizer = tf.group(optimizer.updates+dnn.updates)
 
 # Workers

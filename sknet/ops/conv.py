@@ -135,10 +135,10 @@ class SplineWaveletTransform(Op):
     def __init__(self, input, J, Q, K, strides=1, init='random',
                  trainable_scales=False, trainable_knots=False,
                  trainable_filters=False, hilbert=False, m=None,
-                 p=None, padding='valid',n_conv=None, **kwargs):
+                 p=None, padding='valid',n_conv=None, tied_knots=True, 
+                 complex=True, tied_weights=True, **kwargs):
         with tf.variable_scope(self._name_) as scope:
             self._name = scope.original_name_scope
-            # Attribution
             if n_conv is None:
                 n_conv = J
             K                     += (K%2)-1
@@ -148,7 +148,9 @@ class SplineWaveletTransform(Op):
             self.trainable_filters = trainable_filters
             self.hilbert           = hilbert
             self.strides           = strides
-
+            self.complex           = complex
+            self.tied_weights      = tied_weights
+            self.tied_knots        = tied_knots
             # ------ SCALES
             # we start with scale 1 for the nyquist and then increase 
             # the scale for the lower frequencies. This is built by using
@@ -158,17 +160,23 @@ class SplineWaveletTransform(Op):
             # sort them to have an interpretable time/frequency plot and to 
             # have coherency in case this is followed by 2D conv.
             scales = 2**(tf.range(self.J,delta=1./self.Q,dtype=tf.float32))
-            delta_scales = tf.Variable(tf.zeros(self.J*self.Q),
-                                trainable=self.trainable_scales, name='scales')
-            self.scales  = tf.contrib.framework.sort(scales+delta_scales)
-            self._scales = np.arange(0,J,1./Q)
+            scales = tf.Variable(scales, trainable=self.trainable_scales, 
+                                                            name='scales')
+            self.scales  = tf.contrib.framework.sort(scales)
+            self.indices = np.arange(0,J,1./Q)
 
             # We initialize the knots  with uniform spacing 
             start = (self.K//2)
             grid  = tf.lin_space(np.float32(-start),np.float32(start), self.K)
-            self.knots = tf.Variable(grid, trainable= self.trainable_knots, 
+            if tied_knots:
+                self.knots = tf.Variable(grid, trainable= self.trainable_knots, 
 						               name='knots')
-            self.all_knots = tf.einsum('i,j->ij',self.scales,self.knots)
+                self.all_knots = tf.einsum('i,j->ij',self.scales,self.knots)
+            else:
+                grid = tf.expand_dims(grid,0)*tf.ones(J*Q)
+                self.knots = tf.Variable(grid, trainable= self.trainable_knots,
+                                                               name='knots')
+                self.all_knots =self.scales*self.knots
 
             # initialize m and p
             self.init_mp(m,p,init)
@@ -188,18 +196,17 @@ class SplineWaveletTransform(Op):
         outputs = list()
         for i in range(len(self.W)):
             # shape of W is (width,inchannel,outchannel)
-            width,in_c,out_c = self.W[i].get_shape().as_list()
+            width,in_c,out_c = self.W[i].shape.as_list()
             amount_l = np.int32(np.floor((width-1)/2))
             amount_r = np.int32(width-1-amount_l)
-            x_pad    = tf.pad(input,paddings=[[0,0],[0,0],
-                            [amount_l,amount_r]],mode='SYMMETRIC')
+            x_pad    = tf.pad(input,paddings=[[0,0],[0,0],[amount_l,amount_r]],
+                                                 mode='SYMMETRIC')
 
             conv       = self.apply_filter_bank(x_pad,self.W[i])
             conv_shape = conv.shape.as_list()
-            modulus    = tf.sqrt(tf.square(conv[:,:out_c])
-                                        +tf.square(conv[:,out_c:]))
-            new_shape  = input_shape[:-1]+[out_c,input_shape[-1]//self.strides]
-            outputs.append(tf.reshape(modulus,new_shape))
+            new_shape  = input_shape[:-1]+[out_c//(1+int(self.complex))]\
+                                           +[input_shape[-1]//self.strides]
+            outputs.append(tf.reshape(conv,new_shape))
         if len(self.W)>1:
             output = tf.concat(outputs,-2)
         else:
@@ -208,38 +215,41 @@ class SplineWaveletTransform(Op):
 
 
     def apply_filter_bank(self,input,W):
-            filter_bank = tf.concat([tf.real(W),tf.imag(W)],2)
-            return tf.nn.conv1d(input,filter_bank,stride=self.strides,
+        conv = tf.nn.conv1d(input,W,stride=self.strides,
                                         padding='VALID',data_format='NCW')
+        if self.complex:
+            return tf.complex(conv[...,:self.J*self.Q//len(self.W),:],
+                                   conv[...,self.J*self.Q//len(self.W):,:])
+        return conv
+
     def init_mp(self, m, p, init):
         if m is not None and p is not None:
             self._m = m
             self._p = p
         else:
+            # the filters can be (1,K), (2,K), (J*Q,K), (2*J*K,K)
+            B = 1 if self.tied_weights else self.J*self.Q
             if init=='gabor':
                 window = np.hamming(self.K)
-                m_real = np.cos(np.arange(self.K) * np.pi)*window
-                m_imag = np.zeros(self.K)
-                p_real = np.zeros(self.K)
-                p_imag = np.cos(np.arange(self.K) * np.pi)*window
+                m = (np.cos(np.arange(self.K)*np.pi)*window).astype('float32')
+                m = np.ones((1,B,1),dtype='float32')*m
+                p = np.zeros((1,B,self.K),dtype='float32')
+                if self.complex and not self.hilbert:
+                    m_imag = np.zeros((1, B, self.K))
+                    p_imag = np.cos(np.arange(self.K) * np.pi)*window
+                    p_imag = p_imag*np.ones((1, B, 1))
+                    m = np.concatenate([m,m_imag],0).astype('float32')
+                    p = np.concatenate([p,p_imag],0).astype('float32')
             elif init=='random':
-                m_real = np.random.randn(self.K)/np.sqrt(self.K)
-                m_imag = np.random.randn(self.K)/np.sqrt(self.K)
-                p_real = np.random.randn(self.K)
-                p_imag = np.random.randn(self.K)
-            m = np.stack([m_real,m_imag]).astype('float32')
-            p = np.stack([p_real,p_imag]).astype('float32')
-
-            if self.hilbert:
-                self._m = tf.Variable(m[0], trainable=self.trainable_filters, 
-                                                                    name='m')
-                self._p = tf.Variable(p[0], trainable=self.trainable_filters, 
-                                                                    name='p')
-            else:
-                self._m = tf.Variable(m, trainable=self.trainable_filters, 
-                                                                    name='m')
-                self._p = Variable(p, trainable=self.trainable_filters, 
-                                                                    name='p')
+                m = np.random.randn(1, B, self.K,dtype='float32')
+                p = np.random.randn(1, B, self.K,dtype='float32')
+                if self.complex and not self.hilbert:
+                    m_imag = np.random.randn(1, B, self.K)
+                    p_imag = np.random.randn(1, B, self.K)
+                    m = np.concatenate([m, m_imag],0).astype('float32')
+                    p = np.concatenate([p, p_imag],0).astype('float32')
+            self._m = tf.Variable(m, trainable=self.trainable_filters,name='m')
+            self._p = tf.Variable(p, trainable=self.trainable_filters,name='p')
 
         # Boundary Conditions and centering
         mask    = np.ones(self.K, dtype=np.float32)
@@ -258,13 +268,14 @@ class SplineWaveletTransform(Op):
         # ------ TIME SAMPLING
         # add an extra octave if learnable scales (to go to lower frequency)
         # Define the integer time grid (time sampling) 
-        length    = int(self.K*2**(self._scales[end-1]
+        length    = int(self.K*2**(self.indices[end-1]
                                         +int(self.trainable_scales)))
         time_grid = tf.linspace(np.float32(-(length//2)), 
                                     np.float32(length//2), length)
 
         # ------ FILTER-BANK
         if self.hilbert:
+            exit()
             filters_real = utils.hermite_interp(time_grid, 
                         self.all_knots[start:end], self.m, self.p, True)
             filters_fft = tf.spectral.rfft(filters)
@@ -272,11 +283,15 @@ class SplineWaveletTransform(Op):
                                             tf.zeros_like(filters_fft)],1))
         else:
             filters = utils.hermite_interp(time_grid, self.all_knots[start:end],
-                                            self.m, self.p,False)
-            filters = tf.complex(filters[0],filters[1])
+                                            self.m, self.p)
+            if self.complex:
+                new_shape = (2*len(self.indices[start:end]),length)
+                filters = tf.reshape(filters,new_shape)
+            else:
+                filters = filters[0]
 
         W = tf.expand_dims(tf.transpose(filters),1)
-        W.set_shape((length,1,len(self._scales[start:end])))
+#        W.set_shape((length,1,len(self.indices[start:end])))
         return W
 
 

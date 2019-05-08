@@ -15,8 +15,7 @@ __all__ = [
         "layers",
         "ops",
         "utils",
-        "network",
-        "optimize"]
+        "network"]
 
 __version__ = 'alpha.1'
 
@@ -534,4 +533,6 @@ class ObservedTensor(Tensor):
 
 
 from . import *
-
+from .optimize import loss as losses
+from .optimize import optimizer as optimizers
+from .optimize import schedule as schedules

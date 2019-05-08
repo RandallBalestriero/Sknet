@@ -24,7 +24,7 @@ def count_number_of_params():
 
 
 
-def hermite_interp(t, knots, m, p, real=False):
+def hermite_interp(t, knots, m, p):
     """
     Parameters
     ----------
@@ -36,16 +36,12 @@ def hermite_interp(t, knots, m, p, real=False):
         a collection of knots of dimension (N_FILTERS,N_KNOTS) that share
         the same time sampling
 
-    m : 1d vector
+    m : matrix
         the value of the function at the knots (shared across filters)
 
-    p : 1d vector
+    p : matrix
         the value of the derivative of the function at the knots
         (shared across filters)
-
-    real : bool
-        is the filter is real or complex (in which case the m and p parameters
-        are 2d arrays)
 
     Returns
     -------
@@ -55,39 +51,35 @@ def hermite_interp(t, knots, m, p, real=False):
 
     """
 
-    # Create it here for graph bugs
+    # the matrix sovling the linear system of equation and giving
+    # the solution for the polynomial coefficients based on the
+    # imposed values of the function and its derivative at the
+    # region boundaries
     M = tf.constant(np.array([[1, 0,-3, 2],
                               [0, 0, 3,-2],
                               [0, 1,-2, 1],
                               [0, 0,-1, 1]]).astype('float32'))
 
-    # Concatenate coefficients onto knots 0:-1 and 1:end
-    mm = tf.stack([m[:,:-1], m[:,1:]], axis=-1)  # (2/0 KNOTS-1 2)
-    pp = tf.stack([p[:,:-1], p[:,1:]], axis=-1)  # (2/0 KNOTS-1 2)
-    y  = tf.concat([mm, pp], axis=-1)            # (2 KNOTS-1 4)
-
-    if real:
-        ym = tf.matmul(y,M) # (KNOTS-1 4)
-    else:
-        ym = tf.einsum('iab,bc->iac',y, M)        # (2 KNOTS-1 4)
+    # Concatenate the coefficients of left and right position of the
+    # region over the first dimensiononto knots 0:-1 and 1:end
+    y  = tf.stack([m[...,:-1], m[...,1:], p[...,:-1],
+                                           p[...,1:]], axis=-1) #(I B R 4)
+    ym = tf.einsum('ijab,bc->ijac', y, M)            # (I B R 4)
 
     # create the time sampling versions to be between 0 and 1 for each interval
     # thus having a tensor of shape (N_FILTERS,N_REGIONS,TIME_SAMPLING)
-    # first make it start at 0
-    t_zero  = (t-tf.expand_dims(knots[:,:-1],2))
-    # then make it end at 1
-    t_unit  = t_zero/tf.expand_dims(knots[:,1:]-knots[:,:-1],2)
-
+    # first make it start at 0 and then end at 1
+    t_zero  = (t-tf.expand_dims(knots[:,:-1],2)) #(J*Q R time)
+    t_unit  = t_zero/tf.expand_dims(knots[:,1:]-knots[:,:-1],2) #(J*Q R time)
     # then remove everything that is not between 0 and 1
     mask = tf.cast(tf.logical_and(tf.greater_equal(t_unit, 0.), 
-                                        tf.less(t_unit, 1.)), tf.float32)
+                              tf.less(t_unit, 1.)), tf.float32) #(J*Q R time)
 
     # create all the powers for the interpolation formula
-    t_p  = tf.pow(tf.expand_dims(t_unit,-1), [0,1,2,3])
-    if real:
-        return tf.einsum('irf,srtf->ist',ym,t_p*tf.expand_dims(mask,-1))
-    else:
-        return tf.einsum('irf,srtf->ist',ym,t_p*tf.expand_dims(mask,-1))
+    t_p  = tf.pow(tf.expand_dims(t_unit,-1), [0,1,2,3]) # (J*Q R time 4)
+
+    filters = tf.reduce_sum(tf.expand_dims(ym,3)*t_p*tf.expand_dims(mask,-1),[2,4])
+    return filters
 
 
 

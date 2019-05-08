@@ -2,9 +2,6 @@ import sys
 sys.path.insert(0, "../")
 
 import sknet
-from sknet.optimize import Adam
-from sknet.optimize.loss import *
-from sknet.optimize import schedule
 import matplotlib
 matplotlib.use('Agg')
 import os
@@ -30,7 +27,7 @@ dataset['signals/train_set']/=dataset['signals/train_set'].max(2,keepdims=True)
 dataset.split_set("train_set","test_set",0.33)
 
 
-dataset.create_placeholders(batch_size=20,
+dataset.create_placeholders(batch_size=10,
        iterators_dict={'train_set':BatchIterator("random_see_all"),
                        'valid_set':BatchIterator('continuous'),
                        'test_set':BatchIterator('continuous')},device="/cpu:0")
@@ -47,7 +44,8 @@ dnn = sknet.network.Network(name='model_base')
 
 dnn.append(ops.SplineWaveletTransform(dataset.signals,J=5,Q=16,K=15,
 			trainable_scales=False, trainable_knots=False,
-                 	trainable_filters=False,init='gabor'))
+                 	trainable_filters=False, hilbert=False, init='gabor'))
+dnn.append(ops.Activation(dnn[-1],tf.abs))
 dnn.append(ops.Pool2D(tf.log(dnn[-1]+0.001),(1,1024),strides=(1,512),pool_type='AVG'))
 dnn.append(ops.BatchNorm(dnn[-1],[0,3]))
 
@@ -77,9 +75,9 @@ dnn.append(ops.Dense(dnn[-1],units=dataset.n_classes))
 #-------------------
 
 # Compute some quantities that we want to keep track and/or act upon
-loss     = crossentropy_logits(p=dataset.labels,q=dnn[-1])
-accuracy = accuracy(labels=dataset.labels,predictions=dnn[-1])
-auc      = AUC(dataset.labels,tf.nn.softmax(dnn[-1])[:,1])
+loss     = sknet.losses.crossentropy_logits(p=dataset.labels,q=dnn[-1])
+accuracy = sknet.losses.accuracy(labels=dataset.labels,predictions=dnn[-1])
+auc      = sknet.losses.AUC(dataset.labels,tf.nn.softmax(dnn[-1])[:,1])
 #print(auc)
 #input('try')
 
@@ -88,14 +86,14 @@ auc      = AUC(dataset.labels,tf.nn.softmax(dnn[-1])[:,1])
 # the changes to the model parameters, we also specify that this process
 # should also include some possible network dependencies present in UPDATE_OPS
 
-optimizer = sknet.optimize.Adam(loss,0.05,params=dnn.variables(trainable=True))
+optimizer = sknet.optimizers.Adam(loss,0.01,params=dnn.variables(trainable=True))
 minimizer = tf.group(optimizer.updates+dnn.updates)
 
 # Workers
 #---------
 
-work1 = sknet.Worker(name='minimizer',context='train_set',op=[minimizer,loss,dnn[0].W[-1],dnn[0].W[0]],
-        deterministic=False,period=[1,100,100,100])
+work1 = sknet.Worker(name='minimizer',context='train_set',op=[minimizer,loss],
+        deterministic=False,period=[1,100],verbose=2)
 
 work2 = sknet.Worker(name='AUC',context='test_set',op=[accuracy,auc],
         deterministic=True, transform_function=np.mean,verbose=1)
