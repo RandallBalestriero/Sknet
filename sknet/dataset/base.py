@@ -30,6 +30,10 @@ class Dataset(dict):
     def create_placeholders(self,batch_size,iterators_dict,device="/cpu:0"):
         # Many settings are put in int64 for GPU compatibility with tf
         sets            = self.sets
+        for var in self:
+            if np.shape(self[var])[0]<batch_size:
+                print('Error, batch size larger than some variables')
+                exit()
         self.set2int    = dict([(b,np.int64(a)) for a,b in enumerate(sets)])
         self.iterators  = iterators_dict
         with tf.device(device):
@@ -75,7 +79,7 @@ class Dataset(dict):
                                                                 batch.shape))
                     self.__dict__[v] = case(self.current_set,pairs)
 
-    def split_set(self,set_,new_set_,ratio, stratify = None):
+    def split_set(self,set_,new_set_,ratio, stratify = None, seed=None):
         if new_set_ in self.sets:
             error
         variables = self.variables
@@ -101,8 +105,7 @@ class Dataset(dict):
                         else [s[i] for i in train_indices]
                         for s in self["train_set"]]
         else:
-            print(set_,self.N(set_))
-            indices = np.random.permutation(self.N(set_))
+            indices = np.random.RandomState(seed).permutation(self.N(set_))
             N = int(self.N(set_)*ratio)
             for var in self.variables:
                 self[var+'/'+set_],self[var+'/'+new_set_]=\

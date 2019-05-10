@@ -17,6 +17,7 @@ __all__ = [
         "utils",
         "network"]
 
+from .dataset import Dataset
 __version__ = 'alpha.1'
 
 ZERO_INT32   = tf.constant(np.int32(0))
@@ -85,33 +86,24 @@ class Queue(tuple):
                     print('Could not open file ',self._filename)
                     print('\tRetrying in 10 sec. ...')
             # init the arrays, get shape and init
-            dataset = list()
+            h5_dataset = list()
             for worker in self:
-                worker_dataset = list()
+                h5_dataset.append([])
                 for i,data in enumerate(worker.epoch_data):
-                    data = np.asarray(data[0])
-                    if data.dtype==object:
-                        data = data.astype('float32')
-                    data      = worker._transform_function[i](data)
-                    new_shape = (None,)+data.shape
-                    data      = np.expand_dims(data,0)
-                    worker_dataset.append(self._file.create_dataset(worker.name+"/"\
-                     +str(i), maxshape=new_shape,compression='gzip',data=data))
-                dataset.append(worker_dataset)
+                    maxshape = (None,)+data[0].shape
+                    h5_dataset[-1].append(self._file.create_dataset(
+                            worker.name+"/"+str(i), maxshape=maxshape,
+                            compression='gzip', data=np.expand_dims(data[0],0)))
                 worker.empty()
-            self.dataset = dataset
+            self.h5_dataset      = h5_dataset
             self._file.swmr_mode = True
         else:
             for i,worker in enumerate(self):
                 for j,data in enumerate(worker.epoch_data):
-                    data = np.asarray(data[0])
-                    if data.dtype==object:
-                        data = data.astype('float32')
-                    data = worker._transform_function[j](data)
-                    new_shape = (self.count,)+data.shape
-                    self.dataset[i][j].resize(new_shape)
-                    self.dataset[i][j][self.count-1]=data
-                    self.dataset[i][j].flush()
+                    new_shape = (self.count,)+data[0].shape
+                    self.h5_dataset[i][j].resize(new_shape)
+                    self.h5_dataset[i][j][self.count-1]=data[0]
+                    self.h5_dataset[i][j].flush()
                 worker.empty()
 
 

@@ -5,7 +5,82 @@ import numpy as np
 from . import Op
     
 from .. import utils
-from .. import Variable
+from .. import Variable,ONE_FLOAT32
+
+class Conv1D(Op):
+    """1D (temporal) convolutional layer.
+    Op to perform a 1D convolution onto a 3D input tensor
+
+    :param incoming: input shape of incoming layer
+    :type incoming: Op or tuple of int
+    :param filters: the shape of the filters in the form 
+                    (#filters, width)
+    :type filters: triple of int
+    :param nonlinearity_c: coefficient of the nonlinearity,
+                           0 for ReLU,-1 for absolute value,...
+    :type nonlinearity_c: scalar
+
+    """
+    _name_ = 'Conv1DOp'
+    deterministic_behavior = False
+    def __init__(self,incoming,filters,W = tfl.xavier_initializer(),
+                    b = tf.zeros, stride =1, pad='valid',
+                    mode='CONSTANT', name='', W_func = tf.identity,
+                    b_func = tf.identity,*args,**kwargs):
+        with tf.variable_scope(self._name_) as scope:
+            self._name   = scope.original_name_scope
+            self.mode    = mode
+            self.stride  = stride
+            self.pad     = pad
+            self.stride = stride
+            # Define the padding function
+            if pad=='valid' or (filters[1]==1):
+                self.to_pad=False
+            else:
+                if pad=='same':
+                    assert(filters[1]%2==1 and filters[2]%2==1)
+                    self.p = (filters[1]-1)//2
+                else:
+                    self.p = filters[1]-1
+                self.to_pad = True
+
+            # Compute shape of the W filter parameter
+            w_shape = (filters[1], incoming.shape.as_list()[1], filters[0])
+            # Initialize W
+            if callable(W):
+                self._W = tf.Variable(W(w_shape), name='W')
+            else:
+                self._W  = W
+            self.W  = W_func(self._W)
+
+            # Initialize b
+            if b is None:
+                self._b  = None
+            elif callable(b):
+                self._b = tf.Variable(b((filters[0],1)), name='b')
+            else:
+                self._b = b
+            self.b  = b_func(self._b) if b is not None else self._b
+
+            super().__init__(incoming)
+
+    def forward(self,input, *args,**kwargs):
+        if self.to_pad:
+            padded = tf.pad(input,[[0,0],[0,0], [self.p]*2],mode=self.mode)
+        else:
+            padded = input
+        Wx = tf.nn.conv1d(padded, self.W, stride=self.stride,
+                padding='VALID', data_format="NCW")
+        if self.b is None:
+            return Wx
+        else:
+            return Wx+self.b
+
+    def backward(self,input):
+        return tf.gradients(self,self.input,input)[0]
+
+
+
 
 class Conv2D(Op):
     """2D (spatial) convolutional layer.
@@ -55,17 +130,17 @@ class Conv2D(Op):
             if callable(W):
                 self._W = tf.Variable(W(w_shape), name='W')
             else:
-                self.W  = W
-            self.W  = W_func(self._W)
+                self._W = W
+            self.W = W_func(self._W)
 
             # Initialize b
             if b is None:
-                self._b  = None
+                self._b = None
             elif callable(b):
                 self._b = tf.Variable(b((filters[0],1,1)), name='b')
             else:
                 self._b = b
-            self.b  = b_func(self._b) if b is not None else self._b
+            self.b = b_func(self._b) if b is not None else self._b
 
             super().__init__(incoming)
 
@@ -98,7 +173,7 @@ class Conv2D(Op):
 
 
 
-class SplineWaveletTransform(Op):
+class HermiteSplineConv1D(Op):
     """Learnable scattering network layer.
 
     Parameters
@@ -162,21 +237,25 @@ class SplineWaveletTransform(Op):
             scales = 2**(tf.range(self.J,delta=1./self.Q,dtype=tf.float32))
             scales = tf.Variable(scales, trainable=self.trainable_scales, 
                                                             name='scales')
-            self.scales  = tf.contrib.framework.sort(scales)
+            sorted_scales= tf.contrib.framework.sort(scales)
+            self.scales  = tf.clip_by_value(sorted_scales,ONE_FLOAT32,
+                                            tf.cast(2**(self.J+1),tf.float32))
             self.indices = np.arange(0,J,1./Q)
 
             # We initialize the knots  with uniform spacing 
             start = (self.K//2)
             grid  = tf.lin_space(np.float32(-start),np.float32(start), self.K)
             if tied_knots:
-                self.knots = tf.Variable(grid, trainable= self.trainable_knots, 
+                knots = tf.Variable(grid, trainable= self.trainable_knots,
 						               name='knots')
+                self.knots = tf.contrib.framework.sort(knots)
                 self.all_knots = tf.einsum('i,j->ij',self.scales,self.knots)
             else:
-                grid = tf.expand_dims(grid,0)*tf.ones(J*Q)
-                self.knots = tf.Variable(grid, trainable= self.trainable_knots,
+                grid = tf.expand_dims(grid,0)*tf.ones((J*Q,1))
+                knots = tf.Variable(grid, trainable= self.trainable_knots,
                                                                name='knots')
-                self.all_knots =self.scales*self.knots
+                self.knots = tf.contrib.framework.sort(knots,axis=1)
+                self.all_knots =tf.expand_dims(self.scales,1)*self.knots
 
             # initialize m and p
             self.init_mp(m,p,init)
@@ -189,7 +268,7 @@ class SplineWaveletTransform(Op):
 
     def forward(self,input,*args,**kwargs):
         # Input shape
-        input_shape = input.get_shape().as_list()
+        input_shape = input.shape.as_list()
         n_channels  = np.prod(input_shape[:-1])
         x_reshape   = tf.reshape(input,[n_channels,1,input_shape[-1]])
 
@@ -291,7 +370,7 @@ class SplineWaveletTransform(Op):
                 filters = filters[0]
 
         W = tf.expand_dims(tf.transpose(filters),1)
-#        W.set_shape((length,1,len(self.indices[start:end])))
+        W.set_shape((length,1,len(self.indices[start:end])))
         return W
 
 

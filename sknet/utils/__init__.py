@@ -70,7 +70,7 @@ def hermite_interp(t, knots, m, p):
     # thus having a tensor of shape (N_FILTERS,N_REGIONS,TIME_SAMPLING)
     # first make it start at 0 and then end at 1
     t_zero  = (t-tf.expand_dims(knots[:,:-1],2)) #(J*Q R time)
-    t_unit  = t_zero/tf.expand_dims(knots[:,1:]-knots[:,:-1],2) #(J*Q R time)
+    t_unit  = t_zero/(tf.expand_dims(knots[:,1:]-knots[:,:-1],2)+1e-8)
     # then remove everything that is not between 0 and 1
     mask = tf.cast(tf.logical_and(tf.greater_equal(t_unit, 0.), 
                               tf.less(t_unit, 1.)), tf.float32) #(J*Q R time)
@@ -78,7 +78,8 @@ def hermite_interp(t, knots, m, p):
     # create all the powers for the interpolation formula
     t_p  = tf.pow(tf.expand_dims(t_unit,-1), [0,1,2,3]) # (J*Q R time 4)
 
-    filters = tf.reduce_sum(tf.expand_dims(ym,3)*t_p*tf.expand_dims(mask,-1),[2,4])
+    filters = tf.reduce_sum(tf.expand_dims(ym,3)*t_p*tf.expand_dims(mask,-1),
+                                                              [2,4])
     return filters
 
 

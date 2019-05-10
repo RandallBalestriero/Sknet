@@ -130,7 +130,7 @@ class Op(Tensor):
         return obj
     def __init__(self,input, deterministic=None):
 
-#        self._input   = input
+        self._input   = input
         if type(self).deterministic_behavior:
             if deterministic is None:
                 self.deterministic = tf.placeholder(tf.bool,shape=(),
@@ -151,9 +151,9 @@ class Op(Tensor):
     def backward(self,input):
         return tf.gradients(self,self.input,input)[0]
 
-#    @property
-#    def input(self):
-#        return self._input
+    @property
+    def input(self):
+        return self._input
 
     def variables(self,trainable=True):
         if trainable:

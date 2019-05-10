@@ -8,7 +8,7 @@ from .. import EMA,Variable,ONE_INT32
 
 class Adam:
     def __init__(self, loss_or_grads, learning_rate, beta1=0.9,
-                    beta2=0.999, epsilon=1e-8, params=None):
+                    beta2=0.999, epsilon=1e-6, params=None):
         with tf.variable_scope("AdamOptimizer") as scope:
             self.name = scope.original_name_scope
             # Parameters
