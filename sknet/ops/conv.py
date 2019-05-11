@@ -39,18 +39,16 @@ class Conv1D(Op):
             else:
                 if pad=='same':
                     assert(filters[1]%2==1 and filters[2]%2==1)
-                    self.p = (filters[1]-1)//2
+                    self.p = [[0]*2, [0]*2, [(filters[1]-1)//2]*2]
                 else:
-                    self.p = filters[1]-1
+                    self.p = [[0]*2, [0]*2, [filters[1]-1]*2]
                 self.to_pad = True
 
             # Compute shape of the W filter parameter
             w_shape = (filters[1], incoming.shape.as_list()[1], filters[0])
+
             # Initialize W
-            if callable(W):
-                self._W = tf.Variable(W(w_shape), name='W')
-            else:
-                self._W  = W
+            self._W = tf.Variable(W(w_shape), name='W') if callable(W) else W
             self.W  = W_func(self._W)
 
             # Initialize b
@@ -65,16 +63,10 @@ class Conv1D(Op):
             super().__init__(incoming)
 
     def forward(self,input, *args,**kwargs):
-        if self.to_pad:
-            padded = tf.pad(input,[[0,0],[0,0], [self.p]*2],mode=self.mode)
-        else:
-            padded = input
-        Wx = tf.nn.conv1d(padded, self.W, stride=self.stride,
-                padding='VALID', data_format="NCW")
-        if self.b is None:
-            return Wx
-        else:
-            return Wx+self.b
+        padded = tf.pad(input,self.p,mode=self.mode) if self.to_pad else input
+        Wx     = tf.nn.conv1d(padded, self.W, stride=self.stride, 
+                                      padding='VALID', data_format="NCW")
+        return Wx if self.b is None else Wx+self.b
 
     def backward(self,input):
         return tf.gradients(self,self.input,input)[0]
@@ -118,20 +110,18 @@ class Conv2D(Op):
             else:
                 if pad=='same':
                     assert(filters[1]%2==1 and filters[2]%2==1)
-                    self.p = [(filters[1]-1)//2,(filters[2]-1)//2]
+                    self.p = [[0]*2, [0]*2, [(filters[1]-1)//2]*2,
+                                                  [(filters[2]-1)//2]*2]
                 else:
-                    self.p = [filters[1]-1,filters[2]-1]
+                    self.p = [[0]*2, [0]*2, [filters[1]-1]*2, [filters[2]-1]*2]
                 self.to_pad = True
 
             # Compute shape of the W filter parameter
             w_shape = (filters[1],filters[2],
                                 incoming.shape.as_list()[1],filters[0])
             # Initialize W
-            if callable(W):
-                self._W = tf.Variable(W(w_shape), name='W')
-            else:
-                self._W = W
-            self.W = W_func(self._W)
+            self._W = tf.Variable(W(w_shape), name='W') if callable(W) else W
+            self.W  = W_func(self._W)
 
             # Initialize b
             if b is None:
@@ -145,17 +135,10 @@ class Conv2D(Op):
             super().__init__(incoming)
 
     def forward(self,input, *args,**kwargs):
-        if self.to_pad:
-            padded = tf.pad(input,[[0,0],[0,0],[self.p[0]]*2,
-                                [self.p[1]]*2],mode=self.mode)
-        else:
-            padded = input
-        Wx = tf.nn.conv2d(padded, self.W, strides=self.strides,
-                padding='VALID', data_format="NCHW")
-        if self.b is None:
-            return Wx
-        else:
-            return Wx+self.b
+        padded = tf.pad(input, self.p, mode=self.mode) if self.to_pad else input
+        Wx     = tf.nn.conv2d(padded, self.W, strides=self.strides,
+                                            padding='VALID', data_format="NCHW")
+        return Wx if self.b is None else Wx+self.b
 
     def backward(self,input):
         return tf.nn.conv2d_backprop_input(self.input.get_shape().as_list(),
@@ -243,18 +226,17 @@ class HermiteSplineConv1D(Op):
             self.indices = np.arange(0,J,1./Q)
 
             # We initialize the knots  with uniform spacing 
-            start = (self.K//2)
-            grid  = tf.lin_space(np.float32(-start),np.float32(start), self.K)
+            grid  = tf.random_uniform((self.K,))*self.K-(self.K//2)##tf.range(self.K,dtype=tf.float32)-(self.K//2)
             if tied_knots:
-                knots = tf.Variable(grid, trainable= self.trainable_knots,
+                knots = tf.Variable(grid, trainable=self.trainable_knots,
 						               name='knots')
                 self.knots = tf.contrib.framework.sort(knots)
                 self.all_knots = tf.einsum('i,j->ij',self.scales,self.knots)
             else:
-                grid = tf.expand_dims(grid,0)*tf.ones((J*Q,1))
-                knots = tf.Variable(grid, trainable= self.trainable_knots,
+                grid_2d = tf.expand_dims(grid,0)*tf.ones((J*Q,1))
+                knots = tf.Variable(grid_2d, trainable= self.trainable_knots,
                                                                name='knots')
-                self.knots = tf.contrib.framework.sort(knots,axis=1)
+                self.knots = tf.contrib.framework.sort(knots)
                 self.all_knots =tf.expand_dims(self.scales,1)*self.knots
 
             # initialize m and p
