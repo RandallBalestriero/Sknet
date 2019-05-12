@@ -10,6 +10,16 @@ __all__ = [
         "geometry"]
 
 
+def str2bool(v):
+#    print(v)
+    if v.lower() in ('yes', 'true', 't', 'y', '1'):
+        return True
+    elif v.lower() in ('no', 'false', 'f', 'n', '0'):
+        return False
+    else:
+        raise argparse.ArgumentTypeError('Boolean value expected.')
+
+
 def repeat(tensor,values):
     tensor_shape = tensor.shape.as_list()
     assert len(values)==len(tensor_shape)

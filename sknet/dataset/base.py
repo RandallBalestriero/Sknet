@@ -12,12 +12,21 @@ class Dataset(dict):
     def __init__(self,**args):
         super().__init__()
         self.__dict__.update(args)
+
     def next(self,session=None):
         return self.iterators[self.current_set_string].next(session=session)
+
     def set_set(self,name,session):
         self.current_set_string = name
         session.run(self.assign_set,
                     feed_dict={self.current_set_:self.set2int[name]})
+
+    def cast(self, varn, dtype):
+        # get sets in which this var exists
+        sets = self.sets_(varn)
+        for s in sets:
+            self[varn+'/'+s]=self[varn+'/'+s].astype(dtype)
+
     @property
     def init_dict(self):
         """return the list of couple with the tensorflow
@@ -27,6 +36,7 @@ class Dataset(dict):
         alls= [(self[v+'/'+s+'/placeholder'],self[v+'/'+s]) 
                          for v in self.variables for s in self.sets_(v)]
         return dict(alls)
+
     def create_placeholders(self,batch_size,iterators_dict,device="/cpu:0"):
         # Many settings are put in int64 for GPU compatibility with tf
         sets            = self.sets

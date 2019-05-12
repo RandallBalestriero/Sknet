@@ -18,9 +18,11 @@ def load_mnist(PATH=None):
     techniques and pattern recognition methods on real-world data while 
     spending minimal efforts on preprocessing and formatting.
 
-    :param path: (optional, default $DATASET_PATH), the path to look for the data and
-                     where the data will be downloaded if not present
-    :type path: str
+    Parameters
+    ----------
+        path: str (optional)
+            default $DATASET_PATH), the path to look for the data and
+            where the data will be downloaded if not present
     """
     #init
     #Set up the configuration for data loading and data format
@@ -31,12 +33,10 @@ def load_mnist(PATH=None):
     dict_init = [("n_classes",10),("name","mnist"),
                     ('classes',[str(u) for u in range(10)])]
 
-    mnist_dataset = Dataset(**dict(dict_init))
-    # Load the dataset (download if necessary) and set
-    # the class attributes.
+    dataset = Dataset(**dict(dict_init))
     print('Loading mnist')
 
-    t    = time.time()
+    t0 = time.time()
 
     # Check if directory exists
     if not os.path.isdir(PATH+'mnist'):
@@ -56,19 +56,17 @@ def load_mnist(PATH=None):
     train_set, valid_set, test_set = pickle.load(f,encoding='latin1')
     f.close()
 
-    images = {'train_set':train_set[0].reshape((-1,1,28,28)),
-            'valid_set':valid_set[0].reshape((-1,1,28,28)),
-            'test_set':test_set[0].reshape((-1,1,28,28))}
+    dataset['images/train_set'] = train_set[0].reshape((-1,1,28,28))
+    dataset['images/test_set']  = test_set[0].reshape((-1,1,28,28))
+    dataset['images/valid_set'] = valid_set[0].reshape((-1,1,28,28))
 
-    labels = {'train_set':train_set[1],
-        'valid_set':valid_set[1],
-        'test_set':test_set[1]}
+    dataset['labels/train_set'] = train_set[1]
+    dataset['labels/test_set']  = test_set[1]
+    dataset['labels/valid_set'] = valid_set[1]
 
+    dataset.cast('images','float32')
+    dataset.cast('images','int32')
 
-    mnist_dataset.add_variable({'images':[images,(1,28,28),'float32'],
-                                'labels':[labels,(),'int32']})
-
-    print('Dataset mnist loaded in','{0:.2f}'.format(time.time()-t),'s.')
-
-    return mnist_dataset
+    print('Dataset mnist loaded in {0:.2f}s.'.format(time.time()-t0))
+    return dataset
 

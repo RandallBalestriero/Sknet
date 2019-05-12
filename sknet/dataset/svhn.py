@@ -24,9 +24,11 @@ def load_svhn(PATH=None):
     scene images). SVHN is obtained from house numbers in Google 
     Street View images. 
 
-    :param path: (optional, default $DATASET_PATH), the path to look for the data and 
-                 where the data will be downloaded if not present
-    :type path: str
+    Parameters
+    ----------
+        path: str (optional)
+            default $DATASET_PATH), the path to look for the data and
+            where the data will be downloaded if not present
     """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
@@ -38,7 +40,7 @@ def load_svhn(PATH=None):
     # the class attributess.
     print('Loading svhn')
 
-    t = time.time()
+    t0 = time.time()
 
     if not os.path.isdir(PATH+'svhn'):
         os.mkdir(PATH+'svhn')
@@ -56,18 +58,18 @@ def load_svhn(PATH=None):
                                         desc='Downloading test set') as t:
             urllib.request.urlretrieve(url,PATH+'svhn/test_32x32.mat')
 
-    train_set = sio.loadmat(PATH+'svhn/train_32x32.mat')
-    train_set = [train_set['X'].transpose([3,2,0,1]).astype('float32'),
-                    np.squeeze(train_set['y']).astype('int32')-1]
-    test_set  = sio.loadmat(PATH+'svhn/test_32x32.mat')
-    test_set  = [test_set['X'].transpose([3,2,0,1]).astype('float32'),
-                    np.squeeze(test_set['y']).astype('int32')-1]
+    # Train set
+    data = sio.loadmat(PATH+'svhn/train_32x32.mat')
+    dataset['images/train_set'] = data['X'].transpose([3,2,0,1])
+    dataset['labels/train_set'] = np.squeeze(data['y'])-1
 
+    # Test set
+    data = sio.loadmat(PATH+'svhn/test_32x32.mat')
+    dataset['images/test_set'] = data['X'].transpose([3,2,0,1])
+    dataset['labels/test_set'] = np.squeeze(data['y'])-1
 
-    dataset.add_variable({'images':{'train_set':train_set[0],
-                                    'test_set':test_set[0]},
-                        'labels':{'train_set':train_set[1],
-                                    'test_set':test_set[1]}})
+    dataset.cast('images','float32')
+    dataset.cast('labels','int32')
 
-    print('Dataset svhn loaded in','{0:.2f}'.format(time.time()-t),'s.')
+    print('Dataset svhn loaded in','{0:.2f}'.format(time.time()-t0),'s.')
     return dataset

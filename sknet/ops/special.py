@@ -106,34 +106,36 @@ class Activation(Op):
 
     """
 
-    name = 'Activation'
+    _name_ = 'ActivationOp'
     deterministic_behavior = False
 
     def __init__(self,incoming,func_or_scalar,*args,**kwargs):
+        with tf.variable_scope(self._name_) as scope:
+            self._name           = scope.original_name_scope
+            self._func_or_scalar = func_or_scalar
+            self.identity        = False
+            # determine if a max-affine spline
+            if np.isscalar(func_or_scalar):
+                if func_or_scalar==1:
+                    self.identity = True
+                else:
+                    self.mas=True
+            elif(func_or_scalar==tf.identity):
+                self.identity = True
+            else:
+                self.mas=False
+            super().__init__(incoming)
 
-        self._func_or_scalar = func_or_scalar
-        # determine if a max-affine spline
-        if np.isscalar(func_or_scalar):
-            self.mas=True
-        else:
-            self.mas=False
-        super().__init__(incoming)
-
-    def forward(self,input,deterministic=None,**kwargs):
+    def forward(self, input,  *args, **kwargs):
+        if self.identity: return input
         if np.isscalar(self._func_or_scalar):
-            if self._func_or_scalar==1:
-                self.mask = np.float32(1)
-                output = input
-            else:
-                self.mask = tf.greater(input,0)
-                output = tf.maximum(input,self._func_or_scalar*input)
+            self.mask = tf.greater(input,0)
+            output    = tf.maximum(input,self._func_or_scalar*input)
         else:
-            if self._func_or_scalar is tf.identity:
-                output = input
-            else:
-                output = self._func_or_scalar(input)
+            output = self._func_or_scalar(input)
         return output
     def backward(self,input,*args,**kwargs):
+        if self.identity: return input
         if self.mas:
             return input*self.mask
         else:

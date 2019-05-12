@@ -1,3 +1,6 @@
+import sys
+sys.path.insert(0, "../")
+
 from sknet import dataset
 from sknet.utils import plotting
 import pylab as pl
@@ -7,10 +10,10 @@ dataset_list = [dataset.load_mnist,
                 dataset.load_fashionmnist,
                 dataset.load_svhn,
                 dataset.load_cifar10,
-                dataset.load_cifar100,
-                dataset.load_stl10,
-                dataset.load_warblr,
-                dataset.load_freefield1010]
+                dataset.load_cifar100]#,
+#                dataset.load_stl10,
+#                dataset.load_warblr,
+#                dataset.load_freefield1010]
 
 # Loop over the dataset_list to load them (download them if necessary)
 # and display the first 20 images
@@ -24,20 +27,20 @@ for dataset_func in dataset_list:
 
     # distinguish the cifrar100 case as it has coarse and fine labels
     if dataset.name=='cifar100':
-        images        = dataset['images']['train_set'][:20]
-        fine_labels   = dataset['labels']['train_set'][:20]
-        coarse_labels = dataset['coarse_labels']['train_set'][:20]
+        images        = dataset['images/train_set'][:20]
+        fine_labels   = dataset['labels/train_set'][:20]
+        coarse_labels = dataset['coarse_labels/train_set'][:20]
         for im,coarse,fine,cpt in zip(images,coarse_labels,fine_labels,range(20)):
             pl.subplot(2,10,cpt+1)
             pl.title(str(coarse)+', '+str(fine)+': '\
                     +dataset.classes[fine])
             plotting.imshow(im)
     else:
-        labels = dataset['labels']['train_set'][:20]
+        labels = dataset['labels/train_set'][:20]
         if 'images' in dataset.variables:
-            images = dataset['images']['train_set'][:20]
+            images = dataset['images/train_set'][:20]
         else:
-            images = dataset['signals']['train_set'][:20]
+            images = dataset['signals/train_set'][:20]
         for im,label,cpt in zip(images,labels,range(20)):
             pl.subplot(2,10,cpt+1)
             if len(im)>2:
@@ -52,5 +55,5 @@ for dataset_func in dataset_list:
 
     # Reduce side margins and save fig
     pl.tight_layout()
-    pl.savefig('./sknet/docs/source/_static/'+dataset.name+'_samples.png')
+    pl.savefig('../sknet/docs/source/_static/'+dataset.name+'_samples.png')
     pl.close()

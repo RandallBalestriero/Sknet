@@ -21,11 +21,11 @@ def load_fashionmnist(PATH=None):
     machine learning algorithms. It shares the same image size and structure 
     of training and testing splits.
 
-    :param data_format: (optional, default 'NCHW'), if different than default, adapts :mod:`data_format` and :mod:`datum_shape`
-    :type data_format: 'NCHW' or 'NHWC'
-    :param path: (optional, default $DATASET_PATH), the path to look for the data and 
-                 where the data will be downloaded if not present
-    :type path: str
+    Parameters
+    ----------
+        path: str (optional)
+            default $DATASET_PATH), the path to look for the data and
+            where the data will be downloaded if not present
     """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
@@ -39,8 +39,7 @@ def load_fashionmnist(PATH=None):
     # the class attributes.
     print('Loading fashionmnist')
 
-    t = time.time()
-
+    t0 = time.time()
 
     if not os.path.isdir(PATH+'fashionmnist'):
         print('\tCreating Directory')
@@ -73,24 +72,23 @@ def load_fashionmnist(PATH=None):
     # Loading the file
 
     with gzip.open(PATH+'fashionmnist/train-labels.gz', 'rb') as lbpath:
-        train_labels = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
+        dataset['labels/train_set'] = np.frombuffer(lbpath.read(), 
+                                                   dtype=np.uint8, offset=8)
 
     with gzip.open(PATH+'fashionmnist/train-images.gz', 'rb') as lbpath:
-        train_images = np.frombuffer(lbpath.read(), 
+        dataset['images/train_set'] = np.frombuffer(lbpath.read(), 
                                 dtype=np.uint8, offset=16).reshape((-1,1,28,28))
 
     with gzip.open(PATH+'fashionmnist/test-labels.gz', 'rb') as lbpath:
-        test_labels = np.frombuffer(lbpath.read(), dtype=np.uint8, offset=8)
+        dataset['labels/test_set'] = np.frombuffer(lbpath.read(), 
+                                                   dtype=np.uint8, offset=8)
 
     with gzip.open(PATH+'fashionmnist/test-images.gz', 'rb') as lbpath:
-        test_images = np.frombuffer(lbpath.read(), 
+        dataset['images/test_set'] = np.frombuffer(lbpath.read(), 
                             dtype=np.uint8, offset=16).reshape((-1,1,28,28))
 
+    dataset.cast('images','float32')
+    dataset.cast('labels','int32')
 
-    dataset.add_variable({"images":{'train_set':train_images,
-                                    'test_set':test_images},
-                        "labels":{'train_set':train_labels,
-                                    'test_set':test_labels}})
-
-    print('Dataset fashionmnist loaded in','{0:.2f}'.format(time.time()-t),'s.')
+    print('Dataset fashionmnist loaded in','{0:.2f}s.'.format(time.time()-t0))
     return dataset

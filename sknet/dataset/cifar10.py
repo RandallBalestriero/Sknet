@@ -24,9 +24,12 @@ def load_cifar10(PATH=None):
     contain more images from one class than another. Between them, the 
     training batches contain exactly 5000 images from each class. 
 
-    :param path: (optional, default :envvar:`$DATASET_PATH`), the path to look 
-                 for the data and where the data will be downloaded if not present
-    :type path: str
+    Parameters
+    ----------
+        path: str (optional)
+            default $DATASET_PATH), the path to look for the data and
+            where the data will be downloaded if not present
+
     """
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
@@ -38,7 +41,7 @@ def load_cifar10(PATH=None):
     # Load the dataset (download if necessary) and set
     # the class attributes.
         
-    t = time.time()
+    t0 = time.time()
 
     print('Loading cifar10')
 
@@ -57,7 +60,7 @@ def load_cifar10(PATH=None):
     # Loading dataset
     tar = tarfile.open(PATH+'cifar10/cifar10.tar.gz', 'r:gz')
 
-    # Load training set
+    # Load train set
     train_images  = list()
     train_labels  = list()
     for k in tqdm(range(1,6),desc='Loading dataset'):
@@ -66,15 +69,18 @@ def load_cifar10(PATH=None):
         data_dic = pickle.loads(f,encoding='latin1')
         train_images.append(data_dic['data'].reshape((-1,3,32,32)))
         train_labels.append(data_dic['labels'])
+    dataset['images/train_set'] = np.concatenate(train_images,0)
+    dataset['labels/train_set'] = np.concatenate(train_labels,0)
 
-    dataset['images/train_set'] = np.concatenate(train_images,0).astype('float32')
-    dataset['labels/train_set'] = np.concatenate(train_labels,0).astype('int32')
-
+    # Load test set
     f        = tar.extractfile('cifar-10-batches-py/test_batch').read()
     data_dic = pickle.loads(f,encoding='latin1')
-    dataset['images/test_set'] = data_dic['data'].reshape((-1,3,32,32)).astype('float32')
-    dataset['labels/test_set'] = np.array(data_dic['labels']).astype('int32')
+    dataset['images/test_set'] = data_dic['data'].reshape((-1,3,32,32))
+    dataset['labels/test_set'] = np.array(data_dic['labels'])
 
-    print('Dataset cifar10 loaded in','{0:.2f}'.format(time.time()-t),'s.')
+    dataset.cast('images','float32')
+    dataset.cast('labels','int32')
+
+    print('Dataset cifar10 loaded in{0:.2f}s.'.format(time.time()-t0))
 
     return dataset

@@ -49,38 +49,29 @@ class Space:
         self.x,self.y = meshgrid(linspace(MIN_X,MAX_X,N),linspace(MIN_Y,MAX_Y,N))
         self.X        = concatenate([self.x.reshape((-1,1)),self.y.reshape((-1,1))],axis=1)
  
-
-class CircleSpace:
-    def __init__(self,CENTER,RADIUS,N):
-        x,y    = meshgrid(linspace(CENTER-RADIUS,CENTER+RADIUS,N),linspace(CENTER-RADIUS,CENTER+RADIUS,N))
-        mask   = sqrt(x**2+y**2)<=RADIUS
-        self.x = x[mask]
-        self.y = y[mask]
-        self.X = concatenate([self.x.reshape((-1,1)),self.y.reshape((-1,1))],axis=1)
  
-class Circle:
-    def __init__(self,CENTER,RADIUS,N):
-        x = linspace(-RADIUS,RADIUS,N)
-        y = sqrt(RADIUS**2-x**2)
-        self.X = concatenate([
-            concatenate([x.reshape((-1,1)),y.reshape((-1,1))],axis=1),
-            concatenate([x[::-1].reshape((-1,1)),-y.reshape((-1,1))],axis=1)],0)
-        self.X+=CENTER.reshape((1,-1))
+def circle_2d(center, radius , N):
+    """Given a center, a radius and a number of points, return a uniform of the
+    the 2D circle 
 
+    Parameters
+    ----------
 
+    center : numpy.array
+        the center of the circle, must be a scalar of a vector of length 2.
 
+    radius : float
+        the radius of the circle, must be nonnegative
 
-
-
-
-
-
-
-
-
-
-
-
+    N : int
+        the number of points to be used for the circle discretization, must be
+        nonnegative
+    """
+    t = np.arange(N)/N
+    PI= 2*3.14159
+    X = np.stack([RADIUS*np.cos(t*PI),RADIUS*np.sin(t*PI)],1)
+    X+= CENTER
+    return X
 
 
 
@@ -120,20 +111,50 @@ def grad(x,duplicate=0):
 
 
 
-def states2values(states):
-    #get an array of binary values representing the relu 
-    #or absolute value etc state and thus is 1 if the relu
-    #was active and 0 otherwise and this for each unit
-    #so states is a 2D array of shape (#samples,#units)
-    state2values_dict = dict()
-    values            = zeros(states.shape[0])
-    for i in range(states.shape[0]):
-        str_s = str(states[i].astype('uint8'))
-        if(str_s not in state2values_dict):
-            state2values_dict[str_s] = randn()
-        values[i]=state2values_dict[str_s]
+def states2values(states, state2value_dict=None, return_dict=False):
+    """Given binary masks obtained for example from the ReLU activation, 
+    convert the binary vectors to a single float scalar, the same scalar for
+    the same masks. This allows to drastically reduce the memory overhead to
+    keep track of a large number of masks. The mapping mask -> real is kept
+    inside a dict and thus allow to go from one to another. Thus given a large
+    collection of masks, one ends up with a large collection of scalars and
+    a mapping mask <-> real only for unique masks and thus allow reduced memory
+    requirements.
+
+    Parameters
+    ----------
+
+    states : bool matrix
+        the matrix of shape (#samples,#binary values). Thus if using a deep net
+        the masks of ReLU for all the layers must first be flattened prior
+        using this function.
+
+    state2value_dict : dict
+        optional dict containing an already built mask <-> real mapping which
+        should be used and updated given the states value.
+
+    return_dict : bool
+        if the update/created dict should be return as part of the output
+
+    Returns
+    -------
+
+    values : scalar vector
+        a vector of length #samples in which each entry is the scalar
+        representation of the corresponding mask from states
+
+    state2value_dict : dict (optional)
+        the newly created or updated dict mapping mask to value and vice-versa.
+
+
+    """
+    if state2value_dict is None:
+        state2value_dict = dict()
+    values = zeros(states.shape[0])
+    for i,state in enumerate(states):
+        str_s = str(state.astype('uint8')).replace(' ','')[1:-1]
+        if(str_s not in state2value_dict):
+            state2value_dict[str_s] = randn()
+        values[i] = state2value_dict[str_s]
     return values
-
-
-
 

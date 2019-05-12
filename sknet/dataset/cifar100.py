@@ -39,9 +39,12 @@ def load_cifar100(PATH=None):
     image comes with a "fine" label (the class to which it belongs) and a 
     "coarse" label (the superclass to which it belongs).
 
-    :param path: (optional, default $DATASET_PATH), the path to look for the data and 
-                 where the data will be downloaded if not present
-    :type path: str
+    Parameters
+    ----------
+        path: str (optional)
+            default $DATASET_PATH), the path to look for the data and
+            where the data will be downloaded if not present
+
     """
 
     if PATH is None:
@@ -71,26 +74,21 @@ def load_cifar100(PATH=None):
     tar = tarfile.open(PATH+'cifar100/cifar100.tar.gz', 'r:gz')
 
     # Loading training set
-    f         = tar.extractfile('cifar-100-python/train').read()
-    data_dic  = pickle.loads(f,encoding='latin1')
-
-    train_set = [data_dic['data'].reshape((-1,3,32,32)),
-                    np.array(data_dic['coarse_labels']),
-                    np.array(data_dic['fine_labels'])]
+    f    = tar.extractfile('cifar-100-python/train').read()
+    data = pickle.loads(f,encoding='latin1')
+    dataset['images/train_set']        = data['data'].reshape((-1,3,32,32))
+    dataset['labels/train_set']        = np.array(data['fine_labels'])
+    dataset['coarse_labels/train_set'] = np.array(data['coarse_labels'])
 
     # Loading test set
-    f        = tar.extractfile('cifar-100-python/test').read()
-    data_dic = pickle.loads(f,encoding='latin1')
-    test_set = [data_dic['data'].reshape((-1,3,32,32)),
-                    np.array(data_dic['coarse_labels']),
-                    np.array(data_dic['fine_labels'])]
+    f    = tar.extractfile('cifar-100-python/test').read()
+    data = pickle.loads(f,encoding='latin1')
+    dataset['images/test_set']        = data['data'].reshape((-1,3,32,32))
+    dataset['labels/test_set']        = np.array(data['fine_labels'])
+    dataset['coarse_labels/test_set'] = np.array(data['coarse_labels'])
 
-    dataset.add_variable({'images':{'train_set':train_set[0].astype('float32'),
-                                    'test_set':test_set[0].astype('float32')},
-                        'labels':{'train_set':train_set[2].astype('int32'),
-                                    'test_set':test_set[2].astype('int32')},
-                        'coarse_labels':{'train_set':train_set[1],
-                                        'test_set':test_set[1]}})
+    dataset.cast('images','float32')
+    dataset.cast('labels','int32')
 
-    print('Dataset cifar100 loaded in','{0:.2f}'.format(time.time()-t0),'s.')
+    print('Dataset cifar100 loaded in {0:.2f}s.'.format(time.time()-t0))
     return dataset
