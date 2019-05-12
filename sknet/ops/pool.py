@@ -121,7 +121,8 @@ class Pool2D(Op):
 
         # Set-up the the VQ
         if self.pool_type=='MAX':
-            self.mask = tf.gradients(output,input,tf.ones_like(output))[0]
+            mask = tf.gradients(output,input,tf.ones_like(output))[0]
+            self.mask = tf.cast(mask,tf.bool)
         return output
 
     def backward(self,input):

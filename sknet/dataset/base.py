@@ -39,6 +39,7 @@ class Dataset(dict):
 
     def create_placeholders(self,batch_size,iterators_dict,device="/cpu:0"):
         # Many settings are put in int64 for GPU compatibility with tf
+        self.batch_size = batch_size
         sets            = self.sets
         for var in self:
             if np.shape(self[var])[0]<batch_size:
@@ -136,6 +137,10 @@ class Dataset(dict):
         for var in self:
             if context in var and len(var.split('/'))==2:
                 return len(self[var])
+
+    def N_BATCH(self,context):
+        return self.N(context)//self.batch_size
+
     def shape(self,var):
         set_ = self.sets[0]
         return self[var+'/'+set_].shape

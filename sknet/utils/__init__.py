@@ -9,6 +9,8 @@ __all__ = [
         "plotting",
         "geometry"]
 
+def flatten(tensor):
+    return tf.reshape(tensor,(tensor.shape.as_list()[0],-1))
 
 def str2bool(v):
 #    print(v)

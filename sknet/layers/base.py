@@ -3,9 +3,9 @@
 
 import tensorflow as tf
 
-
 from .. import Tensor
 from .. import ops
+from ..utils import flatten
 
 class Layer(Tensor):
     """Layer class used as parent of any implemented layer.
@@ -158,6 +158,11 @@ class Layer(Tensor):
         for op in self.inner_ops[::-1]:
             input = op.backward(op)
         return input
+
+    @property
+    def VQ(self):
+        VQs = [flatten(op.VQ) for op in self.inner_ops if op.VQ is not None]
+        return tf.concat(VQs,1)
 
     @property
     def inner_ops(self):

@@ -23,7 +23,7 @@ class Workplace(object):
         ops = tf.group(tf.global_variables_initializer(),tf.local_variables_initializer())
         self.session.run(ops,feed_dict=dataset.init_dict)
 
-    def execute_op(self,op,feed_dict,batch_size=None,deterministic=None):
+    def execute_op(self,op,feed_dict,deterministic=None):
         """Perform an epoch (according to the set given by context).
         Execute and save the given ops and optionally apply a numpy function
         on them at the end of the epoch. THis is usefull for example to only
@@ -58,34 +58,10 @@ class Workplace(object):
 
 
         """
-#        N = max([len(value) for value in feed_dict.values()])
-        # find out the batch_size, if not given, take it from the network, 
-        # if given (case when the network was build with None 
-        # as batch_size, then assert that
-        # it is true (or at least that they both match)
-        if batch_size is None and self.network.batch_size is not None:
-            batch_size = self.network.batch_size
-
         # if a deterministic behavior is given, set it
         if deterministic is not None:
             feed_dict.update(self.network.deter_dict(deterministic))
 
-#        # Get number of data and batches
-#        N_BATCH = N//batch_size
-
-#        if N_BATCH>1:
-#            output = list()
-#            for i in range(N_BATCH):
-#                here  = range(i*batch_size,(i+1)*batch_size)
-#                feed_ = [(key,value[here]) for key,value in linkage.items()]
-#                output.append(self.session.run(op,feed_dict=feed_))
-            # Concatenate the outputs over the batch axis
-#            if hasattr(op,'__len__'):
-#                output = np.concatenate([batch_out[i] 
-#                            for batch_out in output],0)
-#            else:
-#                output = np.concatenate(output,0)
-#        else:
         output = self.session.run(op,feed_dict=feed_dict)
         return output
  

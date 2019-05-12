@@ -4,6 +4,7 @@
 import tensorflow as tf
 
 from .. import Tensor, Variable
+from ..utils import flatten
 
 class Op(Tensor):
     """Op class used as parent of any implemented layer.
@@ -144,6 +145,10 @@ class Op(Tensor):
         for var in tf.global_variables(self.name):
             self._reset_variables_op.append(tf.assign(var,var.initial_value))
         super().__init__(output)
+
+    @property
+    def VQ(self):
+        return flatten(self.mask) if self.mask is not None else None
 
     @property
     def reset_variables_op(self):
