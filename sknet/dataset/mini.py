@@ -11,7 +11,7 @@ from sklearn.model_selection import train_test_split
 
 
 
-def load_path(N=1000, std=0.05, option=0, seed=None):
+def load_path(N=1000, std=0.03, option=0, seed=None):
     X  = np.linspace(0,1,N)
     if option==0:
         # simple cosine
@@ -24,8 +24,17 @@ def load_path(N=1000, std=0.05, option=0, seed=None):
         X  = np.concatenate([X[::2],X[::2]],0)
         X  = np.stack([X,Y],1)
     elif option==2:
-        t  = np.linspace(0,2,N)
-        X  = np.stack([t*np.cos(2*3.14*t),t*np.sin(2*3.14*t)],1)
+        # swiss roll
+        t = np.linspace(0,2,N)
+        X = np.stack([t*np.cos(3.14*t),t*np.sin(3.14*t)],1)
+    elif option==3:
+        # square
+        left_side  = np.stack([np.ones(N//4)*X[0],X[::4]],1)
+        right_side = np.stack([np.ones(N//4)*X[-1],X[::4]],1)
+        upper_side = np.stack([X[::4],np.ones(N//4)*X[0]],1)
+        lower_side = np.stack([X[::4],np.ones(N//4)*X[-1]],1)
+        X          = np.concatenate([left_side,upper_side,right_side,
+                                                         lower_side[::-1]],0)
     X += np.random.RandomState(seed).randn(N,2)*std
     X -= X.mean(0,keepdims=True)
     X /= X.max(0,keepdims=True)

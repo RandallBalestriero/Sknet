@@ -126,4 +126,9 @@ class Dataset(dict):
         for var in self:
             if context in var and len(var.split('/'))==2:
                 return len(self[var])
+    def shape(self,var):
+        set_ = self.sets[0]
+        return self[var+'/'+set_].shape
+    def datum_shape(self,var):
+        return self.shape(var)[1:]
 

@@ -302,8 +302,8 @@ class HermiteSplineConv1D(Op):
                     m = np.concatenate([m,m_imag],0).astype('float32')
                     p = np.concatenate([p,p_imag],0).astype('float32')
             elif init=='random':
-                m = np.random.randn(1, B, self.K,dtype='float32')
-                p = np.random.randn(1, B, self.K,dtype='float32')
+                m = np.random.randn(1, B, self.K).astype('float32')
+                p = np.random.randn(1, B, self.K).astype('float32')
                 if self.complex and not self.hilbert:
                     m_imag = np.random.randn(1, B, self.K)
                     p_imag = np.random.randn(1, B, self.K)
@@ -311,7 +311,7 @@ class HermiteSplineConv1D(Op):
                     p = np.concatenate([p, p_imag],0).astype('float32')
             self._m = tf.Variable(m, trainable=self.trainable_filters,name='m')
             self._p = tf.Variable(p, trainable=self.trainable_filters,name='p')
-
+        self.m_channels = self._m.shape.as_list()[1]
         # Boundary Conditions and centering
         mask    = np.ones(self.K, dtype=np.float32)
         mask[0], mask[-1] = 0, 0
@@ -343,8 +343,13 @@ class HermiteSplineConv1D(Op):
             filters = tf.ifft(tf.concat([filters_fft,
                                             tf.zeros_like(filters_fft)],1))
         else:
-            filters = utils.hermite_interp(time_grid, self.all_knots[start:end],
-                                            self.m, self.p)
+            if self.m_channels==1:
+                filters = utils.hermite_interp(time_grid, 
+                                    self.all_knots[start:end], self.m, self.p)
+            else:
+                filters = utils.hermite_interp(time_grid, 
+                                     self.all_knots[start:end], 
+                                     self.m[:,start:end], self.p[:,start:end])
             if self.complex:
                 new_shape = (2*len(self.indices[start:end]),length)
                 filters = tf.reshape(filters,new_shape)

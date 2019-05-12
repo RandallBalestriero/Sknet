@@ -23,6 +23,8 @@ class NesterovMomentum:
             else:
                 gradients = tf.gradients(loss_or_grads,params)
 
+            self.step = Variable(-ONE_INT32, trainable=False, name='step')
+            step = tf.assign_add(self.step, ONE_INT32)
             # get the learning rate
             if not np.isscalar(learning_rate):
                 learning_rate = learning_rate(step)
