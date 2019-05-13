@@ -416,7 +416,8 @@ class Worker(object):
         self._transform_function = [f if f is not None else lambda x:x
                                     for f in self._transform_function]
 
-        self._dependencies  = get_tensor_dependencies(self._op)
+        self._dependencies  = get_tensor_dependencies([op
+                       for op in self._op if not isinstance(op,tf.Variable)])
         self._name          = context+"/"+name
         self._deterministic = deterministic
         self._context       = context

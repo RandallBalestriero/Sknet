@@ -70,7 +70,7 @@ class Activation(Op):
     input based on a given scalar to scalar function.
     The nonlinearity can of the following form:
 
-      - a scalar to scalar function :math:`\sigma` leading to 
+      - a scalar to scalar function :math:`\sigma` leading to
         the output :math:`\sigma(x)`
       - a scalar :math:`\\alpha` , then the activation is defined as
         :math:`\max(x,\\alpha x)`, which thus becomes ReLU :math:`\\alpha=0`,

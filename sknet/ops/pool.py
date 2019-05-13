@@ -67,7 +67,7 @@ class GlobalPool2D(Op):
 
 class Pool2D(Op):
     """Pooling layer over spatial dimensions.
-        
+
     Example of use::
 
         # (3,3) max pooling with (3,3) stride
@@ -77,7 +77,7 @@ class Pool2D(Op):
         # Spatial Pooling with overlap
         Pool2D(previous_layer, window_shape=(5,5), strides=(2,2))
 
-    Each output position :math:'[z]_{n,c,i,j}' results form pooling 
+    Each output position :math:'[z]_{n,c,i,j}' results form pooling
     over the corresponding region in the input.
 
     Parameters
@@ -121,7 +121,9 @@ class Pool2D(Op):
 
         # Set-up the the VQ
         if self.pool_type=='MAX':
-            mask = tf.gradients(output,input,tf.ones_like(output))[0]
+#            _,argmax=tf.nn.max_pool_with_argmax(input,self.window_shape,
+#                    self.strides, self.padding)
+            mask      = tf.gradients(output,input,tf.ones_like(output))[0]
             self.mask = tf.cast(mask,tf.bool)
         return output
 

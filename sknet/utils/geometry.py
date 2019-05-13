@@ -150,11 +150,14 @@ def states2values(states, state2value_dict=None, return_dict=False):
     """
     if state2value_dict is None:
         state2value_dict = dict()
+    if 'count' not in state2value_dict:
+        state2value_dict['count']=0
     values = zeros(states.shape[0])
     for i,state in enumerate(states):
-        str_s = str(state.astype('uint8')).replace(' ','')[1:-1]
+        str_s = ''.join(state.astype('uint8').astype('str'))
         if(str_s not in state2value_dict):
-            state2value_dict[str_s] = randn()
+            state2value_dict[str_s]   = state2value_dict['count']
+            state2value_dict['count']+= 0.001
         values[i] = state2value_dict[str_s]
     return values
 
