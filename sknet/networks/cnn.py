@@ -26,28 +26,25 @@ def ConvLarge(dnn,n_classes=None):
                                     [[0,2,3]], [0.01]))
     if n_classes is not None:
         dnn.append(layers.Conv2D(dnn[-1],[(n_classes,1,1),{'b':None}],
-                                    [[0,2,3]], [0.01]))
+                                    [[0,2,3]], [1]))
         dnn.append(ops.GlobalPool2D(dnn[-1],pool_type='AVG',keep_dims=False))
 
 
-def ConvSmall(dnn):
+def ConvSmall(dnn, n_classes=None):
 
     dnn.append(layers.Conv2DPool(dnn[-1],[(32,5,5),{'b':None,'pad':'full'}],
-                                    [[0,2,3]], [0.01],[(1,2,2)]))
+                                    [[0,2,3]], [0.01],[(2,2)]))
     dnn.append(layers.Conv2D(dnn[-1],[(64,3,3),{'b':None}],
                                     [[0,2,3]], [0.01]))
     dnn.append(layers.Conv2DPool(dnn[-1],[(64,3,3),{'b':None,'pad':'full'}],
-                                    [[0,2,3]], [0.01],[(1,2,2)]))
+                                    [[0,2,3]], [0.01],[(2,2)]))
 
     dnn.append(layers.Conv2D(dnn[-1],[(128,3,3),{'b':None}],
                                     [[0,2,3]], [0.01]))
-    dnn.append(layers.Conv2DPool(dnn[-1],[(10,1,1),{'b':None}],
-                                    [[0,2,3]], [0.01],[(1,-1,-1),
-                                    {'pool_type':'AVG','keep_dims':False}]))
-    return dnn
-
-
-
+    if n_classes is not None:
+        dnn.append(layers.Conv2D(dnn[-1],[(n_classes,1,1),{'b':None}],
+                                    [[0,2,3]], [1]))
+        dnn.append(ops.GlobalPool2D(dnn[-1],pool_type='AVG',keep_dims=False))
 
 
 

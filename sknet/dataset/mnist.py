@@ -65,7 +65,7 @@ def load_mnist(PATH=None):
     dataset['labels/valid_set'] = valid_set[1]
 
     dataset.cast('images','float32')
-    dataset.cast('images','int32')
+    dataset.cast('labels','int32')
 
     print('Dataset mnist loaded in {0:.2f}s.'.format(time.time()-t0))
     return dataset

@@ -70,6 +70,8 @@ dnn       = sknet.Network(name='simple_model')
 if DATA_AUGMENTATION:
     dnn.append(ops.RandomAxisReverse(dataset.images,axis=[-1]))
     dnn.append(ops.RandomCrop(dnn[-1],(28,28),seed=10))
+else:
+    dnn.append(dataset.images)
 
 if MODEL=='cnn':
     sknet.networks.ConvLarge(dnn,dataset.n_classes)

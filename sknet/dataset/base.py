@@ -16,6 +16,9 @@ class Dataset(dict):
     def next(self,session=None):
         return self.iterators[self.current_set_string].next(session=session)
 
+    def reset(self):
+        self.iterators[self.current_set_string].reset()
+
     def set_set(self,name,session):
         self.current_set_string = name
         session.run(self.assign_set,

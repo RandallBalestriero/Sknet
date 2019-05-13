@@ -162,6 +162,8 @@ class Layer(Tensor):
     @property
     def VQ(self):
         VQs = [flatten(op.VQ) for op in self.inner_ops if op.VQ is not None]
+        if len(VQs)==0:
+            return None
         return tf.concat(VQs,1)
 
     @property
