@@ -57,6 +57,7 @@ class Queue(tuple):
         obj.count     = 0
         return obj
     def close(self):
+        self.count = 0
         if self._file is not None:
             self._file.close()
     def dump(self):

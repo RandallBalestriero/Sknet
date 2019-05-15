@@ -3,7 +3,7 @@ import tensorflow.contrib.layers as tfl
 from .normalize import BatchNorm as bn
 import numpy as np
 from . import Op
-    
+
 from .. import utils
 from .. import Variable,ONE_FLOAT32
 
@@ -13,7 +13,7 @@ class Conv1D(Op):
 
     :param incoming: input shape of incoming layer
     :type incoming: Op or tuple of int
-    :param filters: the shape of the filters in the form 
+    :param filters: the shape of the filters in the form
                     (#filters, width)
     :type filters: triple of int
     :param nonlinearity_c: coefficient of the nonlinearity,
@@ -26,26 +26,30 @@ class Conv1D(Op):
     def __init__(self,incoming,filters,W = tfl.xavier_initializer(),
                     b = tf.zeros, stride =1, pad='valid',
                     mode='CONSTANT', name='', W_func = tf.identity,
-                    b_func = tf.identity,*args,**kwargs):
+                    b_func = tf.identity, separable=False, *args, **kwargs):
         with tf.variable_scope(self._name_) as scope:
             self._name   = scope.original_name_scope
             self.mode    = mode
             self.stride  = stride
             self.pad     = pad
             self.stride = stride
+            self.separable = separable
             # Define the padding function
             if pad=='valid' or (filters[1]==1):
                 self.to_pad=False
             else:
                 if pad=='same':
                     assert(filters[1]%2==1 and filters[2]%2==1)
-                    self.p = [[0]*2, [0]*2, [(filters[1]-1)//2]*2]
+                    self.padding = [[0,0], [0,0], [(filters[1]-1)//2]*2]
                 else:
-                    self.p = [[0]*2, [0]*2, [filters[1]-1]*2]
+                    self.padding = [[0,0], [0,0], [filters[1]-1]*2]
                 self.to_pad = True
 
             # Compute shape of the W filter parameter
-            w_shape = (filters[1], incoming.shape.as_list()[1], filters[0])
+            if separable:
+                w_shape = (filters[1], 1, filters[0])
+            else:
+                w_shape = (filters[1], incoming.shape.as_list()[1], filters[0])
 
             # Initialize W
             self._W = tf.Variable(W(w_shape), name='W') if callable(W) else W
@@ -63,13 +67,38 @@ class Conv1D(Op):
             super().__init__(incoming)
 
     def forward(self,input, *args,**kwargs):
-        padded = tf.pad(input,self.p,mode=self.mode) if self.to_pad else input
-        Wx     = tf.nn.conv1d(padded, self.W, stride=self.stride, 
+        # Reshape in case the input already has multi-channels
+        input_shape = input.shape.as_list()
+        if self.separable:
+            new_shape = [np.prod(input_shape[:-1]),1,input_shape[-1]]
+            output_shape = input_shape[:-1]+[None,None]
+        else:
+            new_shape = [np.prod(input_shape[:-2])]+input_shape[-2:]
+            output_shape = input_shape[:-2]+[None,None]
+
+        if new_shape!=input_shape:
+            input = tf.reshape(input,new_shape)
+
+        if self.to_pad:
+            input = tf.pad(input, self.padding, mode=self.mode)
+        output = tf.nn.conv1d(input, self.W, stride=self.stride,
                                       padding='VALID', data_format="NCW")
-        return Wx if self.b is None else Wx+self.b
+        conv_shape = output.shape.as_list()
+        output_shape[-2:]=conv_shape[-2:]
+        if output_shape!=conv_shape:
+            output = tf.reshape(output,output_shape)
+        return output if self.b is None else output+self.b
 
     def backward(self,input):
         return tf.gradients(self,self.input,input)[0]
+
+
+
+
+
+
+
+
 
 
 
@@ -257,34 +286,45 @@ class HermiteSplineConv1D(Op):
             super().__init__(input)
 
     def forward(self,input,*args,**kwargs):
-        # Input shape
+        # Reshape in case the input already has multi-channels
         input_shape = input.shape.as_list()
-        n_channels  = np.prod(input_shape[:-1])
-        x_reshape   = tf.reshape(input,[n_channels,1,input_shape[-1]])
+        new_shape = [np.prod(input_shape[:-1]),1,input_shape[-1]]
+        if new_shape!=input_shape:
+            input = tf.reshape(input,new_shape)
+
+        # define the output shape for the first dims.
+        if len(input_shape)==2 or (len(input_shape)==3 and input_shape[1]==1):
+            output_shape=input_shape[:1]+[None,None]
+        else:
+            output_shape=input_shape[:-1]+[None,None]
 
         outputs = list()
         for i in range(len(self.W)):
             # shape of W is (width,inchannel,outchannel)
             if self.padding=='SAME':
-                width,in_c,out_c = self.W[i].shape.as_list()
+                width, in_c, out_c = self.W[i].shape.as_list()
+                output_shape[-2:] = [out_c, input_shape[-1]//self.strides]
+
                 amount_l = np.int32(np.floor((width-1)/2))
                 amount_r = np.int32(width-1-amount_l)
-                x_pad    = tf.pad(x_reshape,paddings=[[0,0],[0,0],
-                                    [amount_l,amount_r]], mode='SYMMETRIC')
-                new_shape  = input_shape[:-1]+[out_c]\
-                                           +[input_shape[-1]//self.strides]
+                paddings = [[0,0],[0,0],[amount_l,amount_r]]
+                x_pad = tf.pad(input, paddings=paddings, mode='SYMMETRIC')
+
+                conv = self.apply_filter_bank(x_pad,self.W[i])
+                outputs.append(tf.reshape(conv,output_shape))
             else:
-                width0, in_c, out_c0 = self.W[-1].shape.as_list()
-                width, in_c, out_c = self.W[i].shape.as_list()
+                width0 = self.W[-1].shape.as_list()[0]
+                time_bins = (input_shape[-1]-width0)//self.strides+1
+                output_shape[-2:] = [out_c,time_bins]
+
+                width, in_c, out_c = self.W[i].shape.as_list()[0]
                 width_diff = width0-width
                 amount_l = np.int32(np.floor(width_diff/2))
-                new_shape = input_shape[:-1]+[out_c]\
-                                   +[(input_shape[-1]-width0)//self.strides+1]
-                x_pad = x_reshape
-            conv       = self.apply_filter_bank(x_pad,self.W[i])
-            if self.padding=='VALID':
-                conv = conv[...,amount_l:amount_l+new_shape[-1]]
-            outputs.append(tf.reshape(conv,new_shape))
+
+                conv = self.apply_filter_bank(input,self.W[i])
+                conv = conv[...,amount_l:amount_l+output_shape[-1]]
+                outputs.append(tf.reshape(conv,output_shape))
+
         if len(self.W)>1:
             output = tf.concat(outputs,-2)
         else:
