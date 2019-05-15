@@ -16,6 +16,7 @@ import tensorflow as tf
 from sknet.dataset import BatchIterator
 from sknet import ops,layers
 
+import matplotlib.pyplot as plt
 
 # Data Loading
 #-------------
@@ -26,10 +27,8 @@ dataset['signals/train_set']/=dataset['signals/train_set'].max(2,keepdims=True)
 
 dataset.split_set("train_set","test_set",0.33)
 
-
 dataset.create_placeholders(batch_size=10,
        iterators_dict={'train_set':BatchIterator("random_see_all"),
-                       'valid_set':BatchIterator('continuous'),
                        'test_set':BatchIterator('continuous')},device="/cpu:0")
 
 # Create Network
@@ -40,14 +39,18 @@ dataset.create_placeholders(batch_size=10,
 
 my_layer = layers.custom_layer(ops.Dense,ops.BatchNorm,ops.Activation)
 
-dnn = sknet.network.Network(name='model_base')
+dnn = sknet.Network(name='model_base')
 
-dnn.append(ops.SplineWaveletTransform(dataset.signals,J=5,Q=16,K=15,
-			trainable_scales=False, trainable_knots=False,
-                 	trainable_filters=False, hilbert=False, init='gabor'))
-dnn.append(ops.Activation(dnn[-1],tf.abs))
-dnn.append(ops.Pool2D(tf.log(dnn[-1]+0.001),(1,1024),strides=(1,512),pool_type='AVG'))
-dnn.append(ops.BatchNorm(dnn[-1],[0,3]))
+dnn.append(ops.HermiteSplineConv1D(dataset.signals,J=5,Q=16,K=15,
+			trainable_scales=False, trainable_knots=False, complex=False,
+            trainable_filters=False, hilbert=False, init='gabor'))
+dnn.append(ops.BatchNorm(dnn[-1],[0,2]))
+
+dnn.append(tf.abs(dnn[-1]))
+dnn.append(tf.expand_dims(dnn[-1],1))
+dnn.append(ops.Pool2D(tf.log(dnn[-1]+0.001), (1,1024), strides=(1,512),
+                                                    pool_type='AVG'))
+#dnn.append(ops.BatchNorm(dnn[-1],[0,3]))
 
 
 dnn.append(layers.Conv2DPool(dnn[-1],[(32,3,3),{'b':None}],
@@ -62,11 +65,10 @@ dnn.append(layers.Conv2DPool(dnn[-1],[(64,3,3),{'b':None}],
 
 
 dnn.append(my_layer(dnn[-1],[512,{'b':None}],
-                                    [[0]],[0]))
-dnn.append(ops.Dropout(dnn[-1],0.5))
+                                    [[0]],[0.1]))
 
 dnn.append(my_layer(dnn[-1],[256,{'b':None}],
-                                    [[0]],[0]))
+                                    [[0]],[0.1]))
 
 dnn.append(ops.Dense(dnn[-1],units=dataset.n_classes))
 
@@ -86,7 +88,7 @@ auc      = sknet.losses.AUC(dataset.labels,tf.nn.softmax(dnn[-1])[:,1])
 # the changes to the model parameters, we also specify that this process
 # should also include some possible network dependencies present in UPDATE_OPS
 
-optimizer = sknet.optimizers.Adam(loss,0.01,params=dnn.variables(trainable=True))
+optimizer = sknet.optimizers.Adam(loss,0.05,params=dnn.variables(trainable=True))
 minimizer = tf.group(optimizer.updates+dnn.updates)
 
 # Workers
@@ -95,10 +97,11 @@ minimizer = tf.group(optimizer.updates+dnn.updates)
 work1 = sknet.Worker(name='minimizer',context='train_set',op=[minimizer,loss],
         deterministic=False,period=[1,100],verbose=2)
 
-work2 = sknet.Worker(name='AUC',context='test_set',op=[accuracy,auc],
-        deterministic=True, transform_function=np.mean,verbose=1)
+work2 = sknet.Worker(name='AUC',context='test_set',op=[accuracy,auc,dnn[0].W[0]],
+        deterministic=True, verbose=[1,1,0],
+        transform_function=[np.mean,np.mean,None], period=[1,1,1000])
 
-queue = sknet.Queue((work1,work2),filename='test_bird.h5')
+queue = sknet.Queue((work1,work2))
 
 # Pipeline
 #---------
@@ -112,7 +115,11 @@ workplace = sknet.utils.Workplace(dnn,dataset=dataset)
 
 # will fit the model for 50 epochs and return the gathered op
 # outputs given the above definitions
-
-output = workplace.execute_queue(queue,repeat=200)
+#for i in range(10):
+workplace.execute_queue(queue,repeat=100)
+#    print(np.shape(work2.epoch_data[2][0]))
+#    plt.plot(work2.epoch_data[2][0][0,:,0,-1])
+#    plt.plot(work2.epoch_data[2][0][0,:,0,-30])
+#    plt.show()
 
 

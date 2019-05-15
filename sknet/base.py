@@ -63,9 +63,9 @@ class Queue(tuple):
     def dump(self):
         """Method to be called to save data from workers and empty them
         """
-        self.count+=1
         if self._filename is None:
             return
+        self.count+=1
         if self._file is None:
             # create and open the file
             while 1:
