@@ -137,7 +137,7 @@ class Activation(Op):
     def backward(self,input,*args,**kwargs):
         if self.identity: return input
         if self.mas:
-            return input*self.mask
+            return input*tf.cast(self.mask,tf.float32)
         else:
             return tf.gradient(self,self.input,input)[0]
 

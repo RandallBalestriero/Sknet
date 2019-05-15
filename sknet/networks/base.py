@@ -49,6 +49,12 @@ class Network:
                 var+=layer.variables(trainable)
         return var
 
+    def backward(self,tensor):
+        ops = self.as_list()[::-1]
+        for op in ops:
+            tensor = op.backward(tensor)
+        return tensor
+
     @property
     def updates(self):
         updates = []

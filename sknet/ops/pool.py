@@ -3,7 +3,7 @@
 
 import tensorflow as tf
 from . import Op
-
+import numpy as np
 # ToDo: PoolOp: optimize s.t. if it is just channel pooling you dont reshape
 
 
@@ -119,6 +119,78 @@ class Pool2D(Op):
                     strides=self.strides, pooling_type=self.pool_type,
                     padding=self.padding, data_format='NCHW')
 
+        # Set-up the the VQ
+        if self.pool_type=='MAX':
+#            _,argmax=tf.nn.max_pool_with_argmax(input,self.window_shape,
+#                    self.strides, self.padding)
+            mask      = tf.gradients(output,input,tf.ones_like(output))[0]
+            self.mask = tf.cast(mask,tf.bool)
+        return output
+
+    def backward(self,input):
+        return tf.gradient(self, self.input, input)[0]
+
+
+class Pool1D(Op):
+    """Pooling layer over spatial dimensions.
+
+    Example of use::
+
+        # (3,3) max pooling with (3,3) stride
+        # All ther below are equivalent
+        Pool2D(previous_layer, window_shape=(3,3), strides=(3,3))
+        Pool2D(previous_layer, window_shape=(3,3))
+        # Spatial Pooling with overlap
+        Pool2D(previous_layer, window_shape=(5,5), strides=(2,2))
+
+    Each output position :math:'[z]_{n,c,i,j}' results form pooling
+    over the corresponding region in the input.
+
+    Parameters
+    ----------
+
+    incoming : tf.Tensor or sknet.Op
+        The incoming tensor or layer instance
+
+    window_shape : list of int
+        The size of the pooling window
+
+    strides : list of int (default=window)
+        The stride of the pooling
+
+    pool_type : str
+        The pooling to use, can be :var:`"MAX"` or :var:`"AVG"`.
+
+    padding : str
+        The padding to use, cane be :var:`"VALID"` or :var:`"SAME"`
+
+    """
+
+    _name_ = 'Pool1DOp'
+    deterministic_behavior = False
+
+    def __init__(self, incoming, window, stride=None, pool_type='MAX',
+                    padding='VALID', *args, **kwargs):
+        assert(np.isscalar(window))
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
+            self.pool_type = pool_type
+            self.padding = padding
+            self.window = window
+            self.stride = window if stride is None else stride
+            super().__init__(incoming)
+
+    def forward(self, input, *args, **kwargs):
+        input_shape = input.shape.as_list()
+        if len(input_shape)>3:
+            new_shape = [np.prod(input_shape[:-2])]+input_shape[-2:]
+            input = tf.reshape(input,new_shape)
+        output = tf.nn.pool(input,window_shape=[self.window],
+                    strides=[self.stride], pooling_type=self.pool_type,
+                    padding=self.padding, data_format='NCW')
+        if len(input_shape)>3:
+            time_length = output.shape.as_list()[-1]
+            output = tf.reshape(output,input_shape[:-1]+[time_length])
         # Set-up the the VQ
         if self.pool_type=='MAX':
 #            _,argmax=tf.nn.max_pool_with_argmax(input,self.window_shape,

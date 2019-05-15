@@ -191,16 +191,18 @@ class HermiteSplineConv1D(Op):
     _name_ = 'SplineWaveletTransformOp'
 
     def __init__(self, input, J, Q, K, strides=1, init='random',
-                 trainable_scales=False, trainable_knots=False,
+                 trainable_scales=0, trainable_knots=False, padding='SAME',
                  trainable_filters=False, hilbert=False, m=None,
-                 p=None, padding='valid',n_conv=None, tied_knots=True, 
+                 p=None, n_conv=None, tied_knots=True, trainable_chirps=False,
                  complex=True, tied_weights=True, **kwargs):
         with tf.variable_scope(self._name_) as scope:
             self._name = scope.original_name_scope
             if n_conv is None:
                 n_conv = J
             K                     += (K%2)-1
+            self.padding           = padding
             self.J,self.Q,self.K   = J, Q, K
+            self.trainable_chirps  = trainable_chirps
             self.trainable_scales  = trainable_scales
             self.trainable_knots   = trainable_knots
             self.trainable_filters = trainable_filters
@@ -217,19 +219,25 @@ class HermiteSplineConv1D(Op):
             # learned scales to not be away from standard scales, we then 
             # sort them to have an interpretable time/frequency plot and to 
             # have coherency in case this is followed by 2D conv.
-            scales = 2**(tf.range(self.J,delta=1./self.Q,dtype=tf.float32))
-            scales = tf.Variable(scales, trainable=self.trainable_scales, 
+            if trainable_scales<2:
+                scales = 2**(tf.range(self.J,delta=1./self.Q,dtype=tf.float32))
+                scales = tf.Variable(scales, trainable=self.trainable_scales,
                                                             name='scales')
-            sorted_scales= tf.contrib.framework.sort(scales)
-            self.scales  = tf.clip_by_value(sorted_scales,ONE_FLOAT32,
-                                            tf.cast(2**(self.J+1),tf.float32))
-            self.indices = np.arange(0,J,1./Q)
+                sorted_scales= tf.contrib.framework.sort(scales)
+            else:
+                Q_ = tf.Variable(np.float32(self.Q), trainable=True, name='Q')
+                b = tf.Variable(np.float32(0), trainable=True, name='b')
+                scales = 2**(b+tf.range(self.J*self.Q,dtype=tf.float32)/Q_)
+                sorted_scales = scales
+
+            self.scales  = sorted_scales
+            self.indices = np.arange(0,J,1./self.Q)
 
             # We initialize the knots  with uniform spacing 
-            grid  = tf.random_uniform((self.K,))*self.K-(self.K//2)##tf.range(self.K,dtype=tf.float32)-(self.K//2)
+            grid  = tf.random_uniform((self.K,))*self.K-(self.K//2)
             if tied_knots:
                 knots = tf.Variable(grid, trainable=self.trainable_knots,
-						               name='knots')
+                                                                name='knots')
                 self.knots = tf.contrib.framework.sort(knots)
                 self.all_knots = tf.einsum('i,j->ij',self.scales,self.knots)
             else:
@@ -257,16 +265,25 @@ class HermiteSplineConv1D(Op):
         outputs = list()
         for i in range(len(self.W)):
             # shape of W is (width,inchannel,outchannel)
-            width,in_c,out_c = self.W[i].shape.as_list()
-            amount_l = np.int32(np.floor((width-1)/2))
-            amount_r = np.int32(width-1-amount_l)
-            x_pad    = tf.pad(input,paddings=[[0,0],[0,0],[amount_l,amount_r]],
-                                                 mode='SYMMETRIC')
-
-            conv       = self.apply_filter_bank(x_pad,self.W[i])
-            conv_shape = conv.shape.as_list()
-            new_shape  = input_shape[:-1]+[out_c//(1+int(self.complex))]\
+            if self.padding=='SAME':
+                width,in_c,out_c = self.W[i].shape.as_list()
+                amount_l = np.int32(np.floor((width-1)/2))
+                amount_r = np.int32(width-1-amount_l)
+                x_pad    = tf.pad(x_reshape,paddings=[[0,0],[0,0],
+                                    [amount_l,amount_r]], mode='SYMMETRIC')
+                new_shape  = input_shape[:-1]+[out_c]\
                                            +[input_shape[-1]//self.strides]
+            else:
+                width0, in_c, out_c0 = self.W[-1].shape.as_list()
+                width, in_c, out_c = self.W[i].shape.as_list()
+                width_diff = width0-width
+                amount_l = np.int32(np.floor(width_diff/2))
+                new_shape = input_shape[:-1]+[out_c]\
+                                   +[(input_shape[-1]-width0)//self.strides+1]
+                x_pad = x_reshape
+            conv       = self.apply_filter_bank(x_pad,self.W[i])
+            if self.padding=='VALID':
+                conv = conv[...,amount_l:amount_l+new_shape[-1]]
             outputs.append(tf.reshape(conv,new_shape))
         if len(self.W)>1:
             output = tf.concat(outputs,-2)

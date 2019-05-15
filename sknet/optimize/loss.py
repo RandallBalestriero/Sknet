@@ -9,11 +9,12 @@ from .. import Tensor
 
 
 def MSE(target,prediction):
-    N = np.float32(np.prod(target.shape.as_list()))
+    N = np.float32(np.prod(target.shape.as_list()[1:]))
     return SSE(target,prediction)/N
 
 def SSE(target,prediction):
-    return tf.nn.l2_loss(target-prediction)*2
+    N = np.float32(2/target.shape.as_list()[0])
+    return tf.nn.l2_loss(target-prediction)*N
 
 def AUC(target,prediction):
     return tf.metrics.auc(target,prediction)[1]
