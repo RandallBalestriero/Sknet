@@ -335,14 +335,14 @@ class Worker(object):
         assert(len(self._verbose)==self.n_ops)
 
         # Period
-        self._period  = [period]*self.n_ops if type(period)!=list else period
+        self._period = [period]*self.n_ops if type(period)!=list else period
         assert(len(self._period)==self.n_ops)
 
-        self._dependencies  = get_tensor_dependencies([op
+        self._dependencies = get_tensor_dependencies([op
                        for op in self._op if not isinstance(op,tf.Variable)])
-        self._name          = context+"/"+name
+        self._name = context+"/"+name
         self._deterministic = deterministic
-        self._context       = context
+        self._context = context
         self.empty()
 
     def empty(self):
@@ -371,12 +371,14 @@ class Worker(object):
 
     def get_op(self,batch_nb):
         ops = list()
-        for per,op in zip(self._period,self._op):
+        for per, op in zip(self._period, self._op):
             if batch_nb%per==0:
-                if isinstance(op,StreamingLoss):
+                if isinstance(op, StreamingLoss):
                     ops.append(op.update)
                 else:
                     ops.append(op)
+            else:
+                ops.append([])
         return ops
 
     def append(self,data):

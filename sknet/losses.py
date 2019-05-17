@@ -26,7 +26,7 @@ def MSE(target,prediction):
     N = np.float32(np.prod(target.shape.as_list()[1:]))
     return SSE(target,prediction)/N
 
-def AverageMSE(target, prediction, scope_name='mse'):
+def StreamingMSE(target, prediction, scope_name='mse'):
     with tf.variable_scope(scope_name) as scope:
         name = scope.original_name_scope
         mse = tf.metrics.mean_squared_error(target, prediction)
@@ -39,7 +39,7 @@ def SSE(target,prediction):
     N = np.float32(2./target.shape.as_list()[0])
     return tf.nn.l2_loss(target-prediction)*N
 
-def AverageAUC(target,prediction,scope_name='auc'):
+def StreamingAUC(target,prediction,scope_name='auc'):
     with tf.variable_scope(scope_name) as scope:
         name = scope.original_name_scope
         auc = tf.metrics.auc(target,prediction)
@@ -48,7 +48,7 @@ def AverageAUC(target,prediction,scope_name='auc'):
     return StreamingLoss(auc[0], auc[1], reset_op)
 
 
-def AverageAccuracy(target, prediction, scope_name='accuracy'):
+def StreamingAccuracy(target, prediction, scope_name='accuracy'):
     with tf.variable_scope(scope_name) as scope:
         name = scope.original_name_scope
         if len(prediction.shape.as_list())==2:
@@ -59,7 +59,7 @@ def AverageAccuracy(target, prediction, scope_name='accuracy'):
     return StreamingLoss(accu[0], accu[1], reset_op)
 
 
-def AverageMean(tensor, scope_name='mean'):
+def StreamingMean(tensor, scope_name='mean'):
     with tf.variable_scope(scope_name) as scope:
         name = scope.original_name_scope
         amean = tf.metrics.mean(tensor)
@@ -116,7 +116,6 @@ def crossentropy_logits(p,q,weights=None,p_sparse=True):
         return tf.reduce_mean(weights*(-linear_+logsumexp))
     else:
         return tf.reduce_mean(-linear_+logsumexp)
- 
 
 
 
