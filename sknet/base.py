@@ -374,7 +374,7 @@ class Worker(object):
         for per, op in zip(self._period, self._op):
             if batch_nb%per==0:
                 if isinstance(op, StreamingLoss):
-                    ops.append(op.update)
+                    ops.append([op,op.update])
                 else:
                     ops.append(op)
             else:
@@ -384,7 +384,9 @@ class Worker(object):
     def append(self,data):
         print_string =''
         for i,d in enumerate(data):
-            if type(d)==list:
+            if isinstance(self._op[i],StreamingLoss):
+                d=d[0]
+            elif type(d)==list:
                 if len(d)==0:
                     continue
             elif d is None:

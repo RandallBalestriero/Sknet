@@ -120,6 +120,6 @@ workplace = sknet.utils.Workplace(dnn,dataset=dataset)
 
 # will fit the model for 50 epochs and return the gathered op
 # outputs given the above definitions
-workplace.execute_queue(queue,repeat=10)
+workplace.execute_queue(queue,repeat=30)
 
 
