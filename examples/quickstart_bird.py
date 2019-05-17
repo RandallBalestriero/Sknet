@@ -87,7 +87,6 @@ dnn.append(ops.Dense(dnn[-1],units=dataset.n_classes))
 
 # Compute some quantities that we want to keep track and/or act upon
 loss = sknet.losses.crossentropy_logits(p=dataset.labels, q=dnn[-1])
-print(loss)
 accuracy = sknet.losses.StreamingAccuracy(dataset.labels, dnn[-1])
 auc = sknet.losses.StreamingAUC(dataset.labels, tf.nn.softmax(dnn[-1])[:,1])
 
@@ -100,8 +99,6 @@ optimizer = sknet.optimizers.Adam(loss, dnn.variables(trainable=True), 0.01)
 minimizer = tf.group(optimizer.updates+dnn.updates)
 # Workers
 #---------
-print(loss)
-input('ok')
 work1 = sknet.Worker(name='minimizer',context='train_set',
         op=[minimizer, loss, accuracy], deterministic=False, period=[1,100,1],
         verbose=[0,2,1])
