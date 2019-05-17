@@ -75,6 +75,7 @@ dnn.append(layers.Conv2DPool(dnn[-1],[(128,1,3),{'b':None}],
 
 dnn.append(my_layer(dnn[-1],[256,{'b':None}],
                                     [[0]],[0.1]))
+dnn.append(ops.Dropout(dnn[-1],0.5))
 
 dnn.append(my_layer(dnn[-1],[128,{'b':None}],
                                     [[0]],[0.1]))
@@ -95,15 +96,15 @@ auc = sknet.losses.StreamingAUC(dataset.labels, tf.nn.softmax(dnn[-1])[:,1])
 # the changes to the model parameters, we also specify that this process
 # should also include some possible network dependencies present in UPDATE_OPS
 
-optimizer = sknet.optimizers.Adam(loss, dnn.variables(trainable=True), 0.01)
+optimizer = sknet.optimizers.Adam(loss, dnn.variables(trainable=True), 0.001)
 minimizer = tf.group(optimizer.updates+dnn.updates)
 # Workers
 #---------
 work1 = sknet.Worker(name='minimizer',context='train_set',
-        op=[minimizer, loss, accuracy], deterministic=False, period=[1,100,1],
-        verbose=[0,2,1])
+        op=[minimizer, loss, accuracy, auc], deterministic=False,
+        period=[1,100,1,1], verbose=[0,2,1,1])
 
-work2 = sknet.Worker(name='AUC', context='test_set', op=[accuracy,auc],
+work2 = sknet.Worker(name='AUC', context='test_set', op=[accuracy, auc],
         deterministic=True, verbose=[1,1], period=[1,1])
 
 queue = sknet.Queue((work1,work2))
@@ -120,6 +121,6 @@ workplace = sknet.utils.Workplace(dnn,dataset=dataset)
 
 # will fit the model for 50 epochs and return the gathered op
 # outputs given the above definitions
-workplace.execute_queue(queue,repeat=30)
+workplace.execute_queue(queue, repeat=30)
 
 

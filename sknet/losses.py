@@ -12,9 +12,12 @@ class Loss(Tensor):
         super().__init__(value)
 
 class StreamingLoss(Tensor):
-    def __init__(self, value, update, reset_op):
+    def __init__(self, value, update, variables):
         super().__init__(value)
-        self.reset_variables_op = reset_op
+        reset_variables = list()
+        for var in variables:
+            reset_variables.append(tf.assign(var,tf.zeros_like(var)))
+        self.reset_variables_op = tf.group(reset_variables)
         self.update = update
 
 
@@ -31,8 +34,7 @@ def StreamingMSE(target, prediction, scope_name='mse'):
         name = scope.original_name_scope
         mse = tf.metrics.mean_squared_error(target, prediction)
     variables = tf.local_variables(name)+tf.global_variables(name)
-    reset_op = tf.variables_initializer(variables)
-    return StreamingLoss(mse[0], mse[1], reset_op)
+    return StreamingLoss(mse[0], mse[1], variables)
 
 
 def SSE(target,prediction):
@@ -42,11 +44,14 @@ def SSE(target,prediction):
 def StreamingAUC(target,prediction,scope_name='auc'):
     with tf.variable_scope(scope_name) as scope:
         name = scope.original_name_scope
-        auc = tf.metrics.auc(target,prediction)
+        auc = tf.metrics.auc(target, prediction, num_thresholds=1000)
     variables = tf.local_variables(name)+tf.global_variables(name)
-    reset_op = tf.variables_initializer(variables)
-    return StreamingLoss(auc[0], auc[1], reset_op)
+    return StreamingLoss(auc[0], auc[1], variables)
 
+
+def accuracy(labels,predictions):
+    equals =tf.equal(labels,tf.argmax(predictions,1,output_type=tf.int32))
+    return tf.reduce_mean(tf.cast(equals,tf.float32))
 
 def StreamingAccuracy(target, prediction, scope_name='accuracy'):
     with tf.variable_scope(scope_name) as scope:
@@ -55,8 +60,7 @@ def StreamingAccuracy(target, prediction, scope_name='accuracy'):
             prediction = tf.argmax(prediction,1,output_type=tf.int32)
         accu = tf.metrics.accuracy(target, prediction)
     variables = tf.local_variables(name)+tf.global_variables(name)
-    reset_op = tf.variables_initializer(variables)
-    return StreamingLoss(accu[0], accu[1], reset_op)
+    return StreamingLoss(accu[0], accu[1], variables)
 
 
 def StreamingMean(tensor, scope_name='mean'):
@@ -64,8 +68,7 @@ def StreamingMean(tensor, scope_name='mean'):
         name = scope.original_name_scope
         amean = tf.metrics.mean(tensor)
     variables = tf.local_variables(name)+tf.global_variables(name)
-    reset_op = tf.variables_initializer(variables)
-    return StreamingLoss(amean[0], amean[1], reset_op)
+    return StreamingLoss(amean[0], amean[1], variables)
 
 
 
@@ -121,30 +124,6 @@ def crossentropy_logits(p,q,weights=None,p_sparse=True):
 
 
 
-
-
-def accuracy(labels,predictions):
-    """Accuracy
-
-    The formal definition given that :math:`p` is now an
-    index (of the Dirac) s.a. :math:`p\in \{1,\dots,D\}`
-    and :math:`q` is unormalized (log-proba)
-    is given by (for discrete variables) 
-
-    .. math::
-        \mathcal{L}(p,q)=-q_{p}+\log(\sum_{d=1}^D \exp(q_d))
-    .. math::
-        \mathcal{L}(p,q)=-q_{p}+LogSumExp(q)
-    .. math::
-        \mathcal{L}(p,q)=-q_{p}+LogSumExp(q-\max_{d}q_d)
-
-    with :math:`p` the class index and :math:`q` the predicted one
-    (output of the network). This class takes two non sparse
-    vectors which should be nonnegative and sum to one.
-
-    """
-    equals =tf.equal(labels,tf.argmax(predictions,1,output_type=tf.int32))
-    return tf.reduce_mean(tf.cast(equals,tf.float32))
 
 
 

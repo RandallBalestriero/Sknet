@@ -415,23 +415,22 @@ class Worker(object):
         return reset_op
 
 
-from .losses import StreamingLoss                                               
+from .losses import StreamingLoss
 
 
 class ObservedTensor(Tensor):
     """Tensor with dual behavior
-    
-    This tensor is doing 
-    
+
+    This tensor is doing
+
     Parameters
     ----------
-    
+
     tensor : tf.Tensor
         the tensor to equip with dual behavior
-        
+
     """
-    def __init__(self, tensor, observation=None, 
-                        teacher_forcing=None):
+    def __init__(self, tensor, observation=None, teacher_forcing=None):
         self._observed        = observed
         self._teacher_forcing = teacher_forcing
 

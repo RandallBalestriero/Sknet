@@ -12,16 +12,21 @@ import h5py
 
 class Workplace(object):
     def __init__(self, network, dataset=None):
-        config                          = tf.ConfigProto()
+        config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
-        config.log_device_placement     = True
-        self.session                    = tf.Session(config=config)
+        config.log_device_placement = True
+        self.session = tf.Session(config=config)
         # Attributes
-        self.dataset  = dataset
-        self.network  = network
+        self.dataset = dataset
+        self.network = network
         # initialize the variables
-        ops = tf.group(tf.global_variables_initializer(),tf.local_variables_initializer())
+        ops = tf.group(tf.global_variables_initializer(),
+                                        tf.local_variables_initializer())
         self.session.run(ops,feed_dict=dataset.init_dict)
+
+    def close(self):
+        self.session.close()
+
 
     def execute_op(self,op,feed_dict,deterministic=None):
         """Perform an epoch (according to the set given by context).
@@ -51,11 +56,10 @@ class Workplace(object):
         ----------
 
         op : (one or list of) tf.Tensor or sknet.Op
-            the op (or ops as a list of ops) to run for one epoch or 
-            a list of the form [(op1,periodicity, optional np op)] 
-            where op1 can again be a list. For example, during training, 
-            one might prefer to compute 
-
+            the op (or ops as a list of ops) to run for one epoch or
+            a list of the form [(op1,periodicity, optional np op)]
+            where op1 can again be a list. For example, during training,
+            one might prefer to compute
 
         """
         # if a deterministic behavior is given, set it
@@ -64,7 +68,7 @@ class Workplace(object):
 
         output = self.session.run(op,feed_dict=feed_dict)
         return output
- 
+
     def execute_worker(self,worker,feed_dict={}):
         """Perform an epoch (according to the set given by context).
         Execute and save the given ops and optionally apply a numpy function
@@ -93,24 +97,27 @@ class Workplace(object):
         ----------
 
         op : (one or list of) tf.Tensor or sknet.Op
-            the op (or ops as a list of ops) to run for one epoch or 
-            a list of the form [(op1,periodicity, optional np op)] 
-            where op1 can again be a list. For example, during training, 
-            one might prefer to compute 
+            the op (or ops as a list of ops) to run for one epoch or
+            a list of the form [(op1,periodicity, optional np op)]
+            where op1 can again be a list. For example, during training,
+            one might prefer to compute
 
 
         """
-        # Loop over all the batches
+        # set the dataset on the correct set
         self.dataset.set_set(worker.context,session=self.session)
+        # update the feed_dict with deterministic behavior value
         feed_dict.update(self.network.deter_dict(worker.deterministic))
+        # loop over all batches in current set
         batch_nb = 0
         while self.dataset.next(session=self.session):
             op = worker.get_op(batch_nb)
             worker.append(self.session.run(op,feed_dict=feed_dict))
             batch_nb+=1
+        # signal the end of epoch and execute any needed reset op
         self.session.run(worker.epoch_done())
 
- 
+
     def execute_queue(self,queue, repeat=1,feed_dict={}, close_file=True):
         """Apply multiple consecutive epochs of train test and valid
 

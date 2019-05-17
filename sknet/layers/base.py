@@ -125,7 +125,7 @@ class Layer(Tensor):
         this allows the user to feed directly a tensorflow variable as input
 
     """
-    def __init__(self, input, *args,deterministic=None):
+    def __init__(self, input, *args, deterministic=None):
 
         # Link this tensor to its input
         self._input = input

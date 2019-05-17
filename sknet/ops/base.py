@@ -137,8 +137,9 @@ class Op(Tensor):
 
         if type(self).deterministic_behavior and deterministic is None:
             deterministic = tf.placeholder(tf.bool, name='deterministic')
-
-        self._deterministic = [deterministic]
+            self._deterministic = [deterministic]
+        else:
+            self._deterministic = [None]
 
         output = self.forward(input, deterministic)
         super().__init__(output)
