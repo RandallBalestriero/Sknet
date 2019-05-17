@@ -44,30 +44,39 @@ dnn = sknet.Network(name='model_base')
 dnn.append(ops.HermiteSplineConv1D(dataset.signals,J=5,Q=16,K=15,
 			trainable_scales=False, trainable_knots=False, complex=False,
             trainable_filters=False, hilbert=False, init='gabor'))
-dnn.append(ops.BatchNorm(dnn[-1],[0,2]))
-
+#dnn.append(ops.BatchNorm(dnn[-1],[0,2]))
 dnn.append(tf.abs(dnn[-1]))
 dnn.append(tf.expand_dims(dnn[-1],1))
 dnn.append(ops.Pool2D(tf.log(dnn[-1]+0.001), (1,1024), strides=(1,512),
                                                     pool_type='AVG'))
-#dnn.append(ops.BatchNorm(dnn[-1],[0,3]))
+dnn.append(ops.BatchNorm(dnn[-1],[0,3]))
 
 
-dnn.append(layers.Conv2DPool(dnn[-1],[(32,3,3),{'b':None}],
-                                [[0,2,3]],[0.1],[(3,3)]))
+dnn.append(layers.Conv2DPool(dnn[-1],[(32,3,5),{'b':None}],
+                                [[0,2,3]],[0.1],[(1,3)]))
 
+dnn.append(layers.Conv2DPool(dnn[-1],[(64,5,1),{'b':None}],
+                                  [[0,2,3]],[0.1],[(3,1)]))
 
-dnn.append(layers.Conv2DPool(dnn[-1],[(64,3,3),{'b':None}],
-                                  [[0,2,3]],[0.1],[(3,3)]))
+dnn.append(layers.Conv2D(dnn[-1],[(64,1,1),{'b':None}],
+                                  [[0,2,3]],[0.1]))
 
-dnn.append(layers.Conv2DPool(dnn[-1],[(64,3,3),{'b':None}],
+dnn.append(layers.Conv2DPool(dnn[-1],[(64,3,5),{'b':None}],
                                   [[0,2,3]],[0.1],[(1,3)]))
 
+dnn.append(layers.Conv2DPool(dnn[-1],[(64,5,1),{'b':None}],
+                                  [[0,2,3]],[0.1],[(3,1)]))
 
-dnn.append(my_layer(dnn[-1],[512,{'b':None}],
-                                    [[0]],[0.1]))
+dnn.append(layers.Conv2D(dnn[-1],[(128,1,1),{'b':None}],
+                                  [[0,2,3]],[0.1]))
+
+dnn.append(layers.Conv2DPool(dnn[-1],[(128,1,3),{'b':None}],
+                                  [[0,2,3]],[0.1],[(1,3)]))
 
 dnn.append(my_layer(dnn[-1],[256,{'b':None}],
+                                    [[0]],[0.1]))
+
+dnn.append(my_layer(dnn[-1],[128,{'b':None}],
                                     [[0]],[0.1]))
 
 dnn.append(ops.Dense(dnn[-1],units=dataset.n_classes))
@@ -77,29 +86,26 @@ dnn.append(ops.Dense(dnn[-1],units=dataset.n_classes))
 #-------------------
 
 # Compute some quantities that we want to keep track and/or act upon
-loss     = sknet.losses.crossentropy_logits(p=dataset.labels,q=dnn[-1])
-accuracy = sknet.losses.accuracy(labels=dataset.labels,predictions=dnn[-1])
-auc      = sknet.losses.AUC(dataset.labels,tf.nn.softmax(dnn[-1])[:,1])
-#print(auc)
-#input('try')
+loss = sknet.losses.crossentropy_logits(p=dataset.labels,q=dnn[-1])
+accuracy = sknet.losses.AverageAccuracy(dataset.labels, dnn[-1])
+auc = sknet.losses.AverageAUC(dataset.labels, tf.nn.softmax(dnn[-1])[:,1])
 
 # we aim at minimizing the loss, so we create the optimizer (Adam in this case)
 # with a stepwise learning rate, the minimizer is the operation that applies
 # the changes to the model parameters, we also specify that this process
 # should also include some possible network dependencies present in UPDATE_OPS
 
-optimizer = sknet.optimizers.Adam(loss,0.05,params=dnn.variables(trainable=True))
+optimizer = sknet.optimizers.Adam(loss, dnn.variables(trainable=True), 0.01)
 minimizer = tf.group(optimizer.updates+dnn.updates)
-
 # Workers
 #---------
 
-work1 = sknet.Worker(name='minimizer',context='train_set',op=[minimizer,loss],
-        deterministic=False,period=[1,100],verbose=2)
+work1 = sknet.Worker(name='minimizer',context='train_set',
+        op=[minimizer,loss,accuracy], deterministic=False, period=[1,100,1],
+        verbose=1)
 
-work2 = sknet.Worker(name='AUC',context='test_set',op=[accuracy,auc,dnn[0].W[0]],
-        deterministic=True, verbose=[1,1,0],
-        transform_function=[np.mean,np.mean,None], period=[1,1,1000])
+work2 = sknet.Worker(name='AUC', context='test_set', op=[accuracy,auc],
+        deterministic=True, verbose=[1,1], period=[1,1])
 
 queue = sknet.Queue((work1,work2))
 
@@ -115,11 +121,6 @@ workplace = sknet.utils.Workplace(dnn,dataset=dataset)
 
 # will fit the model for 50 epochs and return the gathered op
 # outputs given the above definitions
-#for i in range(10):
-workplace.execute_queue(queue,repeat=100)
-#    print(np.shape(work2.epoch_data[2][0]))
-#    plt.plot(work2.epoch_data[2][0][0,:,0,-1])
-#    plt.plot(work2.epoch_data[2][0][0,:,0,-30])
-#    plt.show()
+workplace.execute_queue(queue,repeat=10)
 
 

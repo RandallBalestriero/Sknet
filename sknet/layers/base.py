@@ -108,7 +108,7 @@ class Layer(Tensor):
         # depending on the value feed to W.teacher_forcing
 
 
-    recall that :py:data:`layer` which is a layer also behaves as a tensor 
+    recall that :py:data:`layer` which is a layer also behaves as a tensor
     and thus can be used directly as the term to be used for hte loss
     computation. In this case, we did not create a target variable for the
     :py:data:`p` distribution and thus set it to :py:data:`None` to allow
@@ -129,7 +129,7 @@ class Layer(Tensor):
 
         # Link this tensor to its input
         self._input = input
-        ops         = type(self)._ops
+        ops = type(self)._ops
 
         # create the chain of inner ops
         inner_ops = [input]
@@ -145,11 +145,8 @@ class Layer(Tensor):
         self._inner_ops = inner_ops[1:]
 
         # set deterministic
-        if deterministic is None:
-            self._deterministic = [op.deterministic
-                    for op in self._inner_ops if hasattr(op,'deterministic')]
-        else:
-            self._deterministic = [deterministic]
+        self._deterministic = [op.deterministic[0] for op in self._inner_ops
+                                            if op.deterministic[0] is not None]
 
         # initialize the Layer as a tf Variable
         super().__init__(self._inner_ops[-1])
@@ -180,8 +177,7 @@ class Layer(Tensor):
 
     @property
     def reset_variables_op(self):
-        return tf.group(*[op for internal in self.inner_ops 
-                                       for op in internal.reset_variables_op])
+        return tf.group(*[op.reset_variables_op for op in self.inner_ops])
 
     def variables(self,trainable=True):
         var = []

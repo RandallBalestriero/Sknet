@@ -5,7 +5,7 @@ import numpy as np
 from . import Op
 
 from .. import utils
-from .. import Variable,ONE_FLOAT32
+from .. import ONE_FLOAT32
 
 class Conv1D(Op):
     """1D (temporal) convolutional layer.

@@ -80,13 +80,14 @@ elif MODEL=='resnet':
 
 prediction = dnn[-1]
 
-loss    = sknet.losses.crossentropy_logits(p=dataset.labels,q=prediction)
-accu    = sknet.losses.accuracy(dataset.labels,prediction)
+loss = sknet.losses.crossentropy_logits(p=dataset.labels,q=prediction)
+accu = sknet.losses.accuracy(dataset.labels,prediction)
 
 B         = dataset.N_BATCH('train_set')
-lr        = sknet.schedules.PiecewiseConstant(0.002,
-                                    {100*B:0.002,200*B:0.001,250*B:0.0005})
-optimizer = sknet.optimizers.Adam(loss,lr,params=dnn.variables(trainable=True))
+lr        = sknet.schedules.PiecewiseConstant(0.05,
+                                    {100*B:0.005,200*B:0.001,250*B:0.0005})
+optimizer = sknet.optimizers.NesterovMomentum(loss,lr,
+                                    params=dnn.variables(trainable=True))
 minimizer = tf.group(optimizer.updates+dnn.updates)
 
 # Workers

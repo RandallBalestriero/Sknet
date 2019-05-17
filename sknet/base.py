@@ -10,20 +10,17 @@ import h5py
 import copy
 from tensorflow.contrib.graph_editor import get_backward_walk_ops
 
-ZERO_INT32   =tf.constant(np.int32(0))
-ZERO_FLOAT32 =tf.constant(np.float32(0))
-ONE_INT32    =tf.constant(np.int32(1))
-ONE_FLOAT32  =tf.constant(np.float32(1))
+ZERO_INT32 = tf.constant(np.int32(0))
+ZERO_FLOAT32 = tf.constant(np.float32(0))
+ONE_INT32 = tf.constant(np.int32(1))
+ONE_FLOAT32 = tf.constant(np.float32(1))
 
-def EMA(tensor, decay, step=None):
-    moving_average = Variable(tf.zeros_like(tensor), trainable=False, name='ma')
-    ma = (moving_average-tensor)*(1-decay)
-    if step is not None:
-        value  = tf.cond(tf.greater(step,ZERO_INT32),lambda :ma,lambda :-tensor)
-        update = tf.assign_sub(moving_average,value)
-    else:
-        update = tf.assign_sub(moving_average,ma)
-    return moving_average,update
+def EMA(tensor, decay, step):
+    ma_value = tf.Variable(tf.zeros_like(tensor), trainable=False, name='ma')
+    ma = ma_value*decay+tensor*(1-decay)
+    value = tf.cond(tf.greater(step,ZERO_INT32),lambda :ma, lambda :tensor)
+    update = tf.assign(ma_value, value)
+    return ma_value, update
 
 def get_tensor_dependencies(tensor):
     dependencies = list()
@@ -268,75 +265,6 @@ class Tensor(tf.Tensor):
         self._id          = tensor_or_func._id
 
 
-class Variable(tf.Variable):
-    """Analog to :class:`tf.Variable` used for initialization
-    with additional inplace option. There are two behaviors for this class
-        - the option :data:`trainable` is a boolean: this variable will be
-          a :class:`tf.Variable` initialized with the given input or
-          function, and with trainable flag set as the given one.
-        - the option :data:`trainable` is :data:`None`: this variable will
-          just be a :class:`tf.Tensor` with value given by the given input
-          or function. This option is usefull when using tied weights
-          between different layers, the tied layers should simply use the
-          original layer weights in place, and not create fixed or
-          independent parameters.
-
-    Example of use ::
-
-        # Let's demonstrate the behavior of this class which can then be
-        # used with layers, ops or other objects.
-        # By default, trainable is set to True. When called, the following 
-        zero_init = sknet.Variable(tf.zeros)
-        # Create one trainable variable initialized with 0s
-        var1 = zero_init((32,32))
-        # When setting trainable=False, the same occurs but returns
-        # a fixed (non trainable variable)
-        zero_init = sknet.Variable(tf.zeros,trainable=False)
-        # the below is equivalent to tf.zeros((32,32))
-        var1 = zero_init((32,32))
-        # Finally, it is often required to use inplace the given
-        # parameter (for example in the reconstruction part of an
-        # autoencoder, we wish to use the encoder weights inplace,
-        # And not as initialization of a :class:`tf.Variable`.
-        # To do so, set trainable=None as
-        w_t = sknet.Variable(tf.transpose(encoder.W),trainable=None)
-        # this is equivalent to w_t = tf.transpose(encoder.W)
-
-    Parameters
-    ----------
-
-    var_or_func : tf.Tensor or func
-        The :class:`tf.Tensor` or :class:`np.ndarray` to use, or
-        the function to use, if a function, it will be given
-        the shape and should return a :class:`tf.Tensor` or
-        :class:`np.ndarray`.
-
-    trainable : bool or None
-        If a boolean, then the variable will be a :class:`tf.Variable`
-        with trainable attribute set with the given one. If :data:`None`
-        then the variable will not be a :class:`tf.Variable but` directly
-        the tensor. This should be used if the passed value or function
-        should not be used as an initializer of a :class:`tf.Variable`
-        but as the parameter itself (inplace).
-    """
-    def __new__(cls,*args,**kwargs):
-        obj = tf.Variable.__new__(cls)
-        if 'trainable' in kwargs:
-            obj._trainable = kwargs['trainable']
-        else:
-            if len(args)>1:
-                obj._trainable = args[0]
-            else:
-                obj._trainable = True
-        return obj
-
-    @property
-    def trainable(self):
-        return self._trainable
-
-
-
-
 
 
 class Worker(object):
@@ -398,9 +326,9 @@ class Worker(object):
             it is added to the h5 file.
     """
     def __init__(self, name, context, op, deterministic=False, period=1,
-                    transform_function=None, verbose=0):
-        self._op      = [op] if type(op)!=list else op
-        self.n_ops    = len(self._op)
+                                        verbose=0):
+        self._op = [op] if type(op)!=list else op
+        self.n_ops = len(self._op)
 
         # Verbose
         self._verbose= [verbose]*self.n_ops if type(verbose)!=list else verbose
@@ -409,13 +337,6 @@ class Worker(object):
         # Period
         self._period  = [period]*self.n_ops if type(period)!=list else period
         assert(len(self._period)==self.n_ops)
-
-        # Transform function
-        self._transform_function = [transform_function]*self.n_ops\
-                       if type(transform_function)!=list else transform_function
-        assert(len(self._transform_function)==self.n_ops)
-        self._transform_function = [f if f is not None else lambda x:x
-                                    for f in self._transform_function]
 
         self._dependencies  = get_tensor_dependencies([op
                        for op in self._op if not isinstance(op,tf.Variable)])
@@ -449,8 +370,14 @@ class Worker(object):
         return self._context
 
     def get_op(self,batch_nb):
-        return [op if batch_nb%per==0 else []
-                           for per,op in zip(self._period,self._op)]
+        ops = list()
+        for per,op in zip(self._period,self._op):
+            if batch_nb%per==0:
+                if isinstance(op,StreamingLoss):
+                    ops.append(op.update)
+                else:
+                    ops.append(op)
+        return ops
 
     def append(self,data):
         print_string =''
@@ -465,18 +392,26 @@ class Worker(object):
                 print_string+='Op'+str(i)+':'+str(d)+', '
         if len(print_string)>0:
             print('\t\t'+self.name+':: '+print_string[:-2])
+
     def epoch_done(self):
         print_string = ''
         for i,data in enumerate(self.batch_data):
-            self.epoch_data[i].append(self._transform_function[i](
-                                                          np.asarray(data)))
+            if isinstance(self._op[i],StreamingLoss):
+                data = data[-1]
+            self.epoch_data[i].append(np.asarray(data))
             if self._verbose[i]==1 or self._verbose[i]==3:
                 print_string+= 'Op'+str(i)+':'+str(self.epoch_data[i][-1])+', '
         self.batch_data = [[] for i in range(len(self._op))]
         if len(print_string)>0:
             print('\tEpoch Done:: '+print_string[:-2])
+        reset_op = list()
+        for op in self._op:
+            if isinstance(op,StreamingLoss):
+                reset_op.append(op.reset_variables_op)
+        return reset_op
 
 
+from .losses import StreamingLoss                                               
 
 
 class ObservedTensor(Tensor):

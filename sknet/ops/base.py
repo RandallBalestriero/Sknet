@@ -3,7 +3,7 @@
 
 import tensorflow as tf
 
-from .. import Tensor, Variable
+from .. import Tensor
 from ..utils import flatten
 
 class Op(Tensor):
@@ -125,26 +125,30 @@ class Op(Tensor):
 
     """
     def __new__(cls, *args, **kwargs):
-        obj                     = super().__new__(cls)
-        obj._updates            = list()
-        obj._reset_variables_op = list()
-        obj.mask                = None
+        obj = super().__new__(cls)
+        obj._updates = list()
+#        obj._reset_variables_op = []
+        obj.mask = None
         return obj
-    def __init__(self,input, deterministic=None):
 
-        self._input   = input
-        if type(self).deterministic_behavior:
-            if deterministic is None:
-                self.deterministic = tf.placeholder(tf.bool,shape=(),
-                                                        name='deterministic')
-            else:
-                self.deterministic = deterministic
-            output = self.forward(input,self.deterministic)
-        else:
-            output = self.forward(input)
-        for var in tf.global_variables(self.name):
-            self._reset_variables_op.append(tf.assign(var,var.initial_value))
+    def __init__(self, input, deterministic=None):
+
+        self._input = input
+
+        if type(self).deterministic_behavior and deterministic is None:
+            deterministic = tf.placeholder(tf.bool, name='deterministic')
+
+        self._deterministic = [deterministic]
+
+        output = self.forward(input, deterministic)
         super().__init__(output)
+
+        vs = tf.global_variables(self.name)+tf.local_variables(self.name)
+        self._reset_variables_op = tf.initializers.variables(vs)
+
+    @property
+    def deterministic(self):
+        return self._deterministic
 
     @property
     def VQ(self):

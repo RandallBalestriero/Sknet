@@ -1,7 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from . import Op
-from .. import Variable, EMA, ONE_INT32, ZERO_INT32
+from .. import EMA, ONE_INT32, ZERO_INT32
 
 class BatchNorm(Op):
     """applies batch-normalization onto the input
@@ -75,7 +75,7 @@ class BatchNorm(Op):
 
             # Steps
             self.steps = tf.Variable(-ONE_INT32, trainable=False, name='step')
-            
+
             super().__init__(incoming,deterministic)
 
     def forward(self,input, deterministic, *args, **kwargs):
@@ -88,17 +88,18 @@ class BatchNorm(Op):
 
         # update of the moving averages and updates/params collection
         if self.decay=='AVG':
-            m_ema, mean_ema_op = EMA(mean_, tf.cast(step+ONE_INT32, tf.float32))
-            v_ema, var_ema_op  = EMA(var_, tf.cast(step+ONE_INT32, tf.float32))
+            decay = tf.cast(step+ONE_INT32, tf.float32)
+            m_ema, m_update = EMA(mean_, decay, step)
+            v_ema, v_update = EMA(var_, decay, step)
         else:
-            m_ema, mean_ema_op = EMA(mean_, self.decay, step)
-            v_ema, var_ema_op  = EMA(var_, self.decay, step)
-        self._updates.append(mean_ema_op)
-        self._updates.append(var_ema_op)
+            m_ema, m_update = EMA(mean_, self.decay, step)
+            v_ema, v_update = EMA(var_, self.decay, step)
+        self._updates.append(m_update)
+        self._updates.append(v_update)
 
         # function, context dependent to get stat to use
-        use_mean,use_var = tf.cond(deterministic, lambda :[m_ema,v_ema],
-                                                  lambda :[mean_,var_])
+        use_mean, use_var = tf.cond(deterministic, lambda :[m_ema, v_ema],
+                                                   lambda :[mean_, var_])
         use_std = tf.sqrt(use_var)+self.epsilon
 
         # we also compute those quantities that allow to rewrite the output as

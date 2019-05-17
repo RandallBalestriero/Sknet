@@ -21,8 +21,8 @@ from . import *
 from .dataset import Dataset
 from .networks import Network
 #from .optimize import loss as losses
-from .optimize import optimizer as optimizers
-from .optimize import schedule as schedules
+#from .optimize import optimizer as optimizers
+#from .optimize import schedule as schedules
 
 
 

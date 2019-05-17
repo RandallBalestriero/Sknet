@@ -7,8 +7,6 @@ import numpy as np
 
 from . import Op
 
-from .. import Variable
-
 
 
 class Dense(Op):

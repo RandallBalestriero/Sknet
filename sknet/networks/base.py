@@ -2,32 +2,36 @@
 # -*- coding: utf-8 -*-
 
 from ..ops import Op
+from ..layers import Layer
 import tensorflow as tf
 
 class Network:
     def __init__(self, layers=[], name = 'model',**kwargs):
         self.name       = name
         self.layers     = layers
+
     def __getitem__(self,key):
         if isinstance(key,slice):
             return Network(layers=self.layers[key],name='sub'+self.name)
         return self.layers[key]
+
     def __len__(self):
         return len(self.layers)
+
     def append(self,item):
         self.layers.append(item)
+
     def as_list(self):
         return [layer for layer in self]
-    def deter_dict(self,value):
-        couple = list()
+
+    def deter_dict(self, value):
+        feed_dict = dict()
         for layer in self.layers:
-            if hasattr(layer,'deterministic'):
-                if isinstance(layer,Op):
-                    couple.append((layer.deterministic,value))
-                else:
-                    for d in layer.deterministic:
-                        couple.append((d,value))
-        return dict(couple)
+            if isinstance(layer,Op) or isinstance(layer,Layer):
+                for d in layer.deterministic:
+                    if d is not None:
+                        feed_dict[d]=value
+        return feed_dict
 
     @property
     def shape(self):

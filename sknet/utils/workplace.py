@@ -108,7 +108,7 @@ class Workplace(object):
             op = worker.get_op(batch_nb)
             worker.append(self.session.run(op,feed_dict=feed_dict))
             batch_nb+=1
-        worker.epoch_done()
+        self.session.run(worker.epoch_done())
 
  
     def execute_queue(self,queue, repeat=1,feed_dict={}, close_file=True):
