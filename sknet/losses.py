@@ -66,7 +66,7 @@ def StreamingAccuracy(target, prediction, scope_name='accuracy'):
 def StreamingMean(tensor, scope_name='mean'):
     with tf.variable_scope(scope_name) as scope:
         name = scope.original_name_scope
-        amean = tf.metrics.mean(tensor)
+        amean = tf.metrics.mean_tensor(tensor)
     variables = tf.local_variables(name)+tf.global_variables(name)
     return StreamingLoss(amean[0], amean[1], variables)
 

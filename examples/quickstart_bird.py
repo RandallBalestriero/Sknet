@@ -1,35 +1,28 @@
 import sys
 sys.path.insert(0, "../")
-
 import sknet
-import matplotlib
-matplotlib.use('Agg')
 import os
-
-# Make Tensorflow quiet.
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
-
-import numpy as np
-import pylab as pl
-import time
 import tensorflow as tf
 from sknet.dataset import BatchIterator
 from sknet import ops,layers
 
-import matplotlib.pyplot as plt
+# Make Tensorflow quiet.
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
 
 # Data Loading
-#-------------
+# -------------
 
 dataset = sknet.dataset.load_freefield1010(subsample=2)
 dataset['signals/train_set']-=dataset['signals/train_set'].mean(2,keepdims=True)
 dataset['signals/train_set']/=dataset['signals/train_set'].max(2,keepdims=True)
-
 dataset.split_set("train_set","test_set",0.33)
 
-dataset.create_placeholders(batch_size=10,
-       iterators_dict={'train_set':BatchIterator("random_see_all"),
-                       'test_set':BatchIterator('continuous')},device="/cpu:0")
+
+iterator = BatchIterator(10, {'train_set':'random_see_all',
+                         'test_set':'continous'})
+
+dataset.create_placeholders(iterator ,device="/cpu:0")
 
 # Create Network
 #---------------

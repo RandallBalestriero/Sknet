@@ -2,33 +2,30 @@
 # -*- coding: utf-8 -*-
 
 import tensorflow as tf
-import numpy as np
-import os
-import h5py
 #ToDo set the seed for the batches etc
 
 
 
 
 class Workplace(object):
-    def __init__(self, network, dataset=None):
+    def __init__(self, dataset):
         config = tf.ConfigProto()
         config.gpu_options.allow_growth = True
         config.log_device_placement = True
         self.session = tf.Session(config=config)
         # Attributes
         self.dataset = dataset
-        self.network = network
         # initialize the variables
         ops = tf.group(tf.global_variables_initializer(),
-                                        tf.local_variables_initializer())
-        self.session.run(ops,feed_dict=dataset.init_dict)
+                       tf.local_variables_initializer())
+        self.session.run(ops, feed_dict=dataset.init_dict)
 
     def close(self):
+        """close the session"""
         self.session.close()
 
 
-    def execute_op(self,op,feed_dict,deterministic=None):
+    def execute_op(self, op, feed_dict):
         """Perform an epoch (according to the set given by context).
         Execute and save the given ops and optionally apply a numpy function
         on them at the end of the epoch. THis is usefull for example to only
@@ -63,13 +60,10 @@ class Workplace(object):
 
         """
         # if a deterministic behavior is given, set it
-        if deterministic is not None:
-            feed_dict.update(self.network.deter_dict(deterministic))
-
-        output = self.session.run(op,feed_dict=feed_dict)
+        output = self.session.run(op, feed_dict=feed_dict)
         return output
 
-    def execute_worker(self,worker,feed_dict={}):
+    def execute_worker(self, worker, deter_func=None, feed_dict={}):
         """Perform an epoch (according to the set given by context).
         Execute and save the given ops and optionally apply a numpy function
         on them at the end of the epoch. THis is usefull for example to only
@@ -105,20 +99,22 @@ class Workplace(object):
 
         """
         # set the dataset on the correct set
-        self.dataset.set_set(worker.context,session=self.session)
+        self.dataset.set_set(worker.context, session=self.session)
+        self.dataset.iterator.reset(worker.context)
         # update the feed_dict with deterministic behavior value
-        feed_dict.update(self.network.deter_dict(worker.deterministic))
+        if worker.deterministic is not None:
+            feed_dict.update(deter_func(worker.deterministic))
         # loop over all batches in current set
         batch_nb = 0
-        while self.dataset.next(session=self.session):
-            op = worker.get_op(batch_nb)
-            worker.append(self.session.run(op,feed_dict=feed_dict))
-            batch_nb+=1
+        while self.dataset.next(worker.context, session=self.session):
+            worker.append(self.execute_op(worker.get_op(batch_nb),
+                                          feed_dict=feed_dict))
+            batch_nb += 1
         # signal the end of epoch and execute any needed reset op
         self.session.run(worker.epoch_done())
 
-
-    def execute_queue(self,queue, repeat=1,feed_dict={}, close_file=True):
+    def execute_queue(self, queue, repeat=1, feed_dict={}, deter_func=None,
+                      close_file=True):
         """Apply multiple consecutive epochs of train test and valid
 
         Example of use ::
@@ -166,11 +162,12 @@ class Workplace(object):
 
         """
         for e in range(repeat):
-            print("Repeat",e)
+            print("Repeat", e)
             for worker in queue:
-                name     = worker.name
-                print("\trunning Worker:",name)
-                self.execute_worker(worker,feed_dict=feed_dict)
+                name = worker.name
+                print("\trunning Worker:", name)
+                self.execute_worker(worker, feed_dict=feed_dict,
+                                    deter_func=deter_func)
             queue.dump()
         if close_file:
             queue.close()
