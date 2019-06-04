@@ -4,10 +4,7 @@
 import tensorflow as tf
 from tensorflow.python.framework import dtypes
 import numpy as np
-import time
-import re
 import h5py
-import copy
 from tensorflow.contrib.graph_editor import get_backward_walk_ops
 
 ZERO_INT32 = tf.constant(np.int32(0))
@@ -18,7 +15,7 @@ ONE_FLOAT32 = tf.constant(np.float32(1))
 def EMA(tensor, decay, step):
     ma_value = tf.Variable(tf.zeros_like(tensor), trainable=False, name='ma')
     ma = ma_value*decay+tensor*(1-decay)
-    value = tf.cond(tf.greater(step,ZERO_INT32),lambda :ma, lambda :tensor)
+    value = tf.cond(tf.greater(step, ZERO_INT32), lambda :ma, lambda :tensor)
     update = tf.assign(ma_value, value)
     return ma_value, update
 
@@ -26,7 +23,8 @@ def get_tensor_dependencies(tensor):
     dependencies = list()
     ops = list()
     for t in tensor:
-        ops.append(get_backward_walk_ops(t,control_inputs=True,inclusive=False))
+        ops.append(get_backward_walk_ops(t, control_inputs=True,
+                   inclusive=False))
     ops = list(set([o for op in ops for o in op]))
     for op in ops:
         if op.type == 'Placeholder' and 'deterministic' not in op.name:
@@ -67,26 +65,26 @@ class Queue(tuple):
             # create and open the file
             while 1:
                 try:
-                    self._file = h5py.File(self._filename, 'w',libver='latest')
+                    self._file = h5py.File(self._filename, 'w', libver='latest')
                     break
                 except:
-                    print('Could not open file ',self._filename)
+                    print('Could not open file ', self._filename)
                     print('\tRetrying in 10 sec. ...')
             # init the arrays, get shape and init
             h5_dataset = list()
             for worker in self:
                 h5_dataset.append(dict())
-                for name,data in worker.epoch_data.items():
+                for name, data in worker.epoch_data.items():
                     maxshape = (None,)+data[0].shape
                     savename = worker.context+"/"+name
                     h5_dataset[-1][name] = self._file.create_dataset(
                             savename,  maxshape=maxshape,
-                            compression='gzip', data=np.expand_dims(data[0],0)))
+                            compression='gzip', data=np.expand_dims(data[0], 0))
                 worker.empty()
             self.h5_dataset = h5_dataset
             self._file.swmr_mode = True
         else:
-            for i,worker in enumerate(self):
+            for i, worker in enumerate(self):
                 for name, data in worker.epoch_data.items():
                     new_shape = (self.count,)+data[0].shape
                     self.h5_dataset[i][name].resize(new_shape)
@@ -238,7 +236,7 @@ class Worker(object):
             cpt += 1
 
         self.current_ops = [[] for i in range(len(self._ops))]
-        self._dependencies = get_tensor_dependencies([op
+        self._dependencies = get_tensor_dependencies([op[1]
                        for op in self._ops if not isinstance(op, tf.Variable)])
         self._deterministic = deterministic
         self._context = context
@@ -247,7 +245,7 @@ class Worker(object):
     def empty(self):
         self.batch_data = [[] for i in range(len(self._ops))]
         self.epoch_data = dict()
-        for name in self.op_names:
+        for name in self._op_names:
             self.epoch_data[name] = []
 
     @property
@@ -315,10 +313,10 @@ class Worker(object):
         reset_op = list()
         for i, data in enumerate(self.batch_data):
             if isinstance(self._ops[i], StreamingTensor):
-                self.epoch_data[self.op_names[i]].append(data)
-                reset_op.append(self._ops[i].reset_variables_op)
+                self.epoch_data[self._op_names[i]].append(data)
+                reset_op.append(self._ops[i][1].reset_variables_op)
             else:
-                self.epoch_data[self.op_names[i]].append(np.asarray(data))
+                self.epoch_data[self._op_names[i]].append(np.asarray(data))
 
         # reset values and ops
         self.batch_data = [[] for i in range(len(self._ops))]

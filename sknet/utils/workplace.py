@@ -63,7 +63,7 @@ class Workplace(object):
         output = self.session.run(op, feed_dict=feed_dict)
         return output
 
-    def execute_worker(self, worker, deter_func=None, feed_dict={}, epoch=0):
+    def execute_worker(self, worker, deter_func, feed_dict={}, epoch=0):
         """Perform an epoch (according to the set given by context).
         Execute and save the given ops and optionally apply a numpy function
         on them at the end of the epoch. THis is usefull for example to only
@@ -110,7 +110,7 @@ class Workplace(object):
         # signal the end of epoch and execute any needed reset op
         self.session.run(worker.epoch_done())
 
-    def execute_queue(self, queue, repeat=1, feed_dict={}, deter_func=None,
+    def execute_queue(self, queue, deter_func, repeat=1, feed_dict={},
                       close_file=True):
         """Apply multiple consecutive epochs of train test and valid
 
@@ -161,8 +161,6 @@ class Workplace(object):
         for e in range(repeat):
             print("Repeat", e)
             for worker in queue:
-                name = worker.name
-                print("\trunning Worker:", name)
                 self.execute_worker(worker, feed_dict=feed_dict,
                                     deter_func=deter_func, epoch=e)
             queue.dump()

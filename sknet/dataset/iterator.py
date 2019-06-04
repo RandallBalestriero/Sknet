@@ -71,7 +71,9 @@ class BatchIterator(dict):
                                            name='current')
             self._current_set = tf.placeholder(tf.int64, name='current')
             self.assign_set = tf.assign(self.current_set, self._current_set)
-
+            self.set2int = dict()
+            for i, name in enumerate(options.keys()):
+                self.set2int[name] = i
 
     def set_N(self, values=None, dataset=None):
         """set the total length of each set. This method keeps updating
@@ -111,7 +113,8 @@ class BatchIterator(dict):
             exit()
 
     def set_set(self, name, session):
-        session.run(self.assign_set, feed_dict={self.current_set_: self.set2int[name]})
+        session.run(self.assign_set,
+                    feed_dict={self._current_set: self.set2int[name]})
 
     def reset(self, s):
         """reset the indices to loop through for a specific set

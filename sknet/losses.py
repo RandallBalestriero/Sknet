@@ -65,10 +65,10 @@ def squared_error(target, prediction, option='mean', aggregate_func=None):
 
        
 def accuracy(targets, predictions):
-    assert len(prediction.shape.as_list()) < 3
-    if len(prediction.shape.as_list()) == 2:
-        prediction = tf.argmax(prediction, 1, output_type=tf.int32)
-    accu = tf.reduce_mean(tf.cast(tf.equal(target, prediction), tf.float32))
+    assert len(predictions.shape.as_list()) < 3
+    if len(predictions.shape.as_list()) == 2:
+        predictions = tf.argmax(predictions, 1, output_type=tf.int32)
+    accu = tf.reduce_mean(tf.cast(tf.equal(targets, predictions), tf.float32))
     return accu
 
 
