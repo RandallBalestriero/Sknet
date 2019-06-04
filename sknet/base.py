@@ -50,8 +50,8 @@ class Queue(tuple):
     def __new__(cls,*args,filename=None):
         obj = super(Queue,cls).__new__(cls,*args)
         obj._filename = filename
-        obj._file     = None
-        obj.count     = 0
+        obj._file = None
+        obj.count = 0
         return obj
     def close(self):
         self.count = 0
@@ -75,174 +75,24 @@ class Queue(tuple):
             # init the arrays, get shape and init
             h5_dataset = list()
             for worker in self:
-                h5_dataset.append([])
-                for i,data in enumerate(worker.epoch_data):
+                h5_dataset.append(dict())
+                for name,data in worker.epoch_data.items():
                     maxshape = (None,)+data[0].shape
-                    h5_dataset[-1].append(self._file.create_dataset(
-                            worker.name+"/"+str(i), maxshape=maxshape,
+                    savename = worker.context+"/"+name
+                    h5_dataset[-1][name] = self._file.create_dataset(
+                            savename,  maxshape=maxshape,
                             compression='gzip', data=np.expand_dims(data[0],0)))
                 worker.empty()
-            self.h5_dataset      = h5_dataset
+            self.h5_dataset = h5_dataset
             self._file.swmr_mode = True
         else:
             for i,worker in enumerate(self):
-                for j,data in enumerate(worker.epoch_data):
+                for name, data in worker.epoch_data.items():
                     new_shape = (self.count,)+data[0].shape
-                    self.h5_dataset[i][j].resize(new_shape)
-                    self.h5_dataset[i][j][self.count-1]=data[0]
-                    self.h5_dataset[i][j].flush()
+                    self.h5_dataset[i][name].resize(new_shape)
+                    self.h5_dataset[i][name][self.count-1] = data[0]
+                    self.h5_dataset[i][name].flush()
                 worker.empty()
-
-
-class DataArray(np.ndarray):
-    def __new__(cls, input_array, partition=None, name='', info= ''):
-        # Input array is an already formed ndarray instance
-        # We first cast to be our class type
-        obj = np.asarray(input_array).view(cls)
-        obj._partition = partition
-        if name =='':
-            obj._name = str(time.time())
-        else:
-            obj._name = name
-        obj._info = info
-        # Finally, we must return the newly created object:
-        return obj
-    def __getitem__(self,k):
-        if type(k)==str:
-            return super().__getitem__(self._partition[k])
-        elif(type(k)==tuple):
-            if(len(k)==2 and type(k[0])==str):
-                return super().__getitem__(self.partition[k[0]][k[1]])
-            else:
-                return super().__getitem__(k)
-        else:
-            return super().__getitem__(k)
-
-    # Binary operators
-    def __add__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)+np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)+other,self.partition)
-    def __radd__(self,other):
-        return self+other
-    def __sub__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)-np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)-other,self.partition)
-    def __rsub__(self,other):
-        return -1*(self-other)
-    def __mul__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)*np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)*other,self.partition)
-    def __rmul__(self,other):
-        return self*other
-    def __truediv__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)/np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)/other,self.partition)
-    def __rtruediv__(self,other):
-        return DataArray(other/np.asarray(self),self.partition)
-    def __floordiv__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)//np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)//other,self.partition)
-    def __rfloordiv__(self,other):
-        return DataArray(other//np.asarray(self),self.partition)
-    def __mod__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)%np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)%other,self.partition)
-    def __rmod__(self,other):
-        return DataArray(other%np.asarray(self),self.partition)
-    def __pow__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)**np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)**other,self.partition)
-    def __rpow__(self,other):
-        return DataArray(other**np.asarray(self),self.partition)
-
-    # Logical operators
-    def __lt__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)<np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)<other,self.partition)
-    def __rlt__(self,other):
-        return self>=other
-    def __gt__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)>np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)>other,self.partition)
-    def __rgt__(self,other):
-        return self<=other
-    def __le__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)<=np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)<=other,self.partition)
-    def __rle__(self,other):
-        return self>other
-    def __ge__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)>=np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)>=other,self.partition)
-    def __rge__(self,other):
-        return self<other
-    def __eq__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)==np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)==other,self.partition)
-    def __req__(self,other):
-        return self==other
-    def __ne__(self,other):
-        if type(other)==DataArray:
-            return DataArray(np.asarray(self)!= np.asarray(other),
-                    {**self.partition,**other.partition})
-        else:
-            return DataArray(np.asarray(self)!=other,self.partition)
-    def __rne__(self,other):
-        return self!=other
-
-    def set_partition(self,partition):
-        self._partition = partition
-
-    @property
-    def partition(self):
-        return self._partition
-
-    @property
-    def name(self):
-        return self._name
-
-    @property
-    def info(self):
-        return self._info
-
-
-
 
 
 class Tensor(tf.Tensor):
@@ -265,89 +115,140 @@ class Tensor(tf.Tensor):
         self._id          = tensor_or_func._id
 
 
+class StreamingTensor(Tensor):
+    """base class for streaming tensors. A streaming tensor
+    performs some type of aggregate (such as mean or max) over
+    all the batches for each epoch. A typical example would be the
+    :class:`sknet.losses.streaming_mean` which computes the average
+    per batch,over all the batches. This can be used to compute the
+    average accuracy on some batched dataset rather than getting all
+    the values back in python and then computig the average.
+    Streaming tensors work by creating an accumulator and keeping on
+    updating it for each batch until completion of the epoch.
+    If used without the :class:`sknet.Workplace` then one needs to be careful
+    to execute the ``reset_variables_op``, to reset the
+    accumulator value and any accompanying variables.
+
+    Parameters:
+    -----------
+
+    value: tensor
+        the current value of the running tensor, the value that this 
+        tensor should hold
+
+    update: op
+        the update operation that should be run on each batch to keep
+        updating the value until epoch completion
+
+    variables: tensor or list of tensors
+        all the :class:`tf.variables` used in the computation of the
+        value, used to generate the reset op to set back all the needed
+        variables at their initial value once an epoch has been completed.
+    """
+    def __init__(self, value, update, variables):
+        super().__init__(value)
+        self.reset_variables_op = tf.initializers.variables(variables)
+        self.update = update
+
 
 
 class Worker(object):
-    """processing unit that manages a single tensorflow op.
-    A Worker allows to specify a tensorflow op to execute. Whether
-    it is for monitoring or saving or printing, the user should favor
-    the use of Workers to simplify the workflow. A worker contains the
-    operator to use, the ations to take with it given by an instruction
+    """processing unit that manages a tensorflow ops during batch iterations.
+    A Worker allows to specify a context, such as train set, test set, or any
+    context present in a datset, and tensorflow ops to be executed, and if the
+    deep net behavior should be deterministic or not (for example during 
+    testing). The ops are given as kwargs of the function, the names used will
+    be the same used for saving (think of :class:`np.savez`. For more control
+    it is possible to give a couple where the second item is a function that
+    takes for input a batch number and epoch number. This allow further
+    control if one wants to only execute an op every X batch or only after the
+    10th epoch and so on. Here is an example::
+
+        # an op updating the dn weight
+        update_ op = ...
+        # an op measuring the accuracy on each batch
+        accu = ...
+        # an op measuring the average accuracy over all batches on the set
+        avg_accu = sknet.losses.streaming_mean(accu)
+        # a tensor which is a weight of the Dn that we wish to monitor
+        # and we want to monitor it only at the first batch of epoch 0, 10, 15
+        W = ....
+        def fW(batch, epoch):
+            if batch == 0 and epoch in [0,10,15]:
+                return True
+            return False
+
+        # we now create the worker
+        worker = Worker(context = 'train_set', deterministic=False,
+                        update = update_op, accu=accu, avg_accu = avg_accu, 
+                        W=(dnn.W,fW))
+
+    
+    with the above example (notice that the index starts at 0), the worker
+    will execute on the train set (in parallel at each batch) all the given
+    and for the weight monitoring, will only save the output if the conditioin
+    if fulfilled. The update op, as obtained from a tensorflow operation
+    returns None values. This will not be saved by the worker. Hence, at the
+    end of an epoch. The data saved in ```worker.epoch_data``` will be::
+
+        worker.epoch_data['update'] # an empty list
+        worker.epoch_data['accu'] # array of shape (N_EPOCH, N_BATCH,1)
+        worker.epoch_data['avg_accu'] # array of shape (N_EPOCH, 1), there are
+                                      # no batch dimension when using 
+                                      # streaming tensors as they compute 
+                                      # aggregated stats. over all batches of 
+                                      # each epoch
+        worker.epoch_data['W'] # array of shape (N_EPOCH, N_BATCH,*np.shape(W))
+
+
+    NOTE: if using a :class:`sknet.Queue` with a given filename, the results
+    are saved into the .h5 file at each epoch, and the worker data are emptied
+    for efficiency, in such cases, the same data as described above will be 
+    present in the .h5 file and not in ```worker.epoch_data```.
 
     Parameters
     ----------
 
-    op_name : str
-        the name of the worker, used for saving and printing
-
-    context : str
-        the name of the set to apply the op on from the dataset. Typical example
+    context: str
+        the name of the set to apply the ops on from the dataset. Typical example
         would be :py;data;`"train_set"` or :py:data:'"valid_set"'
 
-    op : tf.Tensor or tf.operation
-        the tensorflow variable of the worker that will be executed
-        and monitored
+    deterministic: bool
+        the state of the network to execute the op in, for example
+        it is common to set it to :data:`False` during training
+        and :data:`True` during testing.
 
-    instruction : str
-        a description of what how and when to interact with the op. We provide
-        some typical examples ::
-
-            instruction = "execute every batch"
-            # when given another command such as print, execute is
-            # always added by default
-            instruction = "print every 30 batch"
-            # one can give multiple commands to do at the same time, they
-            # are linked with a & a in
-            instruction = "print 7 save every 30 batch"
-            # one can also use the instruction to specify a standard
-            # operation method to do after the epoch such as done with
-            # accuracy where it is computed on each batch and then averaged
-            instruction = "execute every batch and average & print"
-            # as an be seen, the commands to do after the epoch are
-            # introduced via the and keyword. One can also do something like
-            intruction = "execute every bath and save & print & average"
-            # the order of the commands 9around the &) do not matter
-            # finally, if asking to save and the per batch value AND
-            # the epoch value, then the last one is disregarded as it
-            # can be computed a posteriori from the batch ones, for example
-            instruction = "print&save every 30 batch and save & print & average"
-            # in this case the previous case will save only the batch values.
-
-        The second set of commands (after the ``"and"`` must contain either
-        ``"average'`` or ``"maximize"``.
-
-        deterministic : bool
-            the state of the network to execute the op in, for example
-            it is common to set it to :data:`False` during training
-            and :data:`True` during testing.
-
-        description : str (optional)
-            the description of the worker, used for saving,
-            it is added to the h5 file.
+    ops: kwargs
+        any desired op or tensor to be executed/monitored. It can be a
+        op or a couple with the second item being a function with input
+        ```batch, epoch``` that should return a boolean value telling if
+        the op is to be executed at this moment.
     """
-    def __init__(self, name, context, op, deterministic=False, period=1,
-                                        verbose=0):
-        self._op = [op] if type(op)!=list else op
-        self.n_ops = len(self._op)
+    def __init__(self, context, deterministic, **kwargs):
+        self._ops = list()
+        self._op_names = list()
+        cpt = 0
+        for key, value in kwargs.items():
+            if type(value)==tuple:
+                assert len(value)==2
+                self._ops.append((cpt, value[0], value[1]))
+            else:
+                self._ops.append((cpt, value, lambda b, e:True))
+            self._op_names.append(key)
+            cpt += 1
 
-        # Verbose
-        self._verbose= [verbose]*self.n_ops if type(verbose)!=list else verbose
-        assert(len(self._verbose)==self.n_ops)
-
-        # Period
-        self._period = [period]*self.n_ops if type(period)!=list else period
-        assert(len(self._period)==self.n_ops)
-
+        self.current_ops = [[] for i in range(len(self._ops))]
         self._dependencies = get_tensor_dependencies([op
-                       for op in self._op if not isinstance(op,tf.Variable)])
-        self._name = context+"/"+name
+                       for op in self._ops if not isinstance(op, tf.Variable)])
         self._deterministic = deterministic
         self._context = context
         self.empty()
 
     def empty(self):
-        self.batch_data = [[] for i in range(len(self._op))]
-        self.epoch_data = [[] for i in range(len(self._op))]
+        self.batch_data = [[] for i in range(len(self._ops))]
+        self.epoch_data = dict()
+        for name in self.op_names:
+            self.epoch_data[name] = []
 
     @property
     def deterministic(self):
@@ -358,64 +259,71 @@ class Worker(object):
         return self._dependencies
 
     @property
-    def op(self):
-        return self._op
-
-    @property
-    def name(self):
-        return self._name
+    def ops(self):
+        return self._ops
 
     @property
     def context(self):
         return self._context
 
-    def get_op(self,batch_nb):
-        ops = list()
-        for per, op in zip(self._period, self._op):
-            if batch_nb%per==0:
-                if isinstance(op, StreamingLoss):
-                    ops.append([op,op.update])
-                else:
-                    ops.append(op)
-            else:
-                ops.append([])
-        return ops
+    def get_ops(self, batch, epoch):
+        """given a batch index and the current epoch, return the list
+        of ops to be executed
 
-    def append(self,data):
-        print_string =''
-        for i,d in enumerate(data):
-            if isinstance(self._op[i],StreamingLoss):
-                d=d[0]
-            elif type(d)==list:
-                if len(d)==0:
-                    continue
+        Parameters:
+        -----------
+
+        batch: int
+            the batch number in the current epoch
+
+        epoch: int
+            the current epoch
+
+        Returns:
+        --------
+
+        ops: list of ops
+            the ops to be executed at this batch
+        """
+        for index, op, func in self.ops:
+            if func(batch, epoch):
+                if isinstance(op, StreamingTensor):
+                    self.current_ops[index] = op.update
+                else:
+                    self.current_ops[index] = op
+            else:
+                self.current_ops[index] = []
+        return self.current_ops
+
+    def append(self, data):
+        """given the session output obtained by executing the given list of ops,
+        append the data with the batch values"""
+        for i, d in enumerate(data):
+            if isinstance(self._ops[i], StreamingTensor):
+                self.batch_data[i] = d
             elif d is None:
                 continue
-            self.batch_data[i].append(d)
-            if self._verbose[i]>1:
-                print_string+='Op'+str(i)+':'+str(d)+', '
-        if len(print_string)>0:
-            print('\t\t'+self.name+':: '+print_string[:-2])
+            elif type(d) == list:
+                if len(d) == 0:
+                    continue
+            else:
+                self.batch_data[i].append(d)
 
     def epoch_done(self):
-        print_string = ''
-        for i,data in enumerate(self.batch_data):
-            if isinstance(self._op[i],StreamingLoss):
-                data = data[-1]
-            self.epoch_data[i].append(np.asarray(data))
-            if self._verbose[i]==1 or self._verbose[i]==3:
-                print_string+= 'Op'+str(i)+':'+str(self.epoch_data[i][-1])+', '
-        self.batch_data = [[] for i in range(len(self._op))]
-        if len(print_string)>0:
-            print('\tEpoch Done:: '+print_string[:-2])
+        """method to be executed after completion of an epoch.
+        It executes all the needed reset and savings"""
         reset_op = list()
-        for op in self._op:
-            if isinstance(op,StreamingLoss):
-                reset_op.append(op.reset_variables_op)
+        for i, data in enumerate(self.batch_data):
+            if isinstance(self._ops[i], StreamingTensor):
+                self.epoch_data[self.op_names[i]].append(data)
+                reset_op.append(self._ops[i].reset_variables_op)
+            else:
+                self.epoch_data[self.op_names[i]].append(np.asarray(data))
+
+        # reset values and ops
+        self.batch_data = [[] for i in range(len(self._ops))]
         return reset_op
 
-
-from .losses import StreamingLoss
 
 
 class ObservedTensor(Tensor):

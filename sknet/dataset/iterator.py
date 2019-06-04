@@ -65,6 +65,14 @@ class BatchIterator(dict):
                 self.indices_assign_op[s] = tf.assign(self.__dict__[s],
                                                       self.__dict__[s+'_'])
 
+            # first set up some variable to keep track of which
+            # set is used
+            self.current_set = tf.Variable(np.int64(0), trainable=False,
+                                           name='current')
+            self._current_set = tf.placeholder(tf.int64, name='current')
+            self.assign_set = tf.assign(self.current_set, self._current_set)
+
+
     def set_N(self, values=None, dataset=None):
         """set the total length of each set. This method keeps updating
         an internal dictionnary and thus can be called multiple times to add
@@ -102,6 +110,9 @@ class BatchIterator(dict):
             print('error')
             exit()
 
+    def set_set(self, name, session):
+        session.run(self.assign_set, feed_dict={self.current_set_: self.set2int[name]})
+
     def reset(self, s):
         """reset the indices to loop through for a specific set
 
@@ -112,7 +123,7 @@ class BatchIterator(dict):
             one of the set, the one to have its indices reset
 
         """
-        self.batch_counter.update({s: 0})
+        self.batch_counter.update({s: -1})
         if self.options[s] == "continuous":
             self[s] = np.asarray(range(self.N[s])).astype('int64')
         elif self.options[s] == "random":
@@ -123,12 +134,12 @@ class BatchIterator(dict):
     def next(self, s, session=None):
         if session is None:
             session = tf.get_default_session()
-        if self.N_BATCH[s] == self.batch_counter[s]:
+        if self.N_BATCH[s] == (self.batch_counter[s]+1):
             self.reset(s)
             return False
-        batch_indices = range(self.batch_counter[s]*self.batch_size,
-                              (self.batch_counter[s]+1)*self.batch_size)
         self.batch_counter[s] += 1
+        batch_indices = range((self.batch_counter[s])*self.batch_size,
+                              (self.batch_counter[s]+1)*self.batch_size)
         session.run(self.indices_assign_op[s],
                     feed_dict={self.__dict__[s+'_']: self[s][batch_indices]})
         return True

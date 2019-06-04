@@ -3,78 +3,73 @@
 
 import numpy as np
 import tensorflow as tf
-
-from .base import Tensor
-
-
-class Loss(Tensor):
-    def __init__(self, value):
-        super().__init__(value)
-
-class StreamingLoss(Tensor):
-    def __init__(self, value, update, variables):
-        super().__init__(value)
-        reset_variables = list()
-        for var in variables:
-            reset_variables.append(tf.assign(var,tf.zeros_like(var)))
-        self.reset_variables_op = tf.group(reset_variables)
-        self.update = update
+from .base import StreamingTensor
 
 
+def squared_error(target, prediction, option='mean', aggregate_func=None):
+    """Implements the mean squared error between two tensors ```a, b```. 
+    For each observation ```n``` the output is given by 
+    ```output[n]=mean((a[n]-b[n])**2)``` if the given option is mean, or 
+    ```output[n]=sum((a[n]-b[n])**2)``` is the given option is sum, ... 
+    The output is thus a vector of
+    length given by the first dimenson of ```a``` and/or ```b``` (in case
+    of shape broadcasting). Optionally, this vector can be aggregated into
+    a scalar (or other) if an aggregating function is provided.
 
+    Parameters:
+    -----------
 
+    target: tensor or array
+        tensor ```a```
 
-def MSE(target,prediction):
-    return tf.losses.mean_squared_error(target,prediction)
-    N = np.float32(np.prod(target.shape.as_list()[1:]))
-    return SSE(target,prediction)/N
+    prediction: tensor or array
+        tensor ```b```
 
-def StreamingMSE(target, prediction, scope_name='mse'):
-    with tf.variable_scope(scope_name) as scope:
-        name = scope.original_name_scope
-        mse = tf.metrics.mean_squared_error(target, prediction)
-    variables = tf.local_variables(name)+tf.global_variables(name)
-    return StreamingLoss(mse[0], mse[1], variables)
+    option: str
+        the option for the squarred error aggregation. It can be one of
+        ```"mean", "sum", "max", "min"```
 
+    aggregate_func: func (optinal, default None)
+        aggregating function taking as input the vector ```output```. 
+        The output of this functin (if provided) is the output of this loss.
+        The aggregate functin should take as input a tensor. Hence use 
+        :class:`tf.reduce_mean` and not :class:`numpy.mean`.
 
-def SSE(target,prediction):
-    N = np.float32(2./target.shape.as_list()[0])
-    return tf.nn.l2_loss(target-prediction)*N
+    Returns:
+    --------
 
-def StreamingAUC(target,prediction,scope_name='auc'):
-    with tf.variable_scope(scope_name) as scope:
-        name = scope.original_name_scope
-        auc = tf.metrics.auc(target, prediction, num_thresholds=1000)
-    variables = tf.local_variables(name)+tf.global_variables(name)
-    return StreamingLoss(auc[0], auc[1], variables)
+    output: Tensor
+        either the vector of mean squared error for each observatin ```n``` 
+        or (if an aggreagating function is provided) the output of the given
+        ```aggregate_func```.
+    
+    """
+    assert option in ["mean", "sum", "max", "min"]
 
+    if option == "mean":
+        func = tf.reduce_mean
+    elif option == "max":
+        func = tf.reduce_max
+    elif option == "sum":
+        func = tf.reduce_sum
+    elif option == "min":
+        func = tf.reduce_min
 
-def accuracy(labels,predictions):
-    equals =tf.equal(labels,tf.argmax(predictions,1,output_type=tf.int32))
-    return tf.reduce_mean(tf.cast(equals,tf.float32))
+    axis = list(range(1, max(len(target.shape.as_list()), 
+                             len(prediction.shape.as_list()))))
+    output = func(tf.square(target - prediction), axis)
 
-def StreamingAccuracy(target, prediction, scope_name='accuracy'):
-    with tf.variable_scope(scope_name) as scope:
-        name = scope.original_name_scope
-        if len(prediction.shape.as_list())==2:
-            prediction = tf.argmax(prediction,1,output_type=tf.int32)
-        accu = tf.metrics.accuracy(target, prediction)
-    variables = tf.local_variables(name)+tf.global_variables(name)
-    return StreamingLoss(accu[0], accu[1], variables)
+    if aggregate_func is not None:
+        return aggregate_func(output)
+    return output
 
-
-def StreamingMean(tensor, scope_name='mean'):
-    with tf.variable_scope(scope_name) as scope:
-        name = scope.original_name_scope
-        amean = tf.metrics.mean_tensor(tensor)
-    variables = tf.local_variables(name)+tf.global_variables(name)
-    return StreamingLoss(amean[0], amean[1], variables)
-
-
-
-
-
-
+       
+def accuracy(targets, predictions):
+    assert len(prediction.shape.as_list()) < 3
+    if len(prediction.shape.as_list()) == 2:
+        prediction = tf.argmax(prediction, 1, output_type=tf.int32)
+    accu = tf.reduce_mean(tf.cast(tf.equal(target, prediction), tf.float32))
+    return accu
 
 
 def crossentropy_logits(p,q,weights=None,p_sparse=True):
@@ -124,8 +119,25 @@ def crossentropy_logits(p,q,weights=None,p_sparse=True):
 
 
 
+def streaming_mean(tensor):
+    moving_sum = tf.Variable(tf.zeros_like(tensor), trainable=False,
+                             name='moving_sum')
+    moving_count = tf.Variable(tf.zeros(1, dtype=tf.float32), trainable=False,
+                               name='moving_count')
+    current_mean = moving_sum/moving_count
+    updates = tf.group(tf.assign_add(moving_sum, tensor), 
+                       tf.assign_add(moving_count, tensor.shape[0]))
+    return StreamingTensor(current_mean, updates, [moving_sum, moving_count])
 
+def streaming_sum(tensor):
+    moving_sum = tf.Variable(tf.zeros_like(tensor), trainable=False,
+                             name='moving_sum')
+    updates = tf.assign_add(moving_sum, tensor)
+    return StreamingTensor(current_mean, updates, moving_sum)
 
-
-
-
+def streaming_auc(target, prediction):
+    with tf.variable_scope('auc') as scope:
+        name = scope.original_name_scope
+        auc = tf.metrics.auc(target, prediction, num_thresholds=1000)
+    variables = tf.local_variables(name)+tf.global_variables(name)
+    return StreamingTensor(auc[0], auc[1], variables)

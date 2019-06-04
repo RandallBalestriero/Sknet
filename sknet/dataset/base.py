@@ -12,17 +12,6 @@ class Dataset(dict):
         super().__init__()
         self.__dict__.update(args)
 
-    def next(self, s, session=None):
-        return self.iterator.next(s, session=session)
-
-    def reset(self):
-        self.iterator.reset(self.current_set_string)
-
-    def set_set(self, name, session):
-        self.current_set_string = name
-        session.run(self.assign_set,
-                    feed_dict={self.current_set_: self.set2int[name]})
-
     def cast(self, varn, dtype):
         # get sets in which this var exists
         sets = self.sets_(varn)
@@ -43,19 +32,9 @@ class Dataset(dict):
         # Many settings are put in int64 for GPU compatibility with tf
         iterator.set_N(dataset=self)
         sets = self.sets
-        self.set2int = dict([(b, np.int64(a)) for a, b in enumerate(sets)])
         self.iterator = iterator
         with tf.device(device):
             with tf.variable_scope("dataset"):
-
-                # first set up some variable to keep track of which
-                # set is used
-                self.current_set = tf.Variable(np.int64(0), trainable=False,
-                                               name='current')
-                self.current_set_ = tf.placeholder(tf.int64,
-                                                   name='current')
-                self.assign_set = tf.assign(self.current_set,
-                                            self.current_set_)
 
                 # create the tensorflow placeholders and variables that
                 # will hold the values of the sets and variables as part of
@@ -92,8 +71,8 @@ class Dataset(dict):
                         else:
                             batch = tf.gather(self[name], indices)
                         pairs.append(tf.placeholder_with_default(batch,
-                                     batch.shape))
-                    self.__dict__[v] = case(self.current_set, pairs)
+                                                                 batch.shape))
+                    self.__dict__[v] = case(self.iterator.current_set, pairs)
 
     def split_variable(self, var, new_var, ratio, stratify=None, seed=None):
         assert new_var not in self.variables

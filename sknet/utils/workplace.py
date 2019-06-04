@@ -63,7 +63,7 @@ class Workplace(object):
         output = self.session.run(op, feed_dict=feed_dict)
         return output
 
-    def execute_worker(self, worker, deter_func=None, feed_dict={}):
+    def execute_worker(self, worker, deter_func=None, feed_dict={}, epoch=0):
         """Perform an epoch (according to the set given by context).
         Execute and save the given ops and optionally apply a numpy function
         on them at the end of the epoch. THis is usefull for example to only
@@ -99,17 +99,14 @@ class Workplace(object):
 
         """
         # set the dataset on the correct set
-        self.dataset.set_set(worker.context, session=self.session)
-        self.dataset.iterator.reset(worker.context)
+        self.dataset.iterator.set_set(worker.context, session=self.session)
         # update the feed_dict with deterministic behavior value
-        if worker.deterministic is not None:
-            feed_dict.update(deter_func(worker.deterministic))
+        feed_dict.update(deter_func(worker.deterministic))
         # loop over all batches in current set
-        batch_nb = 0
-        while self.dataset.next(worker.context, session=self.session):
-            worker.append(self.execute_op(worker.get_op(batch_nb),
-                                          feed_dict=feed_dict))
-            batch_nb += 1
+        while self.dataset.iterator.next(worker.context, session=self.session):
+            batch_nb = self.dataset.iterator.batch_counter[worker.context]
+            ops = worker.get_ops(batch_nb, epoch),
+            worker.append(self.execute_op(ops, feed_dict=feed_dict))
         # signal the end of epoch and execute any needed reset op
         self.session.run(worker.epoch_done())
 
@@ -167,7 +164,7 @@ class Workplace(object):
                 name = worker.name
                 print("\trunning Worker:", name)
                 self.execute_worker(worker, feed_dict=feed_dict,
-                                    deter_func=deter_func)
+                                    deter_func=deter_func, epoch=e)
             queue.dump()
         if close_file:
             queue.close()

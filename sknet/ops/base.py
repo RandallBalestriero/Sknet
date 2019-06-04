@@ -127,7 +127,6 @@ class Op(Tensor):
     def __new__(cls, *args, **kwargs):
         obj = super().__new__(cls)
         obj._updates = list()
-#        obj._reset_variables_op = []
         obj.mask = None
         return obj
 
