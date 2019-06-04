@@ -34,6 +34,5 @@ def Resnet(dnn,n_classes=None,D=4,W=1):
     if n_classes is not None:
         dnn.append(ops.Conv2D(dnn[-1],(n_classes,1,1)))
         dnn.append(ops.GlobalPool2D(dnn[-1], pool_type='AVG'))
-    return dnn
 
 

@@ -147,6 +147,13 @@ class Op(Tensor):
         vs = tf.global_variables(self.name)+tf.local_variables(self.name)
         self._reset_variables_op = tf.initializers.variables(vs)
 
+    def deter_dict(self, value):
+        """gather the deterministic variable and
+        create a dictionary mapping this variable to value"""
+        if self.deterministic[0] is not None:
+            return {self.deterministic[0]:value}
+        return dict()
+
     @property
     def deterministic(self):
         return self._deterministic

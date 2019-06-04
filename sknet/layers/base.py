@@ -7,6 +7,7 @@ from .. import Tensor
 from .. import ops
 from ..utils import flatten
 
+
 class Layer(Tensor):
     """Layer class used as parent of any implemented layer.
 
@@ -125,31 +126,43 @@ class Layer(Tensor):
         this allows the user to feed directly a tensorflow variable as input
 
     """
-    def __init__(self, input, *args, deterministic=None):
+    def __init__(self, input_or_ops, *args, deterministic=None):
 
         # Link this tensor to its input
-        self._input = input
-        ops = type(self)._ops
+        if hasattr(input_or_ops, '__len__'):
+            self._inner_ops = input_or_ops
+        else:
+            self._input = input_or_ops
+            ops = type(self)._ops
 
-        # create the chain of inner ops
-        inner_ops = [input]
-        for op, arglist in zip(ops,args):
-            argdict = {}
-            for i,arg in enumerate(arglist):
-                if type(arg)==dict:
-                    argdict = arg
-                    arglist.pop(i)
-                    break
-            inner_ops.append(op(inner_ops[-1],deterministic=deterministic,
-                                                *arglist,**argdict))
-        self._inner_ops = inner_ops[1:]
+            # create the chain of inner ops
+            inner_ops = [self._input]
+            for op, arglist in zip(ops, args):
+                argdict = {}
+                for i, arg in enumerate(arglist):
+                    if type(arg) == dict:
+                        argdict = arg
+                        arglist.pop(i)
+                        break
+                inner_ops.append(op(inner_ops[-1], deterministic=deterministic,
+                                    *arglist, **argdict))
+            self._inner_ops = inner_ops[1:]
 
         # set deterministic
         self._deterministic = [op.deterministic[0] for op in self._inner_ops
-                                            if op.deterministic[0] is not None]
+                               if op.deterministic[0] is not None]
 
         # initialize the Layer as a tf Variable
         super().__init__(self._inner_ops[-1])
+
+    def deter_dict(self, value):
+        """gather the deterministic variable and
+        create a dictionary mapping this variable to value"""
+        deter_dict = dict()
+        for deter in self.deterministic:
+            deter_dict[deter] = value
+        return deter_dict
+
 
     def backward(self,input):
         for op in self.inner_ops[::-1]:

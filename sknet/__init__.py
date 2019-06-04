@@ -18,6 +18,7 @@ __version__ = 'alpha.1'
 
 from .base import *
 from . import *
+from .layers import Layer
 from .dataset import Dataset
 from .networks import Network
 from .utils import Workplace
