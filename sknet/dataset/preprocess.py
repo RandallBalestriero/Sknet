@@ -17,21 +17,21 @@ class Identity:
 
 
 class Standardize:
-    def __init__(self, eps=0.0001, axis=[0], name=''):
+    def __init__(self, eps=0.000001, axis=[0], name=''):
         self.name = name+'preprocessing(standardize,eps='+str(eps)+')'
         self.eps = eps
         self.axis = axis
     def fit(self, x, **kwargs):
         print(self.name+" fitting...")
-        t=time.time()
+        t = time.time()
         self.mean = x.mean(axis=tuple(self.axis), keepdims=True)
         self.std = x.std(axis=tuple(self.axis), keepdims=True)+self.eps
         print(self.name+" done in {0:.2f} s.".format(time.time()-t))
         return self
     def transform(self, x, inplace=False, **kwargs):
         if inplace:
-            x-=self.mean
-            x/=self.std
+            x -= self.mean
+            x /= self.std
         else:
             return (x-self.mean)/self.std
     def fit_transform(self, x, inplace=False, **kwargs):

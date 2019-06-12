@@ -44,8 +44,8 @@ class DownloadProgressBar(tqdm):
         self.update(b * bsize - self.n)
 
 
-def count_number_of_params():
-    return np.sum([np.prod(v.get_shape().as_list()) for v in tf.trainable_variables()])
+def count_number_of_params(parameters):
+    return np.sum([np.prod(v.get_shape().as_list()) for v in parameters])
 
 
 
@@ -108,26 +108,46 @@ def hermite_interp(t, knots, m, p):
     return filters
 
 
-
-
-
-                       
-def case(integer,tensors,start=0):
-    cond = tf.equal(integer-start,0)
-    if len(tensors)==1:
-        return tensors[0]
-    if len(tensors)==2:
-        return tf.cond(cond,lambda :tensors[0],lambda :tensors[1])
+def upper_triangular(tensor, strict=0):
+    ones = tf.ones_like(tensor)
+    mask_a = tf.matrix_band_part(ones, 0, -1)  # Upper triangular matrix
+    if strict:
+        mask_b = tf.matrix_band_part(ones, 0, 0)  # Diagonal matrix
     else:
-        follow = case(integer,tensors[1:],start+1)
-        return tf.cond(cond,lambda :tensors[0],lambda :follow)
+        mask_b = 0
+    mask = tf.cast(mask_a - mask_b, dtype=tf.bool)  # Make a bool mask
+    upper_triangular_flat = tf.boolean_mask(tensor, mask)
+    return upper_triangular_flat
+
+def lower_triangular(tensor, strict=0):
+    ones = tf.ones_like(tensor)
+    mask_a = tf.matrix_band_part(ones, -1, 0)  # Upper triangular matrix
+    if strict:
+        mask_b = tf.matrix_band_part(ones, 0, 0)  # Diagonal matrix
+    else:
+        mask_b = 0
+    mask = tf.cast(mask_a - mask_b, dtype=tf.bool)  # Make a bool mask
+    lower_triangular_flat = tf.boolean_mask(tensor, mask)
+    return lower_triangular_flat
 
 
-def to_one_hot(labels,K=None):
+
+def case(value, pairs):
+    if len(pairs) == 1:
+        return pairs[0][0]
+    cond = tf.equal(value, pairs[0][0])
+    if len(pairs) == 2:
+        return tf.cond(cond, lambda: pairs[0][1], lambda: pairs[1][1])
+    else:
+        follow = case(value, pairs[1:])
+        return tf.cond(cond, lambda: pairs[0][1], lambda: follow)
+
+
+def to_one_hot(labels, K=None):
     if K is None:
-        K=int(np.max(labels)+np.min(labels))
-    matrix = np.zeros((len(labels),K),dtype='float32')
-    matrix[range(len(labels)),labels]=1
+        K = int(np.max(labels)+np.min(labels))
+    matrix = np.zeros((len(labels), K), dtype='float32')
+    matrix[range(len(labels)), labels] = 1
     return matrix
 
 

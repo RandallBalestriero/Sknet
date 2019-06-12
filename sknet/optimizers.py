@@ -7,16 +7,12 @@ import tensorflow as tf
 from .base import EMA, ONE_INT32
 
 class NesterovMomentum:
-    def __init__(self, loss_or_grads, learning_rate, momentum=0.9, params=None):
+    def __init__(self, loss_or_grads, params, learning_rate, momentum=0.9):
         with tf.variable_scope("NesterovMomentumOptimizer") as scope:
             self.name = scope.original_name_scope
             # Parameters
             # if no parameters are given then we get them and
             # compute the gradients
-            if params is None:
-                params    = tf.trainable_variables()
-                # ensure that loss_or_grads is really a tf value
-                assert not hasattr(loss_or_grads,'__len__')
             # set up grad or loss
             if hasattr(loss_or_grads,'__len__'):
                 gradients = loss_or_grads
@@ -32,12 +28,12 @@ class NesterovMomentum:
                 learning_rate = tf.constant(learning_rate)
 
             updates = list()
-            for param, grad in zip(params,gradients):
+            for param, grad in zip(params, gradients):
                 lrg  = learning_rate*grad
                 velocity_var = tf.Variable(tf.zeros_like(param),
-                                     name='velocity',trainable=False)
+                                           name='velocity', trainable=False)
                 velocity = tf.assign(velocity_var,momentum*velocity_var-lrg)
-                update   =momentum*velocity-lrg
+                update = momentum*velocity-lrg
                 updates.append(tf.assign_add(param, update))
                 updates.append(velocity)
             self.updates = updates
@@ -71,7 +67,7 @@ class Adam:
             beta2 = tf.constant(beta2)
             self.updates = [step]
 
-            for param, grad in zip(params,gradients):
+            for param, grad in zip(params, gradients):
                 _, m_op = EMA(grad, beta1, step)
                 _, v_op = EMA(tf.square(grad), beta2, step)
                 update = learning_rate*m_op/(tf.sqrt(v_op)+eps)

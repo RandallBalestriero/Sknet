@@ -3,7 +3,6 @@
 
 import tensorflow as tf
 from ..ops import Op
-from ..layers import Layer
 
 class Network:
     def __init__(self, layers=[], name='model'):
@@ -20,7 +19,11 @@ class Network:
 
     def append(self, item):
         """append an additional layer to the current network"""
-        self.layers.append(item)
+        if hasattr(item, '__len__'):
+            item = list(item)
+            self.layers += item
+        else:
+            self.layers.append(item)
 
     def as_list(self):
         """return the layers as a list"""
@@ -31,7 +34,7 @@ class Network:
         create a dictionary mapping those variables to value"""
         feed_dict = dict()
         for layer in self.layers:
-            if isinstance(layer, Op) or isinstance(layer, Layer):
+            if isinstance(layer, Op):
                 for deter in layer.deterministic:
                     if deter is not None:
                         feed_dict[deter] = value
@@ -49,7 +52,7 @@ class Network:
         and group them into a single op if group is True, or
         return the list of operations"""
         var = []
-        for layer in self.layers:
+        for layer in self:
             if hasattr(layer, 'variables'):
                 var.append(layer.reset_variables_op)
         if group:
@@ -60,7 +63,7 @@ class Network:
         """return all the variables of the network
         which are trainable only or all"""
         var = list()
-        for layer in self.layers:
+        for layer in self:
             if hasattr(layer, 'variables'):
                 var += layer.variables(trainable)
         return var

@@ -3,7 +3,6 @@
 
 from .preprocess import *
 from .base import *
-from .iterator import *
 
 from .mnist import *
 from .svhn import *

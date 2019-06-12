@@ -114,21 +114,21 @@ class Merge(Op):
     """
     name = 'Merge'
     deterministic_behavior = False
-    def __init__(self,incomings,func,**kwargs):
-        self.func      = func
-        self.N         = len(incomings)
+    def __init__(self, incomings, func):
+        self.func = func
+        self.N = len(incomings)
         super().__init__(incomings)
 
-    def forward(self,inputs, *args, **kwargs):
-        if type(self.func)==str:
-            if self.func=='SUM':
+    def forward(self, inputs, *args, **kwargs):
+        if type(self.func) == str:
+            if self.func == 'SUM':
                 return tf.add_n(inputs)
-            elif self.func=='AVG':
+            elif self.func == 'AVG':
                 return tf.add_n(inputs)/self.N
-            elif self.func=='MAX':
-                return tf.reduce_max(tf.stack(inputs,0),0)
-            elif self.func=='MIN':
-                return tf.reduce_min(tf.stack(inputs,0),0)
+            elif self.func == 'MAX':
+                return tf.reduce_max(tf.stack(inputs, 0), 0)
+            elif self.func == 'MIN':
+                return tf.reduce_min(tf.stack(inputs, 0), 0)
         else:
             return self.func(inputs)
 

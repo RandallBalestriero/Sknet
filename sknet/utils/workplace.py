@@ -98,15 +98,15 @@ class Workplace(object):
 
 
         """
-        # set the dataset on the correct set
-        self.dataset.iterator.set_set(worker.context, session=self.session)
         # update the feed_dict with deterministic behavior value
-        feed_dict.update(deter_func(worker.deterministic))
-        # loop over all batches in current set
-        while self.dataset.iterator.next(worker.context, session=self.session):
-            batch_nb = self.dataset.iterator.batch_counter[worker.context]
-            ops = worker.get_ops(batch_nb, epoch),
-            worker.append(self.execute_op(ops, feed_dict=feed_dict))
+        feed = feed_dict.copy()
+        feed.update(deter_func(worker.deterministic))
+        self.dataset.iterator.reset(worker.context)
+        for i in range(self.dataset.N_BATCH(worker.context)):
+            feed.update(self.dataset.iterator.next(worker.context))
+            feed.update({self.dataset.iterator.set: worker.context})
+            ops = worker.get_ops(i, epoch)
+            worker.append(self.execute_op(ops, feed_dict=feed))
         # signal the end of epoch and execute any needed reset op
         self.session.run(worker.epoch_done())
 

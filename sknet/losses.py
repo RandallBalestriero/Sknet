@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
-import numpy as np
 import tensorflow as tf
-from .base import StreamingTensor
-
+from .base import StreamingTensor, ONE_FLOAT32, ZERO_FLOAT32
 
 def squared_error(target, prediction, option='mean', aggregate_func=None):
     """Implements the mean squared error between two tensors ```a, b```. 
@@ -122,12 +120,14 @@ def crossentropy_logits(p,q,weights=None,p_sparse=True):
 def streaming_mean(tensor):
     moving_sum = tf.Variable(tf.zeros_like(tensor), trainable=False,
                              name='moving_sum')
-    moving_count = tf.Variable(tf.zeros(1, dtype=tf.float32), trainable=False,
+    moving_count = tf.Variable(ZERO_FLOAT32, trainable=False,
                                name='moving_count')
-    current_mean = moving_sum/moving_count
-    updates = tf.group(tf.assign_add(moving_sum, tensor), 
-                       tf.assign_add(moving_count, tensor.shape[0]))
-    return StreamingTensor(current_mean, updates, [moving_sum, moving_count])
+    updates = [tf.assign_add(moving_sum, tensor),
+               tf.assign_add(moving_count, ONE_FLOAT32)]
+
+    with tf.control_dependencies(updates):
+        current_mean = moving_sum/moving_count
+    return StreamingTensor(current_mean, [moving_sum, moving_count])
 
 def streaming_sum(tensor):
     moving_sum = tf.Variable(tf.zeros_like(tensor), trainable=False,

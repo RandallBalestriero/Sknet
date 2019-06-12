@@ -146,33 +146,38 @@ class Conv2D(Op):
                 self.to_pad = True
 
             # Compute shape of the W filter parameter
-            w_shape = (filters[1],filters[2],
-                                incoming.shape.as_list()[1],filters[0])
+            w_shape = (filters[1], filters[2],
+                       incoming.shape.as_list()[1], filters[0])
             # Initialize W
-            self._W = tf.Variable(W(w_shape), name='W') if callable(W) else W
-            self.W  = W_func(self._W)
+            if callable(W):
+                self._W = tf.Variable(W(w_shape), trainable=True, name='W')
+            else:
+                self._W = W
+            self.W = W_func(self._W)
 
             # Initialize b
             if b is None:
                 self._b = None
             elif callable(b):
-                self._b = tf.Variable(b((filters[0],1,1)), name='b')
+                self._b = tf.Variable(b((filters[0], 1, 1)), trainable=True,
+                                      name='b')
             else:
                 self._b = b
             self.b = b_func(self._b) if b is not None else self._b
 
             super().__init__(incoming)
 
-    def forward(self,input, *args,**kwargs):
+    def forward(self, input, *args, **kwargs):
         padded = tf.pad(input, self.p, mode=self.mode) if self.to_pad else input
-        Wx     = tf.nn.conv2d(padded, self.W, strides=self.strides,
-                                            padding='VALID', data_format="NCHW")
+        Wx = tf.nn.conv2d(padded, self.W, strides=self.strides,
+                          padding='VALID', data_format="NCHW")
         return Wx if self.b is None else Wx+self.b
 
-    def backward(self,input):
+    def backward(self, input):
         return tf.nn.conv2d_backprop_input(self.input.get_shape().as_list(),
-                filter = self.W, out_backprop = input, strides=self.strides,
-                data_format='NCHW',padding='VALID')
+                                           filter=self.W, out_backprop=input,
+                                           strides=self.strides,
+                                           data_format='NCHW', padding='VALID')
 
 
 
