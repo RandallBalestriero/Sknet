@@ -5,10 +5,11 @@ import tensorflow as tf
 from ..ops import Op
 
 class Network:
+
     def __init__(self, layers=[], name='model'):
         self.name = name
         self.layers = layers
-
+        self._deter_dict = dict()
     def __getitem__(self, key):
         if isinstance(key, slice):
             return Network(layers=self.layers[key], name='sub'+self.name)
@@ -24,21 +25,22 @@ class Network:
             self.layers += item
         else:
             self.layers.append(item)
-
+        self.update_deter_dict()
     def as_list(self):
         """return the layers as a list"""
         return [layer for layer in self]
 
-    def deter_dict(self, value):
+    def update_deter_dict(self):
         """gather all the per layer deterministic variables and
         create a dictionary mapping those variables to value"""
-        feed_dict = dict()
         for layer in self.layers:
             if isinstance(layer, Op):
-                for deter in layer.deterministic:
-                    if deter is not None:
-                        feed_dict[deter] = value
-        return feed_dict
+                self._deter_dict.update(layer.deter_dict(True))
+
+    def deter_dict(self, value):
+        for key in self._deter_dict.keys():
+            self._deter_dict[key] = value
+        return self._deter_dict
 
     @property
     def shape(self):

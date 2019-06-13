@@ -135,22 +135,23 @@ class Op(Tensor):
         self._input = input
 
         if type(self).deterministic_behavior and deterministic is None:
-            deterministic = tf.placeholder(tf.bool, name='deterministic')
-            self._deterministic = [deterministic]
-        else:
-            self._deterministic = [None]
+            self._deterministic = tf.placeholder(tf.bool,
+                                                 name='deterministic')
+        elif type(self).deterministic_behavior:
+            self._deterministic = deterministic
 
-        output = self.forward(input, deterministic)
+        output = self.forward(input, self._deterministic)
         super().__init__(output)
 
-        vs = tf.global_variables(self.name)+tf.local_variables(self.name)
-        self._reset_variables_op = tf.initializers.variables(vs)
+        variables = tf.global_variables(self.name)\
+                    +tf.local_variables(self.name)
+        self._reset_variables_op = tf.initializers.variables(variables)
 
     def deter_dict(self, value):
         """gather the deterministic variable and
         create a dictionary mapping this variable to value"""
-        if self.deterministic[0] is not None:
-            return {self.deterministic[0]:value}
+        if self.deterministic is not None:
+            return {self.deterministic: value}
         return dict()
 
     @property
@@ -172,7 +173,7 @@ class Op(Tensor):
     def input(self):
         return self._input
 
-    def variables(self,trainable=True):
+    def variables(self, trainable=True):
         if trainable:
             return tf.trainable_variables(scope=self.name)
         else:
@@ -196,14 +197,3 @@ class Identity(Op):
 
     def forward(self,input,*args,**kwargs):
         return input
-
-
-
-
-
-
-
-
-
-
-
