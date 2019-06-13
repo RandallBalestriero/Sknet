@@ -134,7 +134,7 @@ def lower_triangular(tensor, strict=0):
 
 def case(value, pairs):
     if len(pairs) == 1:
-        return pairs[0][0]
+        return pairs[0][1]
     cond = tf.equal(value, pairs[0][0])
     if len(pairs) == 2:
         return tf.cond(cond, lambda: pairs[0][1], lambda: pairs[1][1])

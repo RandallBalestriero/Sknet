@@ -236,7 +236,6 @@ class Worker(object):
             if type(args[i]) == tuple:
                 assert len(args[i]) == 2
             else:
-                print(args)
                 args[i] = (args[i], lambda b, e: True)
         self.ops = args
 
@@ -305,7 +304,6 @@ class Worker(object):
     def append(self, data):
         """given the session output obtained by executing the given list of ops,
         append the data with the batch values"""
-        print(data[0])
         for name, op, d in zip(self.current_names, self.current_ops[0],
                                data[0]):
             if isinstance(op, StreamingTensor):

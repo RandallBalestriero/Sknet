@@ -119,21 +119,13 @@ class Dataset(dict):
         with tf.device(device):
             self.iterator = BatchIterator(options, self)
             with tf.variable_scope("dataset"):
-
                 # create the tensorflow placeholders and variables that
                 # will hold the values of the sets and variables as part of
-                # the computational graph. Each variable/set is associated
-                # to a tf.Variable and a tf.placeholder (to initialize the
-                # variable)
                 for varn in list(self.keys()):
                     # ensure that there is not already a member with this name
                     # as a method of the class (dict)
                     assert(varn not in self.__dict__)
-#                    if type(self[varn]) == 'int32':
-#                        type_ = 'int64'
-#                    else:
                     type_ = str(self[varn].dtype)
-                    # create all the placeholders and variables for each data
                     name1 = varn+'/placeholder'
                     self[name1] = tf.placeholder(type_, shape=self[varn].
                                                  shape, name=varn)
@@ -141,8 +133,6 @@ class Dataset(dict):
                     self[name2] = tf.Variable(self[name1], trainable=False,
                                               name=varn)
 
-                # now initialize the batch version of each variable/set.
-                # to do so, we use the iterator indices to extract each batch
                 for v in self.variables:
                     pairs = list()
                     for s in self.sets_(v):
