@@ -3,18 +3,98 @@
 
 import tensorflow as tf
 from . import ops
+from . import Tensor
 
-def Conv2D(input, filters, axis, nonlinearity, strides=1):
-    conv = ops.Conv2D(input, filters=filters, strides=strides, b=None)
-    bn = ops.BatchNorm(conv, axis)
+class Layer(Tensor):
+    def __init__(self, internal_ops):
+        super().__init__(internal_ops[-1])
+        self.internal_ops = internal_ops
+        self._input = internal_ops[0].input
+
+    def deter_dict(self, value):
+        deter_dict = dict()
+        for op in self.internal_ops:
+            deter_dict.update(op.deter_dict(value))
+        return deter_dict
+
+    @property
+    def reset_variables_op(self):
+        return tf.group(*[op.reset_variables_op for op in self.internal_ops])
+
+    def backward(self, input):
+        return tf.gradients(self, self.input, input)[0]
+
+    @property
+    def input(self):
+        return self._input
+
+    def variables(self, trainable=True):
+        variables = list()
+        for op in self.internal_ops:
+            variables += op.variables(trainable=trainable)
+        return variables
+
+    @property
+    def updates(self):
+        updates = list()
+        for op in self.internal_ops:
+            updates.append(op.updates)
+        return updates
+
+
+
+def Conv2D(input, filters, nonlinearity=0, strides=1, pad='valid'):
+    conv = ops.Conv2D(input, filters=filters, strides=strides, b=None, pad=pad)
+    bn = ops.BatchNorm(conv, [0, 2, 3])
     nonlinearity = ops.Activation(bn, nonlinearity)
-    return [conv, bn, nonlinearity]
+    return Layer([conv, bn, nonlinearity])
 
-def Conv2DPool(input, filters, axis, nonlinearity, pool_shape, strides=1):
-    conv = ops.Conv2D(input, filters=filters, strides=strides, b=None)
-    bn = ops.BatchNorm(conv, axis)
+def Conv2DPool(input, filters, nonlinearity=0, pad='valid', pool_shape=(2, 2),
+               strides=1):
+    conv = ops.Conv2D(input, filters=filters, strides=strides, b=None, pad=pad)
+    bn = ops.BatchNorm(conv, [0, 2, 3])
     nonlinearity = ops.Activation(bn, nonlinearity)
     pool = ops.Pool2D(nonlinearity, pool_shape)
-    return [conv, bn, nonlinearity, pool]
+    return Layer([conv, bn, nonlinearity, pool])
+
+def ResBlock(input, filters, stride=1):
+    if stride > 1:
+        conv_linear = ops.Conv2D(input, filters=(filters, 3, 3),
+                                 strides=stride, b=None, pad='same')
+    else:
+        conv_linear = ops.Identity(input)
+    conv = ops.Conv2D(input, filters=(filters, 3, 3), b=None,
+                      pad='same')
+    bn = ops.BatchNorm(conv, [0, 2, 3])
+    nonlinearity = ops.Activation(bn, 0.)
+    if stride > 1:
+        pool = ops.Pool2D(nonlinearity, stride)
+    else:
+        pool = ops.Identity(nonlinearity)
+    merge = ops.Merge([pool, conv_linear], tf.add_n)
+    return Layer([conv_linear, conv, bn, nonlinearity, pool, merge])
+
+def ResBlockV2(input, filters, stride=1):
+    if stride > 1:
+        conv_linear = ops.Conv2D(input, filters=(filters, 3, 3),
+                                 strides=stride, b=None, pad='same')
+    else:
+        conv_linear = ops.Identity(input)
+    conv = ops.Conv2D(input, filters=(filters, 3, 3), strides=stride, b=None)
+    bn = ops.BatchNorm(conv, [0, 2, 3])
+    nonlinearity = ops.Activation(bn, 0.)
+    if stride > 1:
+        pool = ops.Pool2D(nonlinearity, stride)
+    else:
+        pool = ops.Identity(nonlinearity)
+    second_conv = ops.Conv2D(pool, filters=(filters, 3, 3),
+                             b=None, pad='same')
+    merge = ops.Merge([second_conv, conv_linear], tf.add_n)
+    return Layer([conv_linear, conv, bn, nonlinearity, pool, second_conv,
+                   merge])
+
+
+
+
 
 

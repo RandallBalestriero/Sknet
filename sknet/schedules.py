@@ -13,18 +13,18 @@ class constant:
     For convex optimization problems, convergence is only guaranteed
     with a decaying learning rate.
     """
-    def __init__(self,lr):
+    def __init__(self, lr):
         """Initialize the class with a learning rate
 
         :param lr: learning rate to use
         :type lr: scalar
         """
-        self.lr   = lr
+        self.lr = lr
         self.name = '-schedule(constant,lr='+str(init_lr)+')'
     def reset(self):
         """Reset the list of learning rates"""
         self.lrs = [self.lr]
-    def update(self,valid_accu,epoch,**kwargs):
+    def update(self, valid_accu, epoch, **kwargs):
         """Update the value of the learning rate, in this case, 
         stay the same"""
         if kwargs['epoch']==0:
@@ -83,7 +83,7 @@ class exponential:
         """reset the class"""
         self.lrs = [self.lr]
     def update(self,**kwargs):
-        if kwargs['epoch']==0:
+        if kwargs['epoch'] == 0:
             self.reset()
         self.lrs.append(self.lr-self.step**kwargs['epoch'])
 
@@ -96,28 +96,29 @@ class PiecewiseConstant:
 
         value = PiecewiseConstant(0.1,{50:0.01,100:0.0005})
         time = tf.placeholder(tf.int32)
-        # as time will evolve, as the value_pc will change based
+        # as time will evolve, as the valuet will change based
         # on the above steps
-        value_pc = value(time)
+        valuet = value(time)
 
     """
 
     name = 'PiecewiseConstant'
 
-    def __init__(self,initial,steps):
+    def __init__(self, initial, steps):
 
-        self.initial    = initial
+        self.initial = initial
         # ensure that the steps are in order
-        argsort         = np.argsort(list(steps.keys()))
-        self.boundaries = list(np.asarray(
-                                  list(steps.keys()))[argsort].astype('int32'))
-        self.values     = list(np.concatenate([[initial],np.asarray(
-                              list(steps.values()))[argsort]]).astype('float32'))
+        keys = list(steps.keys())
+        values = list(steps.values())
+        argsort = np.argsort(keys)
+        self.boundaries = [np.int32(keys[argsort[i]]) for i in argsort]
+        self.values = [np.float32(values[argsort[i]]) for i in argsort]
+        self.values.insert(0, np.float32(self.initial))
         self.description = type(self).name+str(initial)\
-                                    +str(steps).replace(' ','')
+                                    +str(steps).replace(' ',  '')
 
-    def __call__(self,t):
-        return tf.train.piecewise_constant(t,self.boundaries,self.values)
+    def __call__(self, t):
+        return tf.train.piecewise_constant(t, self.boundaries, self.values)
 
 
 

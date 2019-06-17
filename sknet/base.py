@@ -1,30 +1,61 @@
-#!/usr/bin/env python
+# !/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+import warnings
+import h5py
+import numpy as np
 import tensorflow as tf
 from tensorflow.python.framework import dtypes
-import numpy as np
-import h5py
 from tensorflow.contrib.graph_editor import get_backward_walk_ops
+
 
 ZERO_INT32 = tf.constant(np.int32(0))
 ZERO_FLOAT32 = tf.constant(np.float32(0))
 ONE_INT32 = tf.constant(np.int32(1))
 ONE_FLOAT32 = tf.constant(np.float32(1))
 
-def EMA(tensor, decay, step):
+
+def exponential_moving_average(tensor, decay, step):
+    """exponential moving average of a tensor with decay and
+    explicit step
+
+    Parameters
+    ----------
+
+    tensor : tf.Tensor
+        the tensor to do the moving average of
+
+    decay : scalar
+        the decay of the exponential moving average
+
+    step : tf.Tensor of type int
+        the current step, it is only used for debiasing, thus only the
+        fact that it is 0 or greater matters. After the iteration it can be
+        left at 1 without a problem
+
+    Returns
+    -------
+
+    ma_value : tf.tensor
+        the current value of the moving average
+
+    update : tf.Operation
+        the updates to apply (execute) to update the value of the moving
+        average value
+    """
     ma_value = tf.Variable(tf.zeros_like(tensor), trainable=False, name='ma')
-    ma = ma_value*decay+tensor*(1-decay)
-    value = tf.cond(tf.greater(step, ZERO_INT32), lambda :ma, lambda :tensor)
+    value = ma_value*decay+tensor*(1-decay)
+    value = tf.cond(tf.greater(step, ZERO_INT32), lambda: value,
+                    lambda: tensor)
     update = tf.assign(ma_value, value)
     return ma_value, update
 
-def get_tensor_dependencies(tensor):
+
+def get_tensor_dependencies(tensors):
     dependencies = list()
     ops = list()
-    for t in tensor:
-        if not isinstance(t, tf.Variable):
-            ops.append(get_backward_walk_ops(t, control_inputs=True,
+    for tensor in tensors:
+        if not isinstance(tensor, tf.Variable):
+            ops.append(get_backward_walk_ops(tensor, control_inputs=True,
                        inclusive=False))
     ops = list(set([o for op in ops for o in op]))
     for op in ops:
@@ -32,30 +63,20 @@ def get_tensor_dependencies(tensor):
             dependencies.append(op.outputs[0])
     return dependencies
 
-def get_layers(tensor):
-    layers = list()
-    ops = tf.contrib.graph_editor.get_backward_walk_ops(tensor,
-                                                    control_inputs=True)
-    for op in ops:
-        if isinstance(op.outputs[0], layer.Layer):
-            layers.append(op)
-    return layers
-
-
-
-
 
 class Queue(tuple):
     def __new__(cls, *args, filename=None):
-        obj = super(Queue,cls).__new__(cls, *args)
+        obj = super(Queue, cls).__new__(cls, *args)
         obj._filename = filename
         obj._file = None
         obj.count = 0
         return obj
+
     def close(self):
         self.count = 0
         if self._file is not None:
             self._file.close()
+
     def dump(self):
         """Method to be called to save data from workers and empty them
         """
@@ -97,7 +118,7 @@ class Queue(tuple):
 class Tensor(tf.Tensor):
     """Overloading the :py:class:`tf.Tensor`
     """
-    def __init__(self,tensor_or_func=None, shape=None, dtype = None):
+    def __init__(self, tensor_or_func=None, shape=None, dtype=None):
         if tensor_or_func is None:
             tensor_or_func = tf.zeros
         if callable(tensor_or_func):
@@ -147,7 +168,6 @@ class StreamingTensor(Tensor):
     def __init__(self, value, variables):
         super().__init__(value)
         self.reset_variables_op = tf.initializers.variables(variables)
-#        self.update = update
 
 
 
@@ -226,9 +246,17 @@ class Worker(object):
 
     def __init__(self, *args, **kwargs):
         deterministic = kwargs['deterministic']
-        context = kwargs['context']
         kwargs.pop('deterministic')
+        context = kwargs['context']
         kwargs.pop('context')
+
+        if 'name' in kwargs:
+            self.name = kwargs['name']
+            kwargs.pop('name')
+        else:
+            self.name = context
+            warnings.warn("No name specified for Worker"\
+                          + ", using {}".format(context))
 
         # first the ops that are not saved (no name associated)
         args = list(args)
@@ -236,7 +264,7 @@ class Worker(object):
             if type(args[i]) == tuple:
                 assert len(args[i]) == 2
             else:
-                args[i] = (args[i], lambda b, e: True)
+                args[i] = (args[i], lambda *a: True)
         self.ops = args
 
         # second the ops that should be saved
@@ -244,11 +272,11 @@ class Worker(object):
             if type(kwargs[key]) == tuple:
                 assert len(kwargs[key]) == 2
             else:
-                kwargs[key] = (kwargs[key], lambda b, e: True)
+                kwargs[key] = (kwargs[key], lambda *a: True)
         self.named_ops = kwargs
 
         allops = [op[0] for op in self.named_ops.values()]\
-                 + [op[0] for op in self.ops]
+                  + [op[0] for op in self.ops]
         self._dependencies = get_tensor_dependencies(allops)
         self._deterministic = deterministic
         self._context = context
@@ -302,7 +330,7 @@ class Worker(object):
         return self.current_ops
 
     def append(self, data):
-        """given the session output obtained by executing the given list of ops,
+        """given the session output obtained by executing the given list of ops
         append the data with the batch values"""
         for name, op, d in zip(self.current_names, self.current_ops[0],
                                data[0]):
@@ -342,31 +370,30 @@ class ObservedTensor(Tensor):
 
     """
     def __init__(self, tensor, observation=None, teacher_forcing=None):
-        self._observed        = observed
+        self._observed = observed
         self._teacher_forcing = teacher_forcing
 
         if observation is None:
             self._observation = tf.placeholder_with_default(
                     tf.zeros(tensor.shape,dtype=tensor.dtype),
                     shape = tensor.shape,
-                    name  = 'observation-'+tensor.name.replace(':','-'))
+                    name = 'observation-'+tensor.name.replace(':','-'))
         else:
             self._observation = observation
         if teacher_forcing is None:
             self._teacher_forcing = tf.placeholder_with_default(False,
                     shape = (),
-                    name  = 'teacherforcing-'+tensor.name.replace(':','-'))
+                    name = 'teacherforcing-'+tensor.name.replace(':','-'))
         else:
             self._teacher_forcing = teacher_forcing
-        output = tf.cond(self._teacher_forcing, lambda :self._observation, 
-                                                    lambda :tensor)
+        output = tf.cond(self._teacher_forcing, lambda: self._observation,
+                         lambda: tensor)
         super().__init__(output)
-
 
     @property
     def observation(self):
         return self._observation
-    
+
     @property
     def observed(self):
         return self._observed
@@ -374,6 +401,3 @@ class ObservedTensor(Tensor):
     @property
     def teacher_forcing(self):
         return self._teacher_forcing
-
-
-

@@ -139,12 +139,14 @@ class Op(Tensor):
                                                  name='deterministic')
         elif type(self).deterministic_behavior:
             self._deterministic = deterministic
+        else:
+            self._deterministic = None
 
         output = self.forward(input, self._deterministic)
         super().__init__(output)
 
         variables = tf.global_variables(self.name)\
-                    +tf.local_variables(self.name)
+                    + tf.local_variables(self.name)
         self._reset_variables_op = tf.initializers.variables(variables)
 
     def deter_dict(self, value):

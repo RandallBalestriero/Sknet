@@ -61,7 +61,7 @@ def squared_error(target, prediction, option='mean', aggregate_func=None):
         return aggregate_func(output)
     return output
 
-       
+
 def accuracy(targets, predictions):
     assert len(predictions.shape.as_list()) < 3
     if len(predictions.shape.as_list()) == 2:
@@ -70,7 +70,7 @@ def accuracy(targets, predictions):
     return accu
 
 
-def crossentropy_logits(p,q,weights=None,p_sparse=True):
+def crossentropy_logits(p, q, weights=None, p_sparse=True):
     """Cross entropy loss given that :math:`p` is sparse and
     :math:`q` is the log-probability.
 

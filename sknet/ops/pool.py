@@ -105,6 +105,8 @@ class Pool2D(Op):
 
     def __init__(self, incoming, window_shape, strides=None, pool_type='MAX',
                     padding='VALID', *args, **kwargs):
+        if np.isscalar(window_shape):
+            window_shape = (window_shape, window_shape)
         assert(len(window_shape)==len(incoming.shape)-2)
         with tf.variable_scope(self._name_) as scope:
             self._name        = scope.original_name_scope

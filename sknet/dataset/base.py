@@ -5,6 +5,16 @@ import numpy as np
 import tensorflow as tf
 from ..utils import case
 
+
+class BatchPeriod(object):
+    def __init__(self, batch_period, offset=0):
+        self.batch_period = batch_period
+        self.offset = offset
+    def __call__(self, batch, epoch):
+        if (batch + self.offset)%self.batch_period==0:
+            return True
+        return False
+
 class BatchIterator(dict):
     """
     Parameters
@@ -88,9 +98,6 @@ class BatchIterator(dict):
         return {self.indices: self[s][batch]}
 
 
-
-
-
 class Dataset(dict):
     def __init__(self, **args):
         super().__init__()
@@ -141,7 +148,7 @@ class Dataset(dict):
 #                                         self[v+'/'+s].shape[0])
                         indices = tf.mod(self.iterator.indices,
                                          self[v+'/'+s].shape[0])
-                        if 0:#self[v+'/'+s].dtype == 'int32':
+                        if 0:# self[v+'/'+s].dtype == 'int32':
                             batch = tf.gather(tf.cast(self[name], tf.float32),
                                               indices)
                             batch = tf.cast(batch, tf.int32)

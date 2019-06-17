@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
-
+from tqdm import tqdm
 import tensorflow as tf
 #ToDo set the seed for the batches etc
 
@@ -26,44 +26,29 @@ class Workplace(object):
 
 
     def execute_op(self, op, feed_dict):
-        """Perform an epoch (according to the set given by context).
-        Execute and save the given ops and optionally apply a numpy function
-        on them at the end of the epoch. THis is usefull for example to only
-        return the average over the batches of the computed statistics, or the
-        max....
-
-        Example of use is ::
-
-            # typical training setting
-            op = [[minimizer_op,1],
-                  [loss,30,np.mean]]
-            pipeline.epoch(op=op,context='train_set',deterministic=False)
-
-            # typical test setting, average over the batch accuracies
-            op = [[accuracy,1,lambda x:np.mean(x,0)]]
-            pipeline.epoch(op=op,context='test_set',deterministic=True)
-
-            # Case where one is autonomous
-            pipeline.epoch(op=[minimize,loss],context='train_set',
-                            deterministic=False,
-                            linkage={network[0]:X_train,loss.p:Y_train})
-
+        """Executes the given ```op``` with the current session and the
+        given ```feed_dict```.
 
         Parameters
         ----------
 
-        op : (one or list of) tf.Tensor or sknet.Op
+        op : (one or list of) tf.Tensor
             the op (or ops as a list of ops) to run for one epoch or
             a list of the form [(op1,periodicity, optional np op)]
-            where op1 can again be a list. For example, during training,
-            one might prefer to compute
+            where op1 can again be a list.
+
+        Returns
+        -------
+
+        output : (one or list of) tf.Tensor
+            the output of executing the op input.
 
         """
-        # if a deterministic behavior is given, set it
         output = self.session.run(op, feed_dict=feed_dict)
         return output
 
-    def execute_worker(self, worker, deter_func=lambda a:{}, feed_dict={}, epoch=0):
+    def execute_worker(self, worker, deter_func=lambda a: {},
+                       feed_dict={}, epoch=0):
         """Perform an epoch (according to the set given by context).
         Execute and save the given ops and optionally apply a numpy function
         on them at the end of the epoch. THis is usefull for example to only
@@ -102,7 +87,8 @@ class Workplace(object):
         feed = feed_dict.copy()
         feed.update(deter_func(worker.deterministic))
         self.dataset.iterator.reset(worker.context)
-        for i in range(self.dataset.N_BATCH(worker.context)):
+        for i in tqdm(range(self.dataset.N_BATCH(worker.context)),
+                      desc=worker.name):
             feed.update(self.dataset.iterator.next(worker.context))
             feed.update({self.dataset.iterator.set: worker.context})
             ops = worker.get_ops(i, epoch)
