@@ -112,6 +112,8 @@ def ConvLarge(dnn, n_classes=None):
                              nonlinearity=0.01))
     dnn.append(layers.Conv2D(dnn[-1], (96, 3, 3), pad='full',
                              nonlinearity=0.01))
+    dnn.append(layers.Conv2D(dnn[-1], (96, 3, 3), pad='same',
+                               nonlinearity=0.01))
     dnn.append(layers.Conv2DPool(dnn[-1], (96, 3, 3), pad='full',
                                  nonlinearity=0.01, pool_shape=(2, 2)))
 
@@ -119,11 +121,15 @@ def ConvLarge(dnn, n_classes=None):
                              nonlinearity=0.01))
     dnn.append(layers.Conv2D(dnn[-1], (192, 3, 3), pad='full',
                              nonlinearity=0.01))
+    dnn.append(layers.Conv2D(dnn[-1], (192, 3, 3), pad='same',
+                               nonlinearity=0.01))
     dnn.append(layers.Conv2DPool(dnn[-1], (192, 3, 3), pad='valid',
                                  nonlinearity=0.01, pool_shape=(2, 2)))
 
     dnn.append(layers.Conv2D(dnn[-1], (192, 3, 3), pad='valid',
                              nonlinearity=0.01))
+    dnn.append(layers.Conv2D(dnn[-1], (192, 3, 3), pad='same',
+                               nonlinearity=0.01))
     dnn.append(layers.Conv2D(dnn[-1], (192, 1, 1), pad='valid',
                              nonlinearity=0.01))
 

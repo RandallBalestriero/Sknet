@@ -4,7 +4,7 @@
 import numpy as np
 import tensorflow as tf
 #import .schedules as sch
-from .base import EMA, ONE_INT32
+from .base import exponential_moving_average, ONE_INT32
 
 class NesterovMomentum:
     def __init__(self, loss_or_grads, params, learning_rate, momentum=0.9):
@@ -68,8 +68,8 @@ class Adam:
             self.updates = [step]
 
             for param, grad in zip(params, gradients):
-                _, m_op = EMA(grad, beta1, step)
-                _, v_op = EMA(tf.square(grad), beta2, step)
+                _, m_op = exponential_moving_average(grad, beta1, step)
+                _, v_op = exponential_moving_average(tf.square(grad), beta2, step)
                 update = learning_rate*m_op/(tf.sqrt(v_op)+eps)
                 self.updates += [tf.assign_sub(param, update), m_op, v_op]
         self.reset_variables_op = list()

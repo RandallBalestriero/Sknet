@@ -57,7 +57,7 @@ def get_tensor_dependencies(tensors):
         if not isinstance(tensor, tf.Variable):
             ops.append(get_backward_walk_ops(tensor, control_inputs=True,
                        inclusive=False))
-    ops = list(set([o for op in ops for o in op]))
+    ops = list(set(sum(ops, [])))
     for op in ops:
         if op.type == 'Placeholder' and 'deterministic' not in op.name:
             dependencies.append(op.outputs[0])
