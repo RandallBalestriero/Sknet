@@ -1,11 +1,10 @@
 import tensorflow as tf
 import tensorflow.contrib.layers as tfl
-from .normalize import BatchNorm as bn
 import numpy as np
 from . import Op
 
 from .. import utils
-from .. import ONE_FLOAT32
+
 
 class Conv1D(Op):
     """1D (temporal) convolutional layer.
@@ -89,18 +88,8 @@ class Conv1D(Op):
             output = tf.reshape(output,output_shape)
         return output if self.b is None else output+self.b
 
-    def backward(self,input):
-        return tf.gradients(self,self.input,input)[0]
-
-
-
-
-
-
-
-
-
-
+    def backward(self, input):
+        return tf.gradients(self, self.input, input)[0]
 
 
 class Conv2D(Op):
@@ -119,25 +108,25 @@ class Conv2D(Op):
     """
     _name_ = 'Conv2DOp'
     deterministic_behavior = False
-    def __init__(self,incoming,filters,W = tfl.xavier_initializer(),
-                    b = tf.zeros, strides=1, pad='valid',
-                    mode='CONSTANT', name='', W_func = tf.identity,
-                    b_func = tf.identity,*args,**kwargs):
+    def __init__(self, incoming, filters, W=tfl.xavier_initializer(),
+                 b=tf.zeros, strides=1, pad='valid',
+                 mode='CONSTANT', name='', W_func=tf.identity,
+                 b_func=tf.identity, *args, **kwargs):
         with tf.variable_scope(self._name_) as scope:
-            self._name   = scope.original_name_scope
-            self.mode    = mode
+            self._name = scope.original_name_scope
+            self.mode = mode
             self.strides = strides
-            self.pad     = pad
+            self.pad = pad
             if np.isscalar(strides):
-                self.strides = [1,1,strides,strides]
+                self.strides = [1, 1, strides, strides]
             else:
-                self.strides = [1,1]+list(strides)
+                self.strides = [1, 1]+list(strides)
 
             # Define the padding function
-            if pad=='valid' or (filters[1]==1 and filters[2]==1):
-                self.to_pad=False
+            if pad == 'valid' or (filters[1] == 1 and filters[2] == 1):
+                self.to_pad = False
             else:
-                if pad=='same':
+                if pad == 'same':
                     assert(filters[1]%2==1 and filters[2]%2==1)
                     self.p = [[0]*2, [0]*2, [(filters[1]-1)//2]*2,
                                                   [(filters[2]-1)//2]*2]

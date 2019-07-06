@@ -71,8 +71,10 @@ def ResBlock(input, filters, stride=1):
         pool = ops.Pool2D(nonlinearity, stride)
     else:
         pool = ops.Identity(nonlinearity)
-    merge = ops.Merge([pool, conv_linear], tf.add_n)
-    return Layer([conv_linear, conv, bn, nonlinearity, pool, merge])
+    out_conv = ops.Conv2D(pool, filters=(filters, 3, 3), b=None,
+                          pad='same')
+    merge = ops.Merge([out_conv, conv_linear], tf.add_n)
+    return Layer([conv_linear, conv, bn, nonlinearity, pool, out_conv, merge])
 
 def ResBlockV2(input, filters, stride=1):
     if stride > 1:

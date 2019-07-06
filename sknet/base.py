@@ -6,7 +6,7 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.python.framework import dtypes
 from tensorflow.contrib.graph_editor import get_backward_walk_ops
-
+import time
 
 ZERO_INT32 = tf.constant(np.int32(0))
 ZERO_FLOAT32 = tf.constant(np.float32(0))
@@ -65,11 +65,12 @@ def get_tensor_dependencies(tensors):
 
 
 class Queue(tuple):
-    def __new__(cls, *args, filename=None):
+    def __new__(cls, *args, **kwargs):
         obj = super(Queue, cls).__new__(cls, *args)
-        obj._filename = filename
+        obj._filename = kwargs['filename']
         obj._file = None
-        obj.count = 0
+        obj.h5_dataset = dict()
+        obj.count = dict()
         return obj
 
     def close(self):
@@ -82,37 +83,41 @@ class Queue(tuple):
         """
         if self._filename is None:
             return
-        self.count += 1
+        # if the file is not created yet
         if self._file is None:
-            # create and open the file
             while 1:
                 try:
-                    self._file = h5py.File(self._filename, 'w', libver='latest')
+                    self._file = h5py.File(self._filename, 'w',
+                                           libver='latest')
                     break
                 except:
                     print('Could not open file ', self._filename)
                     print('\tRetrying in 10 sec. ...')
-            # init the arrays, get shape and init
-            h5_dataset = list()
-            for worker in self:
-                h5_dataset.append(dict())
-                for name, data in worker.epoch_data.items():
+                    time.sleep(10)
+        for i, worker in enumerate(self):
+            for name, data in worker.epoch_data.items():
+                if len(data) == 0:
+                    continue
+                savename = worker.name+"/"+name
+                if savename not in self.h5_dataset:
                     maxshape = (None,)+data[0].shape
-                    savename = worker.context+"/"+name
-                    h5_dataset[-1][name] = self._file.create_dataset(
-                            savename,  maxshape=maxshape,
-                            compression='gzip', data=np.expand_dims(data[0], 0))
-                worker.empty()
-            self.h5_dataset = h5_dataset
-            self._file.swmr_mode = True
-        else:
-            for i, worker in enumerate(self):
-                for name, data in worker.epoch_data.items():
-                    new_shape = (self.count,)+data[0].shape
-                    self.h5_dataset[i][name].resize(new_shape)
-                    self.h5_dataset[i][name][self.count-1] = data[0]
-                    self.h5_dataset[i][name].flush()
-                worker.empty()
+                    data = np.expand_dims(data[0], 0)
+                    dataset = self._file.create_dataset(savename, data=data,
+                                                        maxshape=maxshape,
+                                                        compression='gzip')
+                    self.count[savename] = 1
+                    self.h5_dataset[savename] = dataset
+                    # check if they are all created
+                    if len(self.h5_dataset) == np.prod([len(w.epoch_data)
+                                                        for w in self]):
+                        self._file.swmr_mode = True
+                else:
+                    self.count[savename] += 1
+                    new_shape = (self.count[savename],)+data[-1].shape
+                    self.h5_dataset[savename].resize(new_shape)
+                    self.h5_dataset[savename][-1] = data[-1]
+                    self.h5_dataset[savename].flush()
+            worker.empty()
 
 
 class Tensor(tf.Tensor):
@@ -168,7 +173,6 @@ class StreamingTensor(Tensor):
     def __init__(self, value, variables):
         super().__init__(value)
         self.reset_variables_op = tf.initializers.variables(variables)
-
 
 
 class Worker(object):
@@ -255,7 +259,7 @@ class Worker(object):
             kwargs.pop('name')
         else:
             self.name = context
-            warnings.warn("No name specified for Worker"\
+            warnings.warn("No name specified for Worker"
                           + ", using {}".format(context))
 
         # first the ops that are not saved (no name associated)
@@ -264,7 +268,7 @@ class Worker(object):
             if type(args[i]) == tuple:
                 assert len(args[i]) == 2
             else:
-                args[i] = (args[i], lambda *a: True)
+                args[i] = (args[i], lambda batch: True)
         self.ops = args
 
         # second the ops that should be saved
@@ -272,11 +276,11 @@ class Worker(object):
             if type(kwargs[key]) == tuple:
                 assert len(kwargs[key]) == 2
             else:
-                kwargs[key] = (kwargs[key], lambda *a: True)
+                kwargs[key] = (kwargs[key], lambda batch: True)
         self.named_ops = kwargs
 
-        allops = [op[0] for op in self.named_ops.values()]\
-                  + [op[0] for op in self.ops]
+        allops = [op[0] for op in self.named_ops.values()]
+        allops += [op[0] for op in self.ops]
         self._dependencies = get_tensor_dependencies(allops)
         self._deterministic = deterministic
         self._context = context
@@ -298,7 +302,7 @@ class Worker(object):
     def context(self):
         return self._context
 
-    def get_ops(self, batch, epoch):
+    def get_ops(self, batch):
         """given a batch index and the current epoch, return the list
         of ops to be executed
 
@@ -314,47 +318,53 @@ class Worker(object):
         Returns:
         --------
 
-        ops: list of ops
-            the ops to be executed at this batch
+        ops: list of list of ops
+            the ops to be executed at this batch. It is a list of length 2
+            in which the first list are the ops that should be saved and the
+            second the ops that should not be saved
         """
         self.current_ops = [[], []]
         self.current_names = []
 
-        for name in self.named_ops.keys():
-            if self.named_ops[name][1](batch, epoch):
-                self.current_ops[0].append(self.named_ops[name][0])
+        for name, (op, func) in self.named_ops.items():
+            if func(batch=batch):
+                self.current_ops[0].append(op)
                 self.current_names.append(name)
         for op, func in self.ops:
-            if func(batch, epoch):
+            if func(batch=batch):
                 self.current_ops[1].append(op)
         return self.current_ops
 
     def append(self, data):
         """given the session output obtained by executing the given list of ops
         append the data with the batch values"""
-        for name, op, d in zip(self.current_names, self.current_ops[0],
-                               data[0]):
+        if len(data[0]) == 0:
+            return
+        for name, op, datum in zip(self.current_names, self.current_ops[0],
+                                   data[0]):
             if isinstance(op, StreamingTensor):
-                self.batch_data[name] = d
+                self.batch_data[name] = datum
             else:
-                self.batch_data[name].append(d)
+                self.batch_data[name].append(datum)
 
     def epoch_done(self):
         """method to be executed after completion of an epoch.
         It executes all the needed reset and savings"""
         reset_op = list()
-        for name in self.named_ops.keys():
-            if isinstance(self.named_ops[name][0], StreamingTensor):
+        for name, (op, func) in self.named_ops.items():
+            if type(self.batch_data[name]) == list:
+                if len(self.batch_data[name]) == 0:
+                    continue
+            if isinstance(op, StreamingTensor):
                 self.epoch_data[name].append(self.batch_data[name])
-                reset_op.append(self.named_ops[name][0].reset_variables_op)
+                reset_op.append(op.reset_variables_op)
             else:
                 self.epoch_data[name].append(np.array(self.batch_data[name]))
             self.batch_data[name] = []
-        for op in self.ops:
-            if isinstance(op[0], StreamingTensor):
-                reset_op.append(op[0].reset_variables_op)
+        for op, _ in self.ops:
+            if isinstance(op, StreamingTensor):
+                reset_op.append(op.reset_variables_op)
         return reset_op
-
 
 
 class ObservedTensor(Tensor):
@@ -370,20 +380,20 @@ class ObservedTensor(Tensor):
 
     """
     def __init__(self, tensor, observation=None, teacher_forcing=None):
-        self._observed = observed
+        self._observed = 0  # observed
         self._teacher_forcing = teacher_forcing
 
         if observation is None:
             self._observation = tf.placeholder_with_default(
-                    tf.zeros(tensor.shape,dtype=tensor.dtype),
-                    shape = tensor.shape,
-                    name = 'observation-'+tensor.name.replace(':','-'))
+                    tf.zeros(tensor.shape, dtype=tensor.dtype),
+                    shape=tensor.shape,
+                    name='observation-'+tensor.name.replace(':', '-'))
         else:
             self._observation = observation
         if teacher_forcing is None:
             self._teacher_forcing = tf.placeholder_with_default(False,
-                    shape = (),
-                    name = 'teacherforcing-'+tensor.name.replace(':','-'))
+                    shape=(),
+                    name='teacherforcing-'+tensor.name.replace(':', '-'))
         else:
             self._teacher_forcing = teacher_forcing
         output = tf.cond(self._teacher_forcing, lambda: self._observation,

@@ -148,7 +148,7 @@ class Dataset(dict):
 #                                         self[v+'/'+s].shape[0])
                         indices = tf.mod(self.iterator.indices,
                                          self[v+'/'+s].shape[0])
-                        if 0:# self[v+'/'+s].dtype == 'int32':
+                        if self[v+'/'+s].dtype == 'int32':
                             batch = tf.gather(tf.cast(self[name], tf.float32),
                                               indices)
                             batch = tf.cast(batch, tf.int32)

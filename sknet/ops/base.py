@@ -133,6 +133,7 @@ class Op(Tensor):
     def __init__(self, input, deterministic=None):
 
         self._input = input
+        self._extra_variables = list()
 
         if type(self).deterministic_behavior and deterministic is None:
             self._deterministic = tf.placeholder(tf.bool,
@@ -144,10 +145,6 @@ class Op(Tensor):
 
         output = self.forward(input, self._deterministic)
         super().__init__(output)
-
-        variables = tf.global_variables(self.name)\
-                    + tf.local_variables(self.name)
-        self._reset_variables_op = tf.initializers.variables(variables)
 
     def deter_dict(self, value):
         """gather the deterministic variable and
@@ -166,7 +163,7 @@ class Op(Tensor):
 
     @property
     def reset_variables_op(self):
-        return self._reset_variables_op
+        return tf.initializers.variables(self.variables(None))
 
     def backward(self,input):
         return tf.gradients(self,self.input,input)[0]
@@ -175,11 +172,24 @@ class Op(Tensor):
     def input(self):
         return self._input
 
-    def variables(self, trainable=True):
-        if trainable:
-            return tf.trainable_variables(scope=self.name)
+    def add_variable(self, var):
+        self._extra_variables.append(var)
+
+    def variables(self, trainable=None):
+        if trainable is None:
+            variables = tf.global_variables(scope=self.name)
+            variables += self._extra_variables
+        elif trainable:
+            variables = tf.trainable_variables(scope=self.name)
+            variables += [var for var in self._extra_variables
+                          if var in tf.trainable_variables()]
         else:
-            return tf.global_variables(scope=self.name)
+            all_vars = tf.global_variables(scope=self.name)
+            train_vars = tf.trainable_variables(scope=self.name)
+            variables = [var for var in all_vars if var not in train_vars]
+            variables += [var for var in self._extra_variables
+                          if var not in tf.trainable_variables()]
+        return variables
 
     @property
     def updates(self):

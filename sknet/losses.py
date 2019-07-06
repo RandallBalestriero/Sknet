@@ -66,6 +66,10 @@ def accuracy(targets, predictions):
     assert len(predictions.shape.as_list()) < 3
     if len(predictions.shape.as_list()) == 2:
         predictions = tf.argmax(predictions, 1, output_type=tf.int32)
+    if targets.dtype == 'int32' and predictions.dtype == 'int64':
+        predictions = tf.cast(predictions, tf.int32)
+    elif targets.dtype == 'int64' and predictions.dtype == 'int32':
+        targets = tf.cast(targets, tf.int32)
     accu = tf.reduce_mean(tf.cast(tf.equal(targets, predictions), tf.float32))
     return accu
 
