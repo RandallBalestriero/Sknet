@@ -41,7 +41,11 @@ class Layer(Tensor):
             updates.append(op.updates)
         return updates
 
-
+def Dense(input, filters, nonlinearity=0):
+    dense = ops.Dense(input, filters, b=None)
+    bn = ops.BatchNorm(dense, [0])
+    nonlinearity = ops.Activation(bn, nonlinearity)
+    return Layer([dense, bn, nonlinearity])
 
 def Conv2D(input, filters, nonlinearity=0, strides=1, pad='valid'):
     conv = ops.Conv2D(input, filters=filters, strides=strides, b=None, pad=pad)
@@ -57,7 +61,7 @@ def Conv2DPool(input, filters, nonlinearity=0, pad='valid', pool_shape=(2, 2),
     pool = ops.Pool2D(nonlinearity, pool_shape)
     return Layer([conv, bn, nonlinearity, pool])
 
-def ResBlock(input, filters, stride=1):
+def ResBlockV1(input, filters, stride=1):
     if stride > 1:
         conv_linear = ops.Conv2D(input, filters=(filters, 3, 3),
                                  strides=stride, b=None, pad='same')
@@ -73,30 +77,26 @@ def ResBlock(input, filters, stride=1):
         pool = ops.Identity(nonlinearity)
     out_conv = ops.Conv2D(pool, filters=(filters, 3, 3), b=None,
                           pad='same')
+    bn2 = ops.BatchNorm(out_conv, [0, 2, 3])
     merge = ops.Merge([out_conv, conv_linear], tf.add_n)
-    return Layer([conv_linear, conv, bn, nonlinearity, pool, out_conv, merge])
+    output = ops.Activation(bn, 0.)
+    return Layer([conv_linear, conv, bn, nonlinearity, pool, out_conv, bn2,
+                  merge, output])
+
 
 def ResBlockV2(input, filters, stride=1):
     if stride > 1:
         conv_linear = ops.Conv2D(input, filters=(filters, 3, 3),
-                                 strides=stride, b=None, pad='same')
+                                 b=None, pad='same')
     else:
         conv_linear = ops.Identity(input)
-    conv = ops.Conv2D(input, filters=(filters, 3, 3), strides=stride, b=None)
+    conv = ops.Conv2D(input, filters=(filters, 3, 3), b=None,
+                      pad='same')
     bn = ops.BatchNorm(conv, [0, 2, 3])
     nonlinearity = ops.Activation(bn, 0.)
-    if stride > 1:
-        pool = ops.Pool2D(nonlinearity, stride)
-    else:
-        pool = ops.Identity(nonlinearity)
-    second_conv = ops.Conv2D(pool, filters=(filters, 3, 3),
-                             b=None, pad='same')
-    merge = ops.Merge([second_conv, conv_linear], tf.add_n)
-    return Layer([conv_linear, conv, bn, nonlinearity, pool, second_conv,
-                   merge])
-
-
-
-
-
-
+    out_conv = ops.Conv2D(nonlinearity, filters=(filters, 3, 3), b=None,
+                          pad='same')
+    bn2 = ops.BatchNorm(out_conv, [0, 2, 3])
+    merge = ops.Merge([bn2, conv_linear], tf.add_n)
+    return Layer([conv_linear, conv, bn, nonlinearity, out_conv, bn2,
+                  merge])

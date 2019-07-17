@@ -11,7 +11,7 @@ class BatchPeriod(object):
         self.batch_period = batch_period
         self.offset = offset
     def __call__(self, batch, epoch):
-        if (batch + self.offset)%self.batch_period==0:
+        if (batch + self.offset)%self.batch_period == 0:
             return True
         return False
 
@@ -62,7 +62,7 @@ class BatchIterator(dict):
         with tf.variable_scope("iterator"):
             for s, v in options.items():
                 print('\t\t{}:{}'.format(s, v))
-            self.indices = tf.placeholder(tf.int64,
+            self.indices = tf.placeholder_with_default(tf.ones(dataset.batch_size, dtype=tf.int64),
                                           shape=(dataset.batch_size,),
                                           name='indices')
 
@@ -104,11 +104,20 @@ class Dataset(dict):
         self.batch_size = None
         self.__dict__.update(args)
 
-    def cast(self, varn, dtype):
-        # get sets in which this var exists
-        sets = self.sets_(varn)
+    def cast(self, var_name, dtype):
+        """cast the dataset variable to a specific type for all the sets
+        Args:
+
+        var_name: str
+            the name of the variable to cast
+
+        dtype: type or str
+            the type to cast the variable into
+
+        """
+        sets = self.sets_(var_name)
         for s in sets:
-            self[varn+'/'+s] = self[varn+'/'+s].astype(dtype)
+            self[var_name+'/'+s] = self[var_name+'/'+s].astype(dtype)
 
     @property
     def init_dict(self):
@@ -144,19 +153,17 @@ class Dataset(dict):
                     pairs = list()
                     for s in self.sets_(v):
                         name = v+'/'+s+'/Variable'
-#                        indices = tf.mod(self.iterator.__dict__[s],
-#                                         self[v+'/'+s].shape[0])
                         indices = tf.mod(self.iterator.indices,
                                          self[v+'/'+s].shape[0])
-                        if self[v+'/'+s].dtype == 'int32':
-                            batch = tf.gather(tf.cast(self[name], tf.float32),
-                                              indices)
-                            batch = tf.cast(batch, tf.int32)
-                        else:
-                            batch = tf.gather(self[name], indices)
-                        batch = tf.placeholder_with_default(batch, batch.shape)
+                        #if self[v+'/'+s].dtype == 'int32':
+                        #    batch = tf.gather(tf.cast(self[name], tf.float32),
+                        #                      indices)
+                        #    batch = tf.cast(batch, tf.int32)
+                        #else:
+                        batch = tf.gather(self[name], indices)
+                        # batch = tf.placeholder_with_default(batch, batch.shape)
                         pairs.append((tf.constant(s), batch))
-                    self.__dict__[v] = case(self.iterator.set, pairs)
+                    self.__dict__[v] = tf.placeholder_with_default(case(self.iterator.set, pairs), batch.shape)
 
     def split_set(self, set_, new_set_, ratio, stratify=None, seed=None):
         assert new_set_ not in self.sets

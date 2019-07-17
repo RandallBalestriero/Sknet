@@ -19,3 +19,4 @@ from . import *
 from .dataset import Dataset
 from .networks import Network
 from .utils import Workplace
+from .layers import Layer

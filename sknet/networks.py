@@ -93,17 +93,21 @@ class Network:
         return updates
 
 
-def Resnet(dnn, n_classes=None, D=4, W=1, block=layers.ResBlock):
+def Resnet(dnn, n_classes=None, D=4, W=1, block=layers.ResBlockV1):
     UNITS = [16*W, 32*W, 64*W]
     dnn.append(ops.Conv2D(dnn[-1], filters=(UNITS[0], 3, 3), pad='same'))
+    dnn.append(ops.BatchNorm(dnn[-1], [0, 2, 3]))
     for bl, units in enumerate(UNITS):
         for d in range(D):
             dnn.append(block(dnn[-1], units))
         if bl < 2:
             dnn.append(block(dnn[-1], UNITS[bl+1], stride=2))
-        elif n_classes is not None:
-            dnn.append(ops.Conv2D(dnn[-1], (n_classes, 3, 3)))
-            dnn.append(ops.GlobalPool2D(dnn[-1], pool_type='AVG'))
+            dnn.append(ops.Pool2D(dnn[-1], (2, 2), pool_type='AVG'))
+    dnn.append(ops.BatchNorm(dnn[-1], [0, 2, 3]))
+    dnn.append(ops.Activation(dnn[-1], 0.01))
+    dnn.append(ops.GlobalPool2D(dnn[-1], pool_type='AVG'))
+    if n_classes is not None:
+        dnn.append(ops.Dense(dnn[-1], n_classes))
 
 
 def ConvLarge(dnn, n_classes=None):
@@ -154,6 +158,52 @@ def ConvSmall(dnn, n_classes=None):
         dnn.append(ops.Conv2D(dnn[-1], (n_classes, 1, 1), b=None))
         dnn.append(ops.BatchNorm(dnn[-1], [0, 2, 3]))
         dnn.append(ops.GlobalPool2D(dnn[-1], pool_type='AVG', keep_dims=False))
+
+
+
+def DenseNet(dnn, num_classes=None, k=32, theta=0.5):
+
+    dnn.append(ops.Conv2D(dnn[-1], (2*k, 7, 7), b=None, pad='same', strides=2))
+    prev_kernels = 2*k
+    input_kernels = prev_kernels
+
+    ###########
+    for ITER in [6, 12, 24, 16]:
+        layers_concat = list()
+        for i in range(ITER):
+            cur_kernels = 4 * k
+            dnn.append(ops.BatchNorm(dnn[-1], [0, 2, 3]))
+            dnn.append(ops.Activation(dnn[-1], 0.))
+            dnn.append(ops.Conv2D(dnn[-1], (cur_kernels, 1, 1), b=None))
+#            dnn.append(ops.Dropout(dnn[-1], 0.2))
+
+            cur_kernels = input_kernels + (k * i)
+            dnn.append(ops.BatchNorm(dnn[-1], [0, 2, 3]))
+            dnn.append(ops.Activation(dnn[-1], 0.))
+            dnn.append(ops.Conv2D(dnn[-1], (cur_kernels, 3, 3), b=None,
+                       pad='same'))
+#            dnn.append(ops.Dropout(dnn[-1], 0.2))
+
+            layers_concat.append(dnn[-1])
+
+        cur_layer = tf.concat(layers_concat, 1)
+        print(cur_layer)
+        prev_kernels = cur_kernels
+
+        dnn.append(ops.BatchNorm(cur_layer, [0, 2, 3]))
+        dnn.append(ops.Conv2D(dnn[-1], (int(prev_kernels*theta), 1, 1), b=None))
+#        dnn.append(ops.Dropout(dnn[-1], 0.2))
+        dnn.append(ops.Pool2D(dnn[-1], (2, 2), pool_type='AVG'))
+
+        prev_kernels = int(prev_kernels*theta)
+        input_kernels = prev_kernels
+    dnn.append(ops.BatchNorm(dnn[-1], [0, 2, 3]))
+    dnn.append(ops.Activation(dnn[-1], 0.01))
+    dnn.append(ops.GlobalPool2D(dnn[-1], pool_type='AVG'))
+    if num_classes is not None:
+        dnn.append(ops.Dense(dnn[-1], num_classes))
+
+
 
 
 

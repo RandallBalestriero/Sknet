@@ -7,6 +7,7 @@ import tensorflow as tf
 from tensorflow.python.framework import dtypes
 from tensorflow.contrib.graph_editor import get_backward_walk_ops
 import time
+import tqdm
 
 ZERO_INT32 = tf.constant(np.int32(0))
 ZERO_FLOAT32 = tf.constant(np.float32(0))
@@ -14,7 +15,7 @@ ONE_INT32 = tf.constant(np.int32(1))
 ONE_FLOAT32 = tf.constant(np.float32(1))
 
 
-def exponential_moving_average(tensor, decay, step):
+def exponential_moving_average(tensor, decay, step, init=tf.zeros_like):
     """exponential moving average of a tensor with decay and
     explicit step
 
@@ -42,7 +43,7 @@ def exponential_moving_average(tensor, decay, step):
         the updates to apply (execute) to update the value of the moving
         average value
     """
-    ma_value = tf.Variable(tf.zeros_like(tensor), trainable=False, name='ma')
+    ma_value = tf.Variable(init(tensor), trainable=False, name='ma')
     value = ma_value*decay+tensor*(1-decay)
     value = tf.cond(tf.greater(step, ZERO_INT32), lambda: value,
                     lambda: tensor)
@@ -176,7 +177,8 @@ class StreamingTensor(Tensor):
 
 
 class Worker(object):
-    """processing unit that manages a tensorflow ops during batch iterations.
+    """processing unit that manages tensorflow ops executation, output saving
+    and printing.
     A Worker allows to specify a context, such as train set, test set, or any
     context present in a datset, and tensorflow ops to be executed, and if the
     deep net behavior should be deterministic or not (for example during
@@ -248,15 +250,17 @@ class Worker(object):
         the op is to be executed at this moment.
     """
 
-    def __init__(self, *args, **kwargs):
-        deterministic = kwargs['deterministic']
-        kwargs.pop('deterministic')
-        context = kwargs['context']
-        kwargs.pop('context')
+    def __init__(self, *args, context, to_print=list(), feed_dict={},
+                 name=None, **kwargs):
+        self.context = context
+        if not hasattr(to_print, '__len__'):
+            self.to_print = [to_print]
+        else:
+            self.to_print = list(to_print)
+        self.feed_dict = feed_dict
 
-        if 'name' in kwargs:
-            self.name = kwargs['name']
-            kwargs.pop('name')
+        if name is not None:
+            self.name = name
         else:
             self.name = context
             warnings.warn("No name specified for Worker"
@@ -277,13 +281,12 @@ class Worker(object):
                 assert len(kwargs[key]) == 2
             else:
                 kwargs[key] = (kwargs[key], lambda batch: True)
+            tf.add_to_collection('vars_to_save', (self, key, kwargs[key][0]))
         self.named_ops = kwargs
 
         allops = [op[0] for op in self.named_ops.values()]
         allops += [op[0] for op in self.ops]
         self._dependencies = get_tensor_dependencies(allops)
-        self._deterministic = deterministic
-        self._context = context
         self.empty()
 
     def empty(self):
@@ -291,16 +294,8 @@ class Worker(object):
         self.epoch_data = dict([(name, []) for name in self.named_ops.keys()])
 
     @property
-    def deterministic(self):
-        return self._deterministic
-
-    @property
     def dependencies(self):
         return self._dependencies
-
-    @property
-    def context(self):
-        return self._context
 
     def get_ops(self, batch):
         """given a batch index and the current epoch, return the list
@@ -340,12 +335,21 @@ class Worker(object):
         append the data with the batch values"""
         if len(data[0]) == 0:
             return
+        to_print = list()
         for name, op, datum in zip(self.current_names, self.current_ops[0],
                                    data[0]):
             if isinstance(op, StreamingTensor):
                 self.batch_data[name] = datum
             else:
                 self.batch_data[name].append(datum)
+            if op in self.to_print:
+                to_print.append((name, datum))
+        for op, datum in zip(self.current_ops[1], data[1]):
+            if op in self.to_print:
+                to_print.append(datum)
+        if len(to_print) > 0:
+            for i in tqdm.trange(1, desc=str(to_print), bar_format='{desc}'):
+                pass
 
     def epoch_done(self):
         """method to be executed after completion of an epoch.

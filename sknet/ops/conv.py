@@ -111,7 +111,7 @@ class Conv2D(Op):
     def __init__(self, incoming, filters, W=tfl.xavier_initializer(),
                  b=tf.zeros, strides=1, pad='valid',
                  mode='CONSTANT', name='', W_func=tf.identity,
-                 b_func=tf.identity, *args, **kwargs):
+                 b_func=tf.identity):
         with tf.variable_scope(self._name_) as scope:
             self._name = scope.original_name_scope
             self.mode = mode

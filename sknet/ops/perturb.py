@@ -182,19 +182,27 @@ class RandomCrop(Op):
     _name_ = 'RandomCropOp'
     deterministic_behavior = True
 
-    def __init__(self, input, crop_shape, deterministic=None, seed=None, 
-                                                                 **kwargs):
+    def __init__(self, input, crop_shape, pad=0, deterministic=None,
+                 seed=None):
         with tf.variable_scope(self._name_) as scope:
             self._name = scope.original_name_scope
             # Set attributes
             self.seed = seed
             if np.isscalar(crop_shape):
-                self.crop_shape = [crop_shape,crop_shape]
+                self.crop_shape = [crop_shape, crop_shape]
             else:
-                assert(len(crop_shape)==2)
+                assert(len(crop_shape) == 2)
                 self.crop_shape = list(crop_shape)
+            if np.isscalar(pad):
+                self.pad = [pad, pad]
+            else:
+                assert(len(crop_shape) == 2)
+                self.pad = list(pad)
+
     
             self.spatial_shape = input.shape.as_list()[2:]
+            self.spatial_shape[0] += self.pad[0]
+            self.spatial_shape[1] += self.pad[1]
 
             # Number of patches of crop_shape shape in the input in H and W
             self.n_H = np.int64(self.spatial_shape[0]-self.crop_shape[0]+1)
@@ -206,6 +214,9 @@ class RandomCrop(Op):
 
         # Patches form the input:
         # need to transpose to extract patches
+        input = tf.pad(input, [[0, 0], [0, 0],
+                               [self.pad[0]//2, self.pad[0]//2], 
+                               [self.pad[1]//2, self.pad[1]//2]], "REFLECT")
         input_t = tf.transpose(input,[0,2,3,1])
         # Extract patches of the crop_shape shape
         input_patches  = tf.extract_image_patches(input_t,
