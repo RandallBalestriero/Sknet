@@ -47,16 +47,17 @@ def Dense(input, filters, nonlinearity=0):
     nonlinearity = ops.Activation(bn, nonlinearity)
     return Layer([dense, bn, nonlinearity])
 
-def Conv2D(input, filters, nonlinearity=0, strides=1, pad='valid'):
+def Conv2D(input, filters, nonlinearity=0, strides=1, pad='valid',
+           W_bn=tf.ones, b_bn=tf.zeros):
     conv = ops.Conv2D(input, filters=filters, strides=strides, b=None, pad=pad)
-    bn = ops.BatchNorm(conv, [0, 2, 3])
+    bn = ops.BatchNorm(conv, [0, 2, 3], W=W_bn, b=b_bn)
     nonlinearity = ops.Activation(bn, nonlinearity)
     return Layer([conv, bn, nonlinearity])
 
 def Conv2DPool(input, filters, nonlinearity=0, pad='valid', pool_shape=(2, 2),
-               strides=1):
+               strides=1, W_bn=tf.ones, b_bn=tf.zeros):
     conv = ops.Conv2D(input, filters=filters, strides=strides, b=None, pad=pad)
-    bn = ops.BatchNorm(conv, [0, 2, 3])
+    bn = ops.BatchNorm(conv, [0, 2, 3], W=W_bn, b=b_bn)
     nonlinearity = ops.Activation(bn, nonlinearity)
     pool = ops.Pool2D(nonlinearity, pool_shape)
     return Layer([conv, bn, nonlinearity, pool])
