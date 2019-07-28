@@ -98,15 +98,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="schedule.html">Schedule</a></li>
 <li class="toctree-l2"><a class="reference internal" href="optimizer.html">Optimizers</a></li>
@@ -179,74 +179,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.optimize.loss">
-<span id="loss"></span><h1>Loss<a class="headerlink" href="#module-sknet.optimize.loss" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="sknet.optimize.loss.accuracy">
-<em class="property">class </em><code class="descclassname">sknet.optimize.loss.</code><code class="descname">accuracy</code><span class="sig-paren">(</span><em>labels=None</em>, <em>predictions=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/loss.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.loss.accuracy" title="Permalink to this definition">¶</a></dt>
-<dd><p>Accuracy</p>
-<p>The formal definition given that <span class="math notranslate nohighlight">\(p\)</span> is now an
-index (of the Dirac) s.a. <span class="math notranslate nohighlight">\(p\in \{1,\dots,D\}\)</span>
-and <span class="math notranslate nohighlight">\(q\)</span> is unormalized (log-proba)
-is given by (for discrete variables)</p>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-q_{p}+\log(\sum_{d=1}^D \exp(q_d))\]</div>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-q_{p}+LogSumExp(q)\]</div>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-q_{p}+LogSumExp(q-\max_{d}q_d)\]</div>
-<p>with <span class="math notranslate nohighlight">\(p\)</span> the class index and <span class="math notranslate nohighlight">\(q\)</span> the predicted one
-(output of the network). This class takes two non sparse
-vectors which should be nonnegative and sum to one.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="sknet.optimize.loss.l2_norm">
-<em class="property">class </em><code class="descclassname">sknet.optimize.loss.</code><code class="descname">l2_norm</code><span class="sig-paren">(</span><em>tensor</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/loss.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.loss.l2_norm" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cross entropy loss given that <span class="math notranslate nohighlight">\(p\)</span> is sparse and
-<span class="math notranslate nohighlight">\(q\)</span> is the log-probability.</p>
-<p>The formal definition given that <span class="math notranslate nohighlight">\(p\)</span> is now an
-index (of the Dirac) s.a. <span class="math notranslate nohighlight">\(p\in \{1,\dots,D\}\)</span>
-and <span class="math notranslate nohighlight">\(q\)</span> is unormalized (log-proba)
-is given by (for discrete variables)</p>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-q_{p}+\log(\sum_{d=1}^D \exp(q_d))\]</div>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-q_{p}+LogSumExp(q)\]</div>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-q_{p}+LogSumExp(q-\max_{d}q_d)\]</div>
-<p>with <span class="math notranslate nohighlight">\(p\)</span> the class index and <span class="math notranslate nohighlight">\(q\)</span> the predicted one
-(output of the network). This class takes two non sparse
-vectors which should be nonnegative and sum to one.</p>
-</dd></dl>
-
-<dl class="class">
-<dt id="sknet.optimize.loss.crossentropy_logits">
-<em class="property">class </em><code class="descclassname">sknet.optimize.loss.</code><code class="descname">crossentropy_logits</code><span class="sig-paren">(</span><em>p=None</em>, <em>q=None</em>, <em>weights=None</em>, <em>p_sparse=True</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/optimize/loss.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.optimize.loss.crossentropy_logits" title="Permalink to this definition">¶</a></dt>
-<dd><p>Cross entropy loss given that <span class="math notranslate nohighlight">\(p\)</span> is sparse and
-<span class="math notranslate nohighlight">\(q\)</span> is the log-probability.</p>
-<p>The formal definition given that <span class="math notranslate nohighlight">\(p\)</span> is now an
-index (of the Dirac) s.a. <span class="math notranslate nohighlight">\(p\in \{1,\dots,D\}\)</span>
-and <span class="math notranslate nohighlight">\(q\)</span> is unormalized (log-proba)
-is given by (for discrete variables, p sparse)</p>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-q_{p}+\log(\sum_{d=1}^D \exp(q_d))\]</div>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-q_{p}+LogSumExp(q)\]</div>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-q_{p}+LogSumExp(q-\max_{d}q_d)\]</div>
-<p>or by (non p sparse)</p>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-\sum_{d=1}^Dp_{d}q_{d}+\log(\sum_{d=1}^D \exp(q_d))\]</div>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-\sum_{d=1}^Dp_{d}q_{d}+LogSumExp(q)\]</div>
-<div class="math notranslate nohighlight">
-\[\mathcal{L}(p,q)=-\sum_{d=1}^Dp_{d}q_{d}+LogSumExp(q-\max_{d}q_d)\]</div>
-<p>with <span class="math notranslate nohighlight">\(p\)</span> the class index and <span class="math notranslate nohighlight">\(q\)</span> the predicted one
-(output of the network). This class takes two non sparse
-vectors which should be nonnegative and sum to one.</p>
-</dd></dl>
-
+  <div class="section" id="loss">
+<h1>Loss<a class="headerlink" href="#loss" title="Permalink to this headline">¶</a></h1>
 </div>
 
 

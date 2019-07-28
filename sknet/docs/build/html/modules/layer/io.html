@@ -44,9 +44,7 @@
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Dense Layer" href="dense.html" />
-    <link rel="prev" title="Base Layer" href="base.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -99,26 +97,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="base.html">Base Layer</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Input Output Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="special.html">Special Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="normalize.html">Normalization Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="perturb.html">Perturb Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
@@ -165,8 +152,6 @@
     
       <li><a href="../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> &raquo;</li>
-        
       <li>Input Output Layer</li>
     
     
@@ -186,43 +171,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.layer.io">
-<span id="input-output-layer"></span><h1>Input Output Layer<a class="headerlink" href="#module-sknet.layer.io" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="sknet.layer.Input">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Input</code><span class="sig-paren">(</span><em>input_shape=None</em>, <em>data_format='NCHW'</em>, <em>input=None</em>, <em>dataset=None</em>, <em>batch_size=None</em>, <em>input_dtype=tf.float32</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Input" title="Permalink to this definition">¶</a></dt>
-<dd><p>Input layer, first of any model.
-This layer provides the interface between an input shape
-the layer format which can then
-be fed to any following <a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a> class</p>
-<dl class="method">
-<dt id="sknet.layer.Input.forward">
-<code class="descname">forward</code><span class="sig-paren">(</span><em>input</em>, <em>deterministic=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Input.forward" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform forward pass given an input Tensorflow variable</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first docutils">
-<dt><strong>input: tf.Tensor</strong></dt>
-<dd><p class="first last">An input variable</p>
-</dd>
-</dl>
-</td>
-</tr>
-<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>output: tf.Tensor</strong></dt>
-<dd><p class="first last">Same as input</p>
-</dd>
-</dl>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-</dd></dl>
-
+  <div class="section" id="input-output-layer">
+<h1>Input Output Layer<a class="headerlink" href="#input-output-layer" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -230,15 +180,6 @@ be fed to any following <a class="reference internal" href="base.html#sknet.laye
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="dense.html" class="btn btn-neutral float-right" title="Dense Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="base.html" class="btn btn-neutral float-left" title="Base Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

@@ -1,5 +1,5 @@
-Base
-----
+Tensor and Observed Tensor
+--------------------------
 
 
 .. currentmodule:: sknet
@@ -10,6 +10,8 @@ Base
 .. autoclass:: ObservedTensor
     :members:
 
+Worker and WorkerGroup
+----------------------
 
 .. autoclass:: Worker
     :members:
@@ -17,6 +19,9 @@ Base
 .. autoclass:: WorkerGroup
     :members:
 
+
+Utilities
+---------
 
 .. autofunction:: to_file
 

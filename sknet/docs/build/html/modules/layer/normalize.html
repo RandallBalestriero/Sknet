@@ -44,9 +44,7 @@
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Perturb Layer" href="perturb.html" />
-    <link rel="prev" title="Special Layer" href="special.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -99,26 +97,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="base.html">Base Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="special.html">Special Layer</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Normalization Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="perturb.html">Perturb Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
@@ -165,8 +152,6 @@
     
       <li><a href="../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> &raquo;</li>
-        
       <li>Normalization Layer</li>
     
     
@@ -186,45 +171,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.layer.normalize">
-<span id="normalization-layer"></span><h1>Normalization Layer<a class="headerlink" href="#module-sknet.layer.normalize" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="sknet.layer.BatchNormalization">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">BatchNormalization</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>training=None</em>, <em>beta_initializer=&lt;function zeros&gt;</em>, <em>gamma_initializer=&lt;function ones&gt;</em>, <em>name='bn_layer'</em>, <em>epsilon=1e-06</em>, <em>decay=0.99</em>, <em>gamma=True</em>, <em>beta=True</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.BatchNormalization" title="Permalink to this definition">¶</a></dt>
-<dd><p>applies batch-normalization onto the input
-Given some <code class="xref py py-data docutils literal notranslate"><span class="pre">axis</span></code>, applies batch-normalization onto the 
-input on those axis. This applies udring training a moment based
-rneormalization, and during testing, the moving average of the
-moments encoutered during training. The moments are computed per batch</p>
-<p>To remove the learnable scaling or offset one can set 
-<code class="xref py py-data docutils literal notranslate"><span class="pre">gamma=False</span></code> and/or <code class="xref py py-data docutils literal notranslate"><span class="pre">beta=False</span></code>. 
-Even though one can let them as <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code> and give a constant
-value, this is no recommander as the implementation optimizes the
-computation otherwise.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (shape or <a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a>) – input shape or incoming layer</li>
-<li><strong>axis</strong> (<em>tuple</em><em> or </em><em>list of ints</em>) – the axis to normalize</li>
-<li><strong>training</strong> (<em>tf.bool</em>) – variable representing the state of the model, if
-training or testing time</li>
-<li><strong>beta_initializer</strong> (<em>initializer</em><em> or </em><em>array</em>) – initializer of the beta parameter</li>
-<li><strong>gamma_initializer</strong> (<em>initializer</em><em> or </em><em>array</em>) – initializer of the gamma parameter</li>
-<li><strong>name</strong> (<em>str</em>) – name of the layer</li>
-<li><strong>epsilon</strong> (<em>scalar</em>) – (optional) the epsilon constant to add 
-to the renormalization</li>
-<li><strong>decay</strong> (<em>scalar</em>) – the decay to use for the exponential
-moving average to compute the test time
-moments form the training batches ones</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+  <div class="section" id="normalization-layer">
+<h1>Normalization Layer<a class="headerlink" href="#normalization-layer" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -232,15 +180,6 @@ moments form the training batches ones</li>
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="perturb.html" class="btn btn-neutral float-right" title="Perturb Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="special.html" class="btn btn-neutral float-left" title="Special Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

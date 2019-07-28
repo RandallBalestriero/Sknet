@@ -1,0 +1,367 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Perturb Ops &mdash; Sknet alpha.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'alpha.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Shape Ops" href="shape.html" />
+    <link rel="prev" title="Normalization Ops" href="normalize.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Sknet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">Base Op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="special.html">Special Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normalize.html">Normalization Ops</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Perturb Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Ops</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Sknet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a> &raquo;</li>
+        
+      <li>Perturb Ops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/modules/ops/perturb.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-sknet.ops.perturb">
+<span id="perturb-ops"></span><h1>Perturb Ops<a class="headerlink" href="#module-sknet.ops.perturb" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sknet.ops.RandomCrop">
+<em class="property">class </em><code class="descclassname">sknet.ops.</code><code class="descname">RandomCrop</code><span class="sig-paren">(</span><em>input</em>, <em>crop_shape</em>, <em>pad=0</em>, <em>deterministic=None</em>, <em>seed=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/ops.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.ops.RandomCrop" title="Permalink to this definition">¶</a></dt>
+<dd><p>Random cropping of input images.</p>
+<p>During deterministic, a random continuous part of the image
+of shape crop_shape is extracted and used as layer output.
+During testing, the center part of the image of shape
+crop_shape is used as output. Apply the same perturbation
+to all the channels of the input.</p>
+<p>Example of use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">input_shape</span> <span class="o">=</span> <span class="p">(</span><span class="mi">64</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">)</span>
+<span class="c1"># Init an input layer with input shape</span>
+<span class="n">crop_layer</span>  <span class="o">=</span> <span class="n">RandomCrop</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,(</span><span class="mi">28</span><span class="p">,</span><span class="mi">28</span><span class="p">))</span>
+<span class="c1"># output of this layer is (64,3,28,28)</span>
+<span class="n">crop_layer</span><span class="o">.</span><span class="n">output_shape</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="base.html#sknet.ops.Op" title="sknet.ops.Op"><code class="xref py py-class docutils literal notranslate"><span class="pre">Op</span></code></a> or shape</span></dt>
+<dd><p class="first last">the incoming layer or input shape</p>
+</dd>
+<dt><strong>crop_shape</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or couple of int</span></dt>
+<dd><p class="first last">the shape of part of the input to be
+cropped</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.ops.RandomAxisReverse">
+<em class="property">class </em><code class="descclassname">sknet.ops.</code><code class="descname">RandomAxisReverse</code><span class="sig-paren">(</span><em>input</em>, <em>axis</em>, <em>deterministic=None</em>, <em>seed=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/ops.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.ops.RandomAxisReverse" title="Permalink to this definition">¶</a></dt>
+<dd><p>randomly reverse axis of the input</p>
+<p>This layer randomly reverse (or flip) one (or multiple) axis
+in its input. It will either apply all the axis or none.
+Apply the same perturbation to all the channels of the input</p>
+<p>Example of use:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># Set the input shape</span>
+<span class="n">input_shape</span> <span class="o">=</span> <span class="p">[</span><span class="mi">10</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">32</span><span class="p">,</span><span class="mi">32</span><span class="p">]</span>
+<span class="c1"># Create the layer</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">RandomAxisReverse</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,[</span><span class="mi">2</span><span class="p">],</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
+<span class="c1"># the output will randomly put the images upside down</span>
+<span class="c1"># Create another case</span>
+<span class="n">layer</span> <span class="o">=</span> <span class="n">RandomAxisReverse</span><span class="p">(</span><span class="n">input_shape</span><span class="p">,[</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
+<span class="c1"># in this case the images will randomly have both spatial</span>
+<span class="c1"># axis reversed</span>
+</pre></div>
+</div>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier">Op or shape</span></dt>
+<dd><p class="first last">the incoming layer of the input shape</p>
+</dd>
+<dt><strong>axis</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int or list of int</span></dt>
+<dd><p class="first last">the axis to randomly reverse the order on</p>
+</dd>
+<dt><strong>deterministic</strong> <span class="classifier-delimiter">:</span> <span class="classifier">bool or tf.bool</span></dt>
+<dd><p class="first last">the state of the model, can be omited if the layer is not computing
+its output with the constructor</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.ops.RandomRot90">
+<em class="property">class </em><code class="descclassname">sknet.ops.</code><code class="descname">RandomRot90</code><span class="sig-paren">(</span><em>incoming</em>, <em>deterministic=None</em>, <em>seed=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/ops.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.ops.RandomRot90" title="Permalink to this definition">¶</a></dt>
+<dd><p>randomly rotate by 90 degrees the input</p>
+<p>This layer performs a random rotation of the input to 90 degrees
+this can be clockwise or counter clockwise with same probability.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>incoming</strong> (shape or instalce of <a class="reference internal" href="base.html#sknet.ops.Op" title="sknet.ops.Op"><code class="xref py py-class docutils literal notranslate"><span class="pre">Op</span></code></a>) – the input shape or the incoming layer</li>
+<li><strong>deterministic</strong> (<em>tf.bool</em>) – boolean describing if the model is in
+trianing or testing mode, should be left
+None in most cases</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="class">
+<dt id="sknet.ops.Dropout">
+<em class="property">class </em><code class="descclassname">sknet.ops.</code><code class="descname">Dropout</code><span class="sig-paren">(</span><em>incoming</em>, <em>p=0.5</em>, <em>deterministic=None</em>, <em>seed=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/ops.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.ops.Dropout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Randomly mask values of the input</p>
+<p>This layer applies a multiplicative perturbation
+on its input by means of a binary mask. Each value
+of the mask is sampled from a Bernoulli distribution
+<span class="math notranslate nohighlight">\(\mathcal{B}ernoulli(p)\)</span> where <span class="math notranslate nohighlight">\(p\)</span> is the
+probability to have a <span class="math notranslate nohighlight">\(1\)</span>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier"><a class="reference internal" href="base.html#sknet.ops.Op" title="sknet.ops.Op"><code class="xref py py-class docutils literal notranslate"><span class="pre">Op</span></code></a> or shape</span></dt>
+<dd><p class="first last">the incoming layer or input shape</p>
+</dd>
+<dt><strong>p</strong> <span class="classifier-delimiter">:</span> <span class="classifier">scalar <span class="math notranslate nohighlight">\(0\leq p \leq 1\)</span></span></dt>
+<dd><p class="first last">the probability to drop the input values</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="shape.html" class="btn btn-neutral float-right" title="Shape Ops" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="normalize.html" class="btn btn-neutral float-left" title="Normalization Ops" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sknet contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Base &mdash; Sknet alpha.1 documentation</title>
+  <title>Tensor and Observed Tensor &mdash; Sknet alpha.1 documentation</title>
   
 
   
@@ -99,18 +99,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Base</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Tensor and Observed Tensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#worker-and-workergroup">Worker and WorkerGroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
@@ -159,7 +161,7 @@
         
           <li><a href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a> &raquo;</li>
         
-      <li>Base</li>
+      <li>Tensor and Observed Tensor</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -178,8 +180,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="base">
-<h1>Base<a class="headerlink" href="#base" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="tensor-and-observed-tensor">
+<h1>Tensor and Observed Tensor<a class="headerlink" href="#tensor-and-observed-tensor" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="sknet.Tensor">
 <em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">Tensor</code><span class="sig-paren">(</span><em>tensor_or_func=None</em>, <em>shape=None</em>, <em>dtype=None</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.Tensor" title="Permalink to this definition">¶</a></dt>
@@ -206,132 +208,114 @@
 </table>
 </dd></dl>
 
+</div>
+<div class="section" id="worker-and-workergroup">
+<h1>Worker and WorkerGroup<a class="headerlink" href="#worker-and-workergroup" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="sknet.Worker">
-<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">Worker</code><span class="sig-paren">(</span><em>op_name</em>, <em>context</em>, <em>op</em>, <em>instruction</em>, <em>deterministic=None</em>, <em>repeat=1</em>, <em>description=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.Worker" title="Permalink to this definition">¶</a></dt>
-<dd><p>processing unit that manages a single tensorflow op.
-A Worker allows to specify a tensorflow op to execute. Whether
-it is for monitoring or saving or printing, the user should favor
-the use of Workers to simplify the workflow. A worker contains the
-operator to use, the ations to take with it given by an instruction</p>
+<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">Worker</code><span class="sig-paren">(</span><em>*args</em>, <em>context</em>, <em>to_print=[]</em>, <em>feed_dict={}</em>, <em>name=None</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.Worker" title="Permalink to this definition">¶</a></dt>
+<dd><p>processing unit that manages tensorflow ops executation, output saving
+and printing.
+A Worker allows to specify a context, such as train set, test set, or any
+context present in a datset, and tensorflow ops to be executed, and if the
+deep net behavior should be deterministic or not (for example during
+testing). The ops are given as kwargs of the function, the names used will
+be the same used for saving (think of <code class="xref py py-class docutils literal notranslate"><span class="pre">np.savez</span></code>. For more control
+it is possible to give a couple where the second item is a function that
+takes for input a batch number and epoch number. This allow further
+control if one wants to only execute an op every X batch or only after the
+10th epoch and so on. Here is an example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># an op updating the dn weight</span>
+<span class="n">update_</span> <span class="n">op</span> <span class="o">=</span> <span class="o">...</span>
+<span class="c1"># an op measuring the accuracy on each batch</span>
+<span class="n">accu</span> <span class="o">=</span> <span class="o">...</span>
+<span class="c1"># an op measuring the average accuracy over all batches on the set</span>
+<span class="n">avg_accu</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">losses</span><span class="o">.</span><span class="n">streaming_mean</span><span class="p">(</span><span class="n">accu</span><span class="p">)</span>
+<span class="c1"># a tensor which is a weight of the Dn that we wish to monitor</span>
+<span class="c1"># and we want to monitor it only at the first batch of epoch 0, 10, 15</span>
+<span class="n">W</span> <span class="o">=</span> <span class="o">....</span>
+<span class="k">def</span> <span class="nf">fW</span><span class="p">(</span><span class="n">batch</span><span class="p">,</span> <span class="n">epoch</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">batch</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="n">epoch</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="mi">15</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="kc">False</span>
+
+<span class="c1"># we now create the worker</span>
+<span class="n">worker</span> <span class="o">=</span> <span class="n">Worker</span><span class="p">(</span><span class="n">context</span> <span class="o">=</span> <span class="s1">&#39;train_set&#39;</span><span class="p">,</span> <span class="n">deterministic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                <span class="n">update</span> <span class="o">=</span> <span class="n">update_op</span><span class="p">,</span> <span class="n">accu</span><span class="o">=</span><span class="n">accu</span><span class="p">,</span> <span class="n">avg_accu</span> <span class="o">=</span> <span class="n">avg_accu</span><span class="p">,</span>
+                <span class="n">W</span><span class="o">=</span><span class="p">(</span><span class="n">dnn</span><span class="o">.</span><span class="n">W</span><span class="p">,</span><span class="n">fW</span><span class="p">))</span>
+</pre></div>
+</div>
+<p>with the above example (notice that the index starts at 0), the worker
+will execute on the train set (in parallel at each batch) all the given
+and for the weight monitoring, will only save the output if the conditioin
+if fulfilled. The update op, as obtained from a tensorflow operation
+returns None values. This will not be saved by the worker. Hence, at the
+end of an epoch. The data saved in <code class="docutils literal notranslate"><span class="pre">`worker.epoch_data`</span></code> will be:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">worker</span><span class="o">.</span><span class="n">epoch_data</span><span class="p">[</span><span class="s1">&#39;update&#39;</span><span class="p">]</span> <span class="c1"># an empty list</span>
+<span class="n">worker</span><span class="o">.</span><span class="n">epoch_data</span><span class="p">[</span><span class="s1">&#39;accu&#39;</span><span class="p">]</span> <span class="c1"># array of shape (N_EPOCH, N_BATCH,1)</span>
+<span class="n">worker</span><span class="o">.</span><span class="n">epoch_data</span><span class="p">[</span><span class="s1">&#39;avg_accu&#39;</span><span class="p">]</span> <span class="c1"># array of shape (N_EPOCH, 1), there are</span>
+                              <span class="c1"># no batch dimension when using</span>
+                              <span class="c1"># streaming tensors as they compute</span>
+                              <span class="c1"># aggregated stats. over all batches of</span>
+                              <span class="c1"># each epoch</span>
+<span class="n">worker</span><span class="o">.</span><span class="n">epoch_data</span><span class="p">[</span><span class="s1">&#39;W&#39;</span><span class="p">]</span> <span class="c1"># array of shape (N_EPOCH, N_BATCH,*np.shape(W))</span>
+</pre></div>
+</div>
+<p>NOTE: if using a <code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.Queue</span></code> with a given filename, the results
+are saved into the .h5 file at each epoch, and the worker data are emptied
+for efficiency, in such cases, the same data as described above will be
+present in the .h5 file and not in <code class="docutils literal notranslate"><span class="pre">`worker.epoch_data`</span></code>.</p>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
 <tbody valign="top">
 <tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>op_name</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">the name of the worker, used for saving and printing</p>
+<dt><strong>context: str</strong></dt>
+<dd><p class="first last">the name of the set to apply the ops on from the dataset. Typical
+example would be :py;data;`”train_set”` or :py:data:‘“valid_set”’</p>
 </dd>
-<dt><strong>context</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first last">the name of the set to apply the op on from the dataset. Typical example
-would be :py;data;`”train_set”` or :py:data:‘“valid_set”’</p>
+<dt><strong>deterministic: bool</strong></dt>
+<dd><p class="first last">the state of the network to execute the op in, for example
+it is common to set it to <code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code> during training
+and <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code> during testing.</p>
 </dd>
-<dt><strong>op</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tf.Tensor or tf.operation</span></dt>
-<dd><p class="first last">the tensorflow variable of the worker that will be executed and monitored</p>
-</dd>
-<dt><strong>instruction</strong> <span class="classifier-delimiter">:</span> <span class="classifier">str</span></dt>
-<dd><p class="first">a description of what how and when to interact with the op. We provide
-some typical examples</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">instruction</span> <span class="o">=</span> <span class="s2">&quot;execute every batch&quot;</span>
-<span class="c1"># when given another command such as print, execute is</span>
-<span class="c1"># always added by default</span>
-<span class="n">instruction</span> <span class="o">=</span> <span class="s2">&quot;print every 30 batch&quot;</span>
-<span class="c1"># one can give multiple commands to do at the same time, they</span>
-<span class="c1"># are linked with a &amp; a in</span>
-<span class="n">instruction</span> <span class="o">=</span> <span class="s2">&quot;print 7 save every 30 batch&quot;</span>
-<span class="c1"># one can also use the instruction to specify a standard </span>
-<span class="c1"># operation method to do after the epoch such as done with</span>
-<span class="c1"># accuracy where it is computed on each batch and then averaged</span>
-<span class="n">instruction</span> <span class="o">=</span> <span class="s2">&quot;execute every batch and average &amp; print&quot;</span>
-<span class="c1"># as an be seen, the commands to do after the epoch are introduced via</span>
-<span class="c1"># the and keyword. One can also do something like</span>
-<span class="n">intruction</span> <span class="o">=</span> <span class="s2">&quot;execute every bath and save &amp; print &amp; average&quot;</span>
-<span class="c1"># the order of the commands 9around the &amp;) do not matter</span>
-<span class="c1"># finally, if asking to save and the per batch value AND</span>
-<span class="c1"># the epoch value, then the last one is disregarded as it</span>
-<span class="c1"># can be computed a posteriori from the batch ones, for example</span>
-<span class="n">instruction</span> <span class="o">=</span> <span class="s2">&quot;print&amp;save every 30 batch and save &amp; print &amp; average&quot;</span>
-<span class="c1"># in this case the previous case will save only the batch values.</span>
-</pre></div>
-</div>
-<p>The second set of commands (after the <code class="docutils literal notranslate"><span class="pre">&quot;and&quot;</span></code> must contain either
-<code class="docutils literal notranslate"><span class="pre">&quot;average'</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;maximize&quot;</span></code>.</p>
-<dl class="last docutils">
-<dt>deterministic <span class="classifier-delimiter">:</span> <span class="classifier">bool</span></dt>
-<dd><p class="first last">the state of the network to execute the op in, for example it is common to 
-set it to <code class="xref py py-data docutils literal notranslate"><span class="pre">False</span></code> during training and <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code> during testing.</p>
-</dd>
-<dt>description <span class="classifier-delimiter">:</span> <span class="classifier">str (optional)</span></dt>
-<dd><p class="first last">the description of the worker, used for saving, it is added to the h5 file.</p>
-</dd>
-</dl>
+<dt><strong>ops: kwargs</strong></dt>
+<dd><p class="first last">any desired op or tensor to be executed/monitored. It can be a
+op or a couple with the second item being a function with input
+<code class="docutils literal notranslate"><span class="pre">`batch,</span> <span class="pre">epoch`</span></code> that should return a boolean value telling if
+the op is to be executed at this moment.</p>
 </dd>
 </dl>
 </td>
 </tr>
 </tbody>
 </table>
+<dl class="method">
+<dt id="sknet.Worker.append">
+<code class="descname">append</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.Worker.append" title="Permalink to this definition">¶</a></dt>
+<dd><p>given the session output obtained by executing the given list of ops
+append the data with the batch values</p>
 </dd></dl>
 
-<dl class="class">
-<dt id="sknet.WorkerGroup">
-<em class="property">class </em><code class="descclassname">sknet.</code><code class="descname">WorkerGroup</code><span class="sig-paren">(</span><em>workers</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.WorkerGroup" title="Permalink to this definition">¶</a></dt>
-<dd><p>Allow executing of multiple workers at once (similar to multi-threading).
-it is common to need to monitor or execute multiple workers during the 
-same process. Typical example would be to execute the weight update 
-(learning) while monitoring (printing or saving) the loss. those two 
-workers can thus be made parallel simply by using the 
-<a class="reference internal" href="#sknet.WorkerGroup" title="sknet.WorkerGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.WorkerGroup</span></code></a> class. To obtain a <a class="reference internal" href="#sknet.WorkerGroup" title="sknet.WorkerGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkerGroup</span></code></a>
-one can do any of the followings</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">worker1</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="n">worker2</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="n">workergroup</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">WorkerGroup</span><span class="p">([</span><span class="n">worker1</span><span class="p">,</span><span class="n">worker2</span><span class="p">])</span>
-<span class="n">workergroup</span> <span class="o">=</span> <span class="n">worker1</span><span class="o">+</span><span class="n">worker2</span>
-</pre></div>
-</div>
-<p>Similarly, once given a <a class="reference internal" href="#sknet.WorkerGroup" title="sknet.WorkerGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">WorkerGroup</span></code></a> instance, it is possible to add
-workers (or evenwWorergroup) on the fly as follows</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">extra_worker</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-<span class="n">workergroup</span> <span class="o">=</span> <span class="n">workergroup</span><span class="o">+</span><span class="n">extra_worker</span>
-<span class="c1"># or if adding an extra workergroup</span>
-<span class="n">workergroup</span><span class="o">=</span><span class="n">workergroup</span><span class="o">+</span><span class="n">other_workergroup</span>
-</pre></div>
-</div>
-<p>A typical example would be to do the following</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">worker1</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="n">op_name</span><span class="o">=</span><span class="s2">&quot;minimizer&quot;</span><span class="p">,</span><span class="n">op</span><span class="o">=</span><span class="n">minimizer</span><span class="p">,</span>
-            <span class="n">context</span><span class="o">=</span><span class="s2">&quot;train_set&quot;</span><span class="p">,</span><span class="n">deterministic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
-            <span class="n">instruction</span><span class="o">=</span><span class="s2">&quot;execute every batch&quot;</span><span class="p">)</span>
-<span class="n">worker2</span> <span class="o">=</span> <span class="n">sknet</span><span class="o">.</span><span class="n">Worker</span><span class="p">(</span><span class="n">op_name</span><span class="o">=</span><span class="s1">&#39;loss&#39;</span><span class="p">,</span><span class="n">op</span><span class="o">=</span><span class="n">loss</span><span class="p">,</span><span class="n">context</span><span class="o">=</span><span class="s1">&#39;train_set&#39;</span><span class="p">,</span>
-            <span class="n">deterministic</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">instruction</span><span class="o">=</span><span class="s2">&quot;print every 30 batch&quot;</span><span class="p">)</span>
-<span class="n">train_worker</span> <span class="o">=</span> <span class="n">worker1</span><span class="o">+</span><span class="n">worker2</span>
-<span class="c1"># then train</span>
-<span class="c1"># ...</span>
-</pre></div>
-</div>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
-<dt><strong>worker</strong> <span class="classifier-delimiter">:</span> <span class="classifier">list of sknet.Worker</span></dt>
-<dd><p class="first last">the list of workers that are to be run concurrently during an epoch</p>
-</dd>
-</dl>
-</td>
-</tr>
-</tbody>
-</table>
+<dl class="method">
+<dt id="sknet.Worker.epoch_done">
+<code class="descname">epoch_done</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.Worker.epoch_done" title="Permalink to this definition">¶</a></dt>
+<dd><p>method to be executed after completion of an epoch.
+It executes all the needed reset and savings</p>
 </dd></dl>
 
-<dl class="function">
-<dt id="sknet.to_file">
-<code class="descclassname">sknet.</code><code class="descname">to_file</code><span class="sig-paren">(</span><em>value</em>, <em>filename</em>, <em>mode='w'</em>, <em>compression_level=4</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.to_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>dump the content of a worker, workergroupe, or
-list/tuple of them into h5 files
-if given with mode=’w’ then dump everything,
-if given with mode=’a’ then dump only the non present keys</p>
+<dl class="method">
+<dt id="sknet.Worker.get_ops">
+<code class="descname">get_ops</code><span class="sig-paren">(</span><em>batch</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.Worker.get_ops" title="Permalink to this definition">¶</a></dt>
+<dd><p>given a batch index and the current epoch, return the list
+of ops to be executed</p>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="utilities">
+<h1>Utilities<a class="headerlink" href="#utilities" title="Permalink to this headline">¶</a></h1>
 </div>
 
 

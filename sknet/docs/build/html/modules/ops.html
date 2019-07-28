@@ -1,0 +1,374 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>sknet.ops &mdash; Sknet alpha.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../',
+              VERSION:'alpha.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Base Op" href="ops/base.html" />
+    <link rel="prev" title="Preprocessing" href="dataset/preprocess.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> Sknet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/preprocess.html">Preprocess</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/network.html">Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../user/pipeline.html">Pipeline</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a><ul>
+<li class="toctree-l2"><a class="reference internal" href="ops/base.html">Base Op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops/dense.html">Dense Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops/conv.html">Convolutional Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops/pool.html">Pool Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops/special.html">Special Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops/normalize.html">Normalization Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops/perturb.html">Perturb Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="ops/shape.html">Shape Ops</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">Sknet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+      <li><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/modules/ops.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-sknet.ops">
+<span id="sknet-ops"></span><h1><a class="reference internal" href="ops/base.html#module-sknet.ops" title="sknet.ops"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.ops</span></code></a><a class="headerlink" href="#module-sknet.ops" title="Permalink to this headline">¶</a></h1>
+<div class="toctree-wrapper compound">
+</div>
+<p>All the <a class="reference internal" href="ops/base.html#module-sknet.ops" title="sknet.ops"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.ops</span></code></a> inherit from this base class. Its documentation
+presents all the details about thegeneral behaviors of the layers.</p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="ops/base.html#sknet.ops.Op" title="sknet.ops.Op"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Op</span></code></a></td>
+<td>Op class used as parent of any implemented layer.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric"><a class="reference internal" href="ops/dense.html"><span class="doc">Dense Ops</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="ops/dense.html#sknet.ops.Dense" title="sknet.ops.Dense"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dense</span></code></a></td>
+<td>Dense or fully connected layer.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric"><a class="reference internal" href="ops/conv.html"><span class="doc">Convolutional Ops</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="ops/conv.html#sknet.ops.Conv2D" title="sknet.ops.Conv2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv2D</span></code></a></td>
+<td>2D (spatial) convolutional layer.</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">SplineWaveletTransform</span></code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric"><a class="reference internal" href="ops/pool.html"><span class="doc">Pool Ops</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Pool</span></code></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p class="rubric"><a class="reference internal" href="ops/special.html"><span class="doc">Special Ops</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="ops/special.html#sknet.ops.Activation" title="sknet.ops.Activation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Activation</span></code></a></td>
+<td>Apply nonlinearity.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="ops/special.html#sknet.ops.Spectrogram" title="sknet.ops.Spectrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Spectrogram</span></code></a></td>
+<td>spectrogram layer (time-frequency representation of a time serie) This layer implement a spectrogram computation to allow to include  it as part of a model when dealing with time serie data, it is also  crucial to allow backpropagation through it in case some previous  operation prior to this layer must be differentiated w.r.t.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="ops/special.html#sknet.ops.LambdaFunction" title="sknet.ops.LambdaFunction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LambdaFunction</span></code></a></td>
+<td>Apply a lambda function onto the input</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric"><a class="reference internal" href="ops/normalize.html"><span class="doc">Normalization Ops</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="ops/normalize.html#sknet.ops.BatchNorm" title="sknet.ops.BatchNorm"><code class="xref py py-obj docutils literal notranslate"><span class="pre">BatchNorm</span></code></a></td>
+<td>applies batch-normalization onto the input Given some <code class="xref py py-data docutils literal notranslate"><span class="pre">axis</span></code>, applies batch-normalization onto the input on those axis.</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric"><a class="reference internal" href="ops/perturb.html"><span class="doc">Perturb Ops</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="ops/perturb.html#sknet.ops.Dropout" title="sknet.ops.Dropout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dropout</span></code></a></td>
+<td>Randomly mask values of the input</td>
+</tr>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Gaussian</span></code></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Uniform</span></code></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="ops/perturb.html#sknet.ops.RandomCrop" title="sknet.ops.RandomCrop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomCrop</span></code></a></td>
+<td>Random cropping of input images.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="ops/perturb.html#sknet.ops.RandomRot90" title="sknet.ops.RandomRot90"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomRot90</span></code></a></td>
+<td>randomly rotate by 90 degrees the input</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="ops/perturb.html#sknet.ops.RandomAxisReverse" title="sknet.ops.RandomAxisReverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomAxisReverse</span></code></a></td>
+<td>randomly reverse axis of the input</td>
+</tr>
+</tbody>
+</table>
+<p class="rubric"><a class="reference internal" href="ops/shape.html"><span class="doc">Shape Ops</span></a></p>
+<table border="1" class="longtable docutils">
+<colgroup>
+<col width="10%" />
+<col width="90%" />
+</colgroup>
+<tbody valign="top">
+<tr class="row-odd"><td><a class="reference internal" href="ops/shape.html#sknet.ops.Reshape" title="sknet.ops.Reshape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reshape</span></code></a></td>
+<td>reshape of the input accoridng to a given shape.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="ops/shape.html#sknet.ops.Stack" title="sknet.ops.Stack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Stack</span></code></a></td>
+<td>stack multiple inputs into one.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="ops/shape.html#sknet.ops.Concat" title="sknet.ops.Concat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Concat</span></code></a></td>
+<td>concatenate multiple inputs into one according to a given axis.</td>
+</tr>
+<tr class="row-even"><td><a class="reference internal" href="ops/shape.html#sknet.ops.ExpandDim" title="sknet.ops.ExpandDim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExpandDim</span></code></a></td>
+<td>add an extra dimension in the input.</td>
+</tr>
+<tr class="row-odd"><td><a class="reference internal" href="ops/shape.html#sknet.ops.Merge" title="sknet.ops.Merge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Merge</span></code></a></td>
+<td>merge multiple inputs into one according to some function.</td>
+</tr>
+</tbody>
+</table>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="ops/base.html" class="btn btn-neutral float-right" title="Base Op" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="dataset/preprocess.html" class="btn btn-neutral float-left" title="Preprocessing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sknet contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

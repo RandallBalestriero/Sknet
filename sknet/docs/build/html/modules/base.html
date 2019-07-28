@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Base" href="base/base.html" />
+    <link rel="next" title="Tensor and Observed Tensor" href="base/base.html" />
     <link rel="prev" title="Pipeline" href="../user/pipeline.html" /> 
 </head>
 
@@ -99,18 +99,20 @@
 <li class="toctree-l1"><a class="reference internal" href="../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/preprocess.html">Preprocess</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/network.html">Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/schedule.html">Schedules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/pipeline.html">Pipeline</a></li>
 </ul>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="base/base.html">Base</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base/base.html">Tensor and Observed Tensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base/base.html#worker-and-workergroup">Worker and WorkerGroup</a></li>
+<li class="toctree-l2"><a class="reference internal" href="base/base.html#utilities">Utilities</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
@@ -180,7 +182,7 @@
 <span id="sknet"></span><h1><a class="reference internal" href="#module-sknet" title="sknet"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet</span></code></a><a class="headerlink" href="#module-sknet" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>All the <a class="reference internal" href="layer/base.html#module-sknet.layer" title="sknet.layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> inherit from this base class. Its documentation
+<p>All the <code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer</span></code> inherit from this base class. Its documentation
 presents all the details about thegeneral behaviors of the layers.</p>
 <p class="rubric">Tensor and Observed Tensor</p>
 <table border="1" class="longtable docutils">
@@ -205,10 +207,10 @@ presents all the details about thegeneral behaviors of the layers.</p>
 </colgroup>
 <tbody valign="top">
 <tr class="row-odd"><td><a class="reference internal" href="base/base.html#sknet.Worker" title="sknet.Worker"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Worker</span></code></a></td>
-<td>processing unit that manages a single tensorflow op.</td>
+<td>processing unit that manages tensorflow ops executation, output saving and printing.</td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="base/base.html#sknet.WorkerGroup" title="sknet.WorkerGroup"><code class="xref py py-obj docutils literal notranslate"><span class="pre">WorkerGroup</span></code></a></td>
-<td>Allow executing of multiple workers at once (similar to multi-threading).</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">WorkerGroup</span></code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -219,8 +221,8 @@ presents all the details about thegeneral behaviors of the layers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="base/base.html#sknet.to_file" title="sknet.to_file"><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_file</span></code></a></td>
-<td>dump the content of a worker, workergroupe, or list/tuple of them into h5 files if given with mode=’w’ then dump everything, if given with mode=’a’ then dump only the non present keys</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">to_file</span></code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -234,7 +236,7 @@ presents all the details about thegeneral behaviors of the layers.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="base/base.html" class="btn btn-neutral float-right" title="Base" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="base/base.html" class="btn btn-neutral float-right" title="Tensor and Observed Tensor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="../user/pipeline.html" class="btn btn-neutral float-left" title="Pipeline" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

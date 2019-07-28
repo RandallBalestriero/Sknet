@@ -44,9 +44,7 @@
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Special Layer" href="special.html" />
-    <link rel="prev" title="Convolutional Layer" href="conv.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -99,26 +97,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="base.html">Base Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Layer</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Pool Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="special.html">Special Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="normalize.html">Normalization Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="perturb.html">Perturb Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
@@ -165,8 +152,6 @@
     
       <li><a href="../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> &raquo;</li>
-        
       <li>Pool Layer</li>
     
     
@@ -186,58 +171,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.layer.pool">
-<span id="pool-layer"></span><h1>Pool Layer<a class="headerlink" href="#module-sknet.layer.pool" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="sknet.layer.Pool">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Pool</code><span class="sig-paren">(</span><em>incoming</em>, <em>windows</em>, <em>strides=None</em>, <em>pool_type='MAX'</em>, <em>padding='VALID'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Pool" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pooling layer over spatial and/or channel dimensions.</p>
-<p>Example of use:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># (3,3) max pooling with (3,3) strides</span>
-<span class="c1"># All ther below are equivalent</span>
-<span class="n">PoolLayer</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
-<span class="n">PoolLayer</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="p">(</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
-<span class="n">PoolLayer</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">strides</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
-<span class="n">PoolLayer</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span> <span class="n">windows</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span><span class="mi">3</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span><span class="n">data_format</span><span class="o">=</span><span class="s1">&#39;NCHW&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Each output position :math:’[z]_{n,i,j,c}’ results form pooling 
-over the corresponding region in the input</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (<em>ranet.layer</em><em> or </em><em>1D-vector of ints</em>) – input layer or input shape</li>
-<li><strong>windows</strong> (<em>1D-vector of ints</em>) – shape of the pooling window</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
-<dl class="class">
-<dt id="sknet.layer.GlobalSpatialPool">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">GlobalSpatialPool</code><span class="sig-paren">(</span><em>incoming</em>, <em>pool_type='AVG'</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.GlobalSpatialPool" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pooling over all spatial dimension.</p>
-<p>This layer implements a global spatial pooling removing all spatial
-dimension present in the input.</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (shape or <a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">Layer</span></code></a>) – the input shape or an incoming layer</li>
-<li><strong>pool_type</strong> (<em>str</em>) – the type of pooling to apply, can be either 
-<code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;MAX&quot;</span></code>, or <code class="xref py py-data docutils literal notranslate"><span class="pre">&quot;AVG&quot;</span></code></li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+  <div class="section" id="pool-layer">
+<h1>Pool Layer<a class="headerlink" href="#pool-layer" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -245,15 +180,6 @@ dimension present in the input.</p>
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="special.html" class="btn btn-neutral float-right" title="Special Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="conv.html" class="btn btn-neutral float-left" title="Convolutional Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

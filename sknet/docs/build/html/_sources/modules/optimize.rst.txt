@@ -54,5 +54,7 @@ as such in the above, the variables also contrain the loss attributes such as
 
     accuracy
     crossentropy_logits
+    MSE
+    SSE
     l2_norm
  

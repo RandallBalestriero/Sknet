@@ -1,66 +1,29 @@
-Welcome to Sknet (in construction)
-===================================
+Welcome to Sknet
+================
 
-Sknet is a lightweight library built mainly upon numpy and tensorflow.
-The aim is to provide a fully independent and self content toolbox. Similarly
-to matplotlib, the user can either run some state-of-the-art deep learning
-methods on the most comon dataset with just a few lines of codes and no prerequisites;
-but also accees any block and any subtleties of the provided methods to
-tweak, experiment, or improve upon them. As such, this library aims to
-fulfill two major goals:
+Sknet is a lightweight python library built upon Tensorflow.
+Sknet levereages the low level Tensorflow ops at its core for performances
+and GPU computing while prividing its own high level methods.
+The library is built with the deep learning pipeline in mind:
 
-    - provide an out-of-the-box solution for practicioner allowing to reproduce 
-      results and build upon previous work with a comon working environment without
-      any prerequisites or additional ressources
-    - Allow easy access and modification of any of the provided methods to allow
-      anyone to experiment and improve upon existing methods
+    - :ref:`datasets-label`: mostly refurbishes tensorflow_datasets plus additional dataset s.a. cifar10 and imagenet
+    - :ref:`preprocess-label`: standard pre-processing techniques s.a. zca whitening and standardization
+    - :ref:`networks-label` : some pre defined deep networks such as resnets, densenets, CNNs, built upon  :ref:`layers-label`
+    - :ref:`layers-label`: medium-level building blocks of any deep network and are created from the low level :ref:`ops-label`.
+    - :ref:`ops-label`: mostly refurbishes and augment the basic tensorflow ops.
+    - :ref:`optimizers-label`: collection of gradient descent flavors to do optimization s.a. adam or sgd
+    - :ref:`schedules-label`: time-varying functions used for example to have adaptive learning rates s.a. stepwise or adaptive
 
-The above makes this toolbox oriented for any party interested in trying deep
-learning methods for some specific tasks to researchers in need of a qualitative
-and self content toolbox. By providing to the user enough transparency and 
-flexibility to implement their own creation without requiring to redo all the
-other parts of the pipeline we hope to 
+The above blocks can be considered as refurbishing and augmenting some of the key modules proivded
+by Tensorflow to allow completeness of the Sknet library. In addition of the above, two crucial 
+components are further introduced in Sknet:
 
-    - allow fast and easy experimenting on any part of the deep learning
-      pipeline
-    - allow anyone to easily validate their idea without requiring time
-      ressources in coding parts independent from the idea to test
-    - ensure that provided and used methods follow the guidelines used by
-      the developers and practicioners
+    - sknet.workplace : this class manages the the acutal execution of ops
 
-    
+
 This toolbox is oriented for research and education, and any projects
 do not requiring multi-GPU computing.
 We briefly describe here the fundamentals of the toolbox. The project is on _GitHub.
-
-
-Sknet way of working
---------------------
-
-The library is built with the deep learning pipeline in mind. That is, it provides
-multiple blocks which are highly customizable. Those blocks are then combined into a 
-pipeline to solve a task. Those blocks are:
-
-    - :ref:`dataloading-label`: any collection of inputs or (input-output) pairs
-    - :ref:`preprocess-label` (optional): pre-processing that can be applied onto any
-      dataset for increased performances s.a. zca whitening
-    - :ref:`network-label`: a fully described network from input to output, in term of 
-      layers s.a. LeNet5. Any network is built by combining any :ref:`layer-label`
-    - :ref:`layer-label`: low-level building blocks of any network. They are
-      grouped per type as
-
-        - dense
-        - convolutional
-        - data augmentation
-        - shape
-
-    - optimizer : any updating policy applied onto the learnable weights 
-      of a model s.a. adam or sgd
-    - learning rate :ref:`schedule-label`: combined with a loss function, a model and 
-      a dataset, the learning rate scheduler plays a crucial role to 
-      guarantee best performances s.a. stepwise or adaptive
-    - :ref:`pipeline-label` : a higher-level method assembling those independent blocks 
-      into a trainable pipeline, also containing the tensorflow session
 
   
 User Guide

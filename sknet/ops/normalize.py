@@ -66,7 +66,7 @@ class BatchNorm(Op):
                 self._W = tf.Variable(W(shape_), trainable=trainable_W,
                                       name='W')
             elif W is None:
-                self._W = np.floa32(1)
+                self._W = np.float32(1)
             else:
                 self._W = tf.Variable(W, trainable=trainable_W, name='W')
             self.W = W_func(self._W)

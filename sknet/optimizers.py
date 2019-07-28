@@ -40,6 +40,7 @@ class NesterovMomentum:
         self.reset_variables_op = list()
         for var in tf.global_variables(self.name):
             self.reset_variables_op.append(tf.assign(var,var.initial_value))
+        self.reset_variables_op = tf.group(self.reset_variables_op)
 
 class Adam:
     def __init__(self, loss_or_grads, params, learning_rate, beta1=0.9,
@@ -75,4 +76,4 @@ class Adam:
         self.reset_variables_op = list()
         for var in tf.global_variables(self.name):
             self.reset_variables_op.append(tf.assign(var,var.initial_value))
-
+        self.reset_variables_op = tf.group(self.reset_variables_op) 

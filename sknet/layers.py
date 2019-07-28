@@ -78,8 +78,8 @@ def ResBlockV1(input, filters, stride=1):
     out_conv = ops.Conv2D(pool, filters=(filters, 3, 3), b=None,
                           pad='same')
     bn2 = ops.BatchNorm(out_conv, [0, 2, 3])
-    merge = ops.Merge([out_conv, conv_linear], tf.add_n)
-    output = ops.Activation(bn, 0.)
+    merge = ops.Merge([bn2, conv_linear], tf.add_n)
+    output = ops.Activation(merge, 0.)
     return Layer([conv_linear, conv, bn, nonlinearity, pool, out_conv, bn2,
                   merge, output])
 

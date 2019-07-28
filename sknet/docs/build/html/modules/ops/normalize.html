@@ -1,0 +1,278 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Normalization Ops &mdash; Sknet alpha.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'alpha.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Perturb Ops" href="perturb.html" />
+    <link rel="prev" title="Special Ops" href="special.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Sknet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">Base Op</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="special.html">Special Ops</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Normalization Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perturb.html">Perturb Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Ops</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Sknet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a> &raquo;</li>
+        
+      <li>Normalization Ops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/modules/ops/normalize.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-sknet.ops.normalize">
+<span id="normalization-ops"></span><h1>Normalization Ops<a class="headerlink" href="#module-sknet.ops.normalize" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sknet.ops.BatchNorm">
+<em class="property">class </em><code class="descclassname">sknet.ops.</code><code class="descname">BatchNorm</code><span class="sig-paren">(</span><em>incoming</em>, <em>axis</em>, <em>deterministic=None</em>, <em>epsilon=0.0001</em>, <em>decay=0.9</em>, <em>W=&lt;function ones&gt;</em>, <em>b=&lt;function zeros&gt;</em>, <em>W_func=&lt;function identity&gt;</em>, <em>b_func=&lt;function identity&gt;</em>, <em>trainable_W=True</em>, <em>trainable_b=True</em>, <em>center=True</em>, <em>scale=True</em>, <em>use_median=False</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/ops.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.ops.BatchNorm" title="Permalink to this definition">¶</a></dt>
+<dd><p>applies batch-normalization onto the input
+Given some <code class="xref py py-data docutils literal notranslate"><span class="pre">axis</span></code>, applies batch-normalization onto the
+input on those axis. This applies udring training a moment based
+rneormalization, and during testing, the moving average of the
+moments encoutered during training. The moments are computed per batch</p>
+<p>To remove the learnable scaling or offset one can set
+<code class="xref py py-data docutils literal notranslate"><span class="pre">gamma=False</span></code> and/or <code class="xref py py-data docutils literal notranslate"><span class="pre">beta=False</span></code>.
+Even though one can let them as <code class="xref py py-data docutils literal notranslate"><span class="pre">True</span></code> and give a constant
+value, this is no recommander as the implementation optimizes the
+computation otherwise.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>incoming</strong> (shape or <a class="reference internal" href="base.html#sknet.ops.Op" title="sknet.ops.Op"><code class="xref py py-class docutils literal notranslate"><span class="pre">Op</span></code></a>) – input shape or incoming layer</li>
+<li><strong>axis</strong> (<em>tuple</em><em> or </em><em>list of ints</em>) – the axis to normalize</li>
+<li><strong>training</strong> (<em>tf.bool</em>) – variable representing the state of the model, if
+training or testing time</li>
+<li><strong>beta_initializer</strong> (<em>initializer</em><em> or </em><em>array</em>) – initializer of the beta parameter</li>
+<li><strong>gamma_initializer</strong> (<em>initializer</em><em> or </em><em>array</em>) – initializer of the gamma parameter</li>
+<li><strong>name</strong> (<em>str</em>) – name of the layer</li>
+<li><strong>epsilon</strong> (<em>scalar</em>) – (optional) the epsilon constant to add
+to the renormalization</li>
+<li><strong>decay</strong> (<em>scalar</em>) – the decay to use for the exponential
+moving average to compute the test time
+moments form the training batches ones</li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="perturb.html" class="btn btn-neutral float-right" title="Perturb Ops" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="special.html" class="btn btn-neutral float-left" title="Special Ops" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sknet contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

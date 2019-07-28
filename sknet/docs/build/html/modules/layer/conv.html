@@ -44,9 +44,7 @@
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
-    <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="Pool Layer" href="pool.html" />
-    <link rel="prev" title="Dense Layer" href="dense.html" /> 
+    <link rel="search" title="Search" href="../../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -99,26 +97,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="base.html">Base Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="io.html">Input Output Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dense.html">Dense Layer</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Convolutional Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="special.html">Special Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="normalize.html">Normalization Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="perturb.html">Perturb Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Layer</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
@@ -165,8 +152,6 @@
     
       <li><a href="../../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> &raquo;</li>
-        
       <li>Convolutional Layer</li>
     
     
@@ -186,30 +171,8 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.layer.conv">
-<span id="convolutional-layer"></span><h1>Convolutional Layer<a class="headerlink" href="#module-sknet.layer.conv" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="sknet.layer.Conv2D">
-<em class="property">class </em><code class="descclassname">sknet.layer.</code><code class="descname">Conv2D</code><span class="sig-paren">(</span><em>incoming</em>, <em>filters</em>, <em>nonlinearity=1.0</em>, <em>training=None</em>, <em>batch_norm=True</em>, <em>init_W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>strides=1</em>, <em>pad='valid'</em>, <em>mode='CONSTANT'</em>, <em>name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/layer.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.layer.Conv2D" title="Permalink to this definition">¶</a></dt>
-<dd><p>2D (spatial) convolutional layer.
-Layer to perform a 2D convolution onto a 4D input tensor</p>
-<table class="docutils field-list" frame="void" rules="none">
-<col class="field-name" />
-<col class="field-body" />
-<tbody valign="top">
-<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
-<li><strong>incoming</strong> (<a class="reference internal" href="base.html#sknet.layer.Layer" title="sknet.layer.Layer"><em>Layer</em></a><em> or </em><em>tuple of int</em>) – input shape of incoming layer</li>
-<li><strong>filters</strong> (<em>triple of int</em>) – the shape of the filters in the form 
-(#filters, height, width)</li>
-<li><strong>nonlinearity_c</strong> (<em>scalar</em>) – coefficient of the nonlinearity,
-0 for ReLU,-1 for absolute value,…</li>
-</ul>
-</td>
-</tr>
-</tbody>
-</table>
-</dd></dl>
-
+  <div class="section" id="convolutional-layer">
+<h1>Convolutional Layer<a class="headerlink" href="#convolutional-layer" title="Permalink to this headline">¶</a></h1>
 </div>
 
 
@@ -217,15 +180,6 @@ Layer to perform a 2D convolution onto a 4D input tensor</p>
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="pool.html" class="btn btn-neutral float-right" title="Pool Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="dense.html" class="btn btn-neutral float-left" title="Dense Layer" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>

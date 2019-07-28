@@ -1,0 +1,305 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Dense Ops &mdash; Sknet alpha.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript">
+          var DOCUMENTATION_OPTIONS = {
+              URL_ROOT:'../../',
+              VERSION:'alpha.1',
+              LANGUAGE:'None',
+              COLLAPSE_INDEX:false,
+              FILE_SUFFIX:'.html',
+              HAS_SOURCE:  true,
+              SOURCELINK_SUFFIX: '.txt'
+          };
+      </script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="Convolutional Ops" href="conv.html" />
+    <link rel="prev" title="Base Op" href="base.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> Sknet
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.8.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../user/installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
+</ul>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="base.html">Base Op</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Dense Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="conv.html">Convolutional Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pool.html">Pool Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="special.html">Special Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="normalize.html">Normalization Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="perturb.html">Perturb Ops</a></li>
+<li class="toctree-l2"><a class="reference internal" href="shape.html">Shape Ops</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">Sknet</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a> &raquo;</li>
+        
+      <li>Dense Ops</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../../_sources/modules/ops/dense.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-sknet.ops.dense">
+<span id="dense-ops"></span><h1>Dense Ops<a class="headerlink" href="#module-sknet.ops.dense" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="sknet.ops.Dense">
+<em class="property">class </em><code class="descclassname">sknet.ops.</code><code class="descname">Dense</code><span class="sig-paren">(</span><em>incoming</em>, <em>units</em>, <em>W=&lt;function variance_scaling_initializer.&lt;locals&gt;._initializer&gt;</em>, <em>b=&lt;function zeros&gt;</em>, <em>W_func=&lt;function identity&gt;</em>, <em>b_func=&lt;function identity&gt;</em>, <em>name=''</em>, <em>*args</em>, <em>**kwargs</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/ops.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.ops.Dense" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dense or fully connected layer.
+This layer implement a fully connected (or dense) linear operator.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><dl class="first last docutils">
+<dt><strong>incoming</strong> <span class="classifier-delimiter">:</span> <span class="classifier">tf.Tensor or np.ndarray</span></dt>
+<dd><p class="first last">input to the dense operator, can be another 
+:py:class:~`sknet.layer.Op`, a <code class="xref py py-class docutils literal notranslate"><span class="pre">tf.placeholder</span></code>, or even
+a <code class="xref py py-class docutils literal notranslate"><span class="pre">np.ndarray</span></code>.</p>
+</dd>
+<dt><strong>units</strong> <span class="classifier-delimiter">:</span> <span class="classifier">int</span></dt>
+<dd><p class="first last">the number of output units, must be greater or equal to 1.</p>
+</dd>
+<dt><strong>W</strong> <span class="classifier-delimiter">:</span> <span class="classifier">func or tf.Tensor or np.ndarray</span></dt>
+<dd><p class="first">the initialization for the <span class="math notranslate nohighlight">\(W\)</span> parameter. In any case, if the
+given value is not a function then it is considered a not trainable
+(because coming from another computation and thus not to be used
+solely as initialization of a trainable unconstrained variable). If
+a func then it is assumed to be trainable. The function will be passed
+the shape of the parameter and should return the value that will be
+used for initialization of the variable.
+Example of use</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># the case where the W parameter will be treated as a given</span>
+<span class="c1"># external (and thus non trainable in the layer) parameter</span>
+<span class="c1"># assuming previous_layer is 2D</span>
+<span class="n">W</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">((</span><span class="n">previous_layer</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span><span class="mi">20</span><span class="p">))</span>
+<span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">W</span> <span class="o">=</span> <span class="n">W</span><span class="p">)</span>
+<span class="c1"># to have a learnable (unconstrained) parameter simply do</span>
+<span class="c1"># if already given the value</span>
+<span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">W</span> <span class="o">=</span> <span class="k">lambda</span> <span class="o">*</span><span class="n">x</span><span class="p">:</span><span class="n">W</span><span class="p">)</span>
+<span class="c1"># or in this case, simply do</span>
+<span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">W</span> <span class="o">=</span> <span class="n">tf</span><span class="o">.</span><span class="n">random_normal</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>b</strong> <span class="classifier-delimiter">:</span> <span class="classifier">func or tf.Tensor or np.ndarray</span></dt>
+<dd><p class="first last">same than W but for the <span class="math notranslate nohighlight">\(b\)</span> parameter.</p>
+</dd>
+<dt><strong>func_W</strong> <span class="classifier-delimiter">:</span> <span class="classifier">(optional, default = tf.identity) func</span></dt>
+<dd><p class="first">an external function to be applied onto the weights <span class="math notranslate nohighlight">\(W\)</span> before
+computing the forward pass
+Example of use</p>
+<div class="last highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1"># this will force the weights W to be nonnegative to</span>
+<span class="c1"># compute the layer output (all nonegative weights</span>
+<span class="c1"># are turned to 0 by the relu applied on W)</span>
+<span class="n">Dense</span><span class="p">(</span><span class="n">previous_layer</span><span class="p">,</span><span class="n">units</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span><span class="n">func_W</span><span class="o">=</span><span class="n">tf</span><span class="o">.</span><span class="n">nn</span><span class="o">.</span><span class="n">relu</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt><strong>func_b</strong> <span class="classifier-delimiter">:</span> <span class="classifier">(optional, default = tf.identity) func</span></dt>
+<dd><p class="first last">same as func_W but for the <span class="math notranslate nohighlight">\(b\)</span> parameter</p>
+</dd>
+</dl>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="conv.html" class="btn btn-neutral float-right" title="Convolutional Ops" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="base.html" class="btn btn-neutral float-left" title="Base Op" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Sknet contributors
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

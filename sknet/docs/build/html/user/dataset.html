@@ -106,15 +106,15 @@
 </li>
 <li class="toctree-l1"><a class="reference internal" href="preprocess.html">Preprocess</a></li>
 <li class="toctree-l1"><a class="reference internal" href="network.html">Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schedule.html">Schedules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline.html">Pipeline</a></li>
 </ul>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../modules/base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../modules/layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../modules/layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../modules/optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
@@ -253,7 +253,10 @@ sknet for example). The saved dataset are in compressed format.</p>
 <div class="section" id="open-a-pre-loaded-dataset">
 <h2>Open a pre-loaded dataset<a class="headerlink" href="#open-a-pre-loaded-dataset" title="Permalink to this headline">¶</a></h2>
 <p>Running the code _quickstart_data_loading.py</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">sknet</span> <span class="kn">import</span> <span class="n">dataset</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">sys</span>
+<span class="n">sys</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;../&quot;</span><span class="p">)</span>
+
+<span class="kn">from</span> <span class="nn">sknet</span> <span class="kn">import</span> <span class="n">dataset</span>
 <span class="kn">from</span> <span class="nn">sknet.utils</span> <span class="kn">import</span> <span class="n">plotting</span>
 <span class="kn">import</span> <span class="nn">pylab</span> <span class="kn">as</span> <span class="nn">pl</span>
 
@@ -262,10 +265,10 @@ sknet for example). The saved dataset are in compressed format.</p>
                 <span class="n">dataset</span><span class="o">.</span><span class="n">load_fashionmnist</span><span class="p">,</span>
                 <span class="n">dataset</span><span class="o">.</span><span class="n">load_svhn</span><span class="p">,</span>
                 <span class="n">dataset</span><span class="o">.</span><span class="n">load_cifar10</span><span class="p">,</span>
-                <span class="n">dataset</span><span class="o">.</span><span class="n">load_cifar100</span><span class="p">,</span>
-                <span class="n">dataset</span><span class="o">.</span><span class="n">load_stl10</span><span class="p">,</span>
-                <span class="n">dataset</span><span class="o">.</span><span class="n">load_warblr</span><span class="p">,</span>
-                <span class="n">dataset</span><span class="o">.</span><span class="n">load_freefield1010</span><span class="p">]</span>
+                <span class="n">dataset</span><span class="o">.</span><span class="n">load_cifar100</span><span class="p">]</span><span class="c1">#,</span>
+<span class="c1">#                dataset.load_stl10,</span>
+<span class="c1">#                dataset.load_warblr,</span>
+<span class="c1">#                dataset.load_freefield1010]</span>
 
 <span class="c1"># Loop over the dataset_list to load them (download them if necessary)</span>
 <span class="c1"># and display the first 20 images</span>
@@ -279,20 +282,20 @@ sknet for example). The saved dataset are in compressed format.</p>
 
     <span class="c1"># distinguish the cifrar100 case as it has coarse and fine labels</span>
     <span class="k">if</span> <span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="o">==</span><span class="s1">&#39;cifar100&#39;</span><span class="p">:</span>
-        <span class="n">images</span>        <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;images&#39;</span><span class="p">][</span><span class="s1">&#39;train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
-        <span class="n">fine_labels</span>   <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">][</span><span class="s1">&#39;train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
-        <span class="n">coarse_labels</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;coarse_labels&#39;</span><span class="p">][</span><span class="s1">&#39;train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
+        <span class="n">images</span>        <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;images/train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
+        <span class="n">fine_labels</span>   <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;labels/train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
+        <span class="n">coarse_labels</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;coarse_labels/train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">im</span><span class="p">,</span><span class="n">coarse</span><span class="p">,</span><span class="n">fine</span><span class="p">,</span><span class="n">cpt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">images</span><span class="p">,</span><span class="n">coarse_labels</span><span class="p">,</span><span class="n">fine_labels</span><span class="p">,</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)):</span>
             <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">cpt</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="n">pl</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">coarse</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;, &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">fine</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;: &#39;</span>\
                     <span class="o">+</span><span class="n">dataset</span><span class="o">.</span><span class="n">classes</span><span class="p">[</span><span class="n">fine</span><span class="p">])</span>
             <span class="n">plotting</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;labels&#39;</span><span class="p">][</span><span class="s1">&#39;train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
+        <span class="n">labels</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;labels/train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
         <span class="k">if</span> <span class="s1">&#39;images&#39;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="o">.</span><span class="n">variables</span><span class="p">:</span>
-            <span class="n">images</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;images&#39;</span><span class="p">][</span><span class="s1">&#39;train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
+            <span class="n">images</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;images/train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">images</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;signals&#39;</span><span class="p">][</span><span class="s1">&#39;train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
+            <span class="n">images</span> <span class="o">=</span> <span class="n">dataset</span><span class="p">[</span><span class="s1">&#39;signals/train_set&#39;</span><span class="p">][:</span><span class="mi">20</span><span class="p">]</span>
         <span class="k">for</span> <span class="n">im</span><span class="p">,</span><span class="n">label</span><span class="p">,</span><span class="n">cpt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">images</span><span class="p">,</span><span class="n">labels</span><span class="p">,</span><span class="nb">range</span><span class="p">(</span><span class="mi">20</span><span class="p">)):</span>
             <span class="n">pl</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span><span class="mi">10</span><span class="p">,</span><span class="n">cpt</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">im</span><span class="p">)</span><span class="o">&gt;</span><span class="mi">2</span><span class="p">:</span>
@@ -307,7 +310,7 @@ sknet for example). The saved dataset are in compressed format.</p>
 
     <span class="c1"># Reduce side margins and save fig</span>
     <span class="n">pl</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
-    <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;./sknet/docs/source/_static/&#39;</span><span class="o">+</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;_samples.png&#39;</span><span class="p">)</span>
+    <span class="n">pl</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="s1">&#39;../sknet/docs/source/_static/&#39;</span><span class="o">+</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="o">+</span><span class="s1">&#39;_samples.png&#39;</span><span class="p">)</span>
     <span class="n">pl</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>

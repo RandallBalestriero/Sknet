@@ -45,7 +45,7 @@
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
-    <link rel="next" title="sknet.network" href="../network.html" />
+    <link rel="next" title="sknet.ops" href="../ops.html" />
     <link rel="prev" title="Dataset" href="dataset.html" /> 
 </head>
 
@@ -99,7 +99,6 @@
 <li class="toctree-l1"><a class="reference internal" href="../../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/preprocess.html">Preprocess</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/network.html">Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/schedule.html">Schedules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../user/pipeline.html">Pipeline</a></li>
 </ul>
@@ -110,8 +109,9 @@
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Preprocessing</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="../layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="../layer.html"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="../optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
@@ -200,10 +200,10 @@
 
 <dl class="class">
 <dt id="sknet.dataset.Standardize">
-<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">Standardize</code><span class="sig-paren">(</span><em>eps=0.0001, axis=[0], name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.Standardize" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="descclassname">sknet.dataset.</code><code class="descname">Standardize</code><span class="sig-paren">(</span><em>eps=1e-06, axis=[0], name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.Standardize" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="method">
 <dt id="sknet.dataset.Standardize.__init__">
-<code class="descname">__init__</code><span class="sig-paren">(</span><em>eps=0.0001, axis=[0], name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.Standardize.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="descname">__init__</code><span class="sig-paren">(</span><em>eps=1e-06, axis=[0], name=''</em><span class="sig-paren">)</span><a class="reference external" href="https://github.com/RandallBalestriero/Sknet/valpha.1/sknet/dataset.py"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#sknet.dataset.Standardize.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
 </dd></dl>
 
@@ -242,7 +242,7 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../network.html" class="btn btn-neutral float-right" title="sknet.network" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../ops.html" class="btn btn-neutral float-right" title="sknet.ops" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="dataset.html" class="btn btn-neutral float-left" title="Dataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

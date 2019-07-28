@@ -35,9 +35,15 @@ def load_path(N=1000, std=0.03, option=0, seed=None):
         lower_side = np.stack([X[::4],np.ones(N//4)*X[-1]],1)
         X          = np.concatenate([left_side,upper_side,right_side,
                                                          lower_side[::-1]],0)
-    if option == 4:
+    elif option == 4:
         # simple cosine
         X  = np.stack([X*9, np.random.rand(*X.shape), np.cos(X*9)],1)
+    elif option == 5:
+#        X = np.random.randn(N, 3)
+#        X /= np.linalg.norm(X, 2, axis=1, keepdims=True)
+#        X[:,0] = np.abs(X[:, 0])
+        import sklearn
+        X, _ = sklearn.datasets.make_swiss_roll(N,0)
     X += np.random.RandomState(seed).randn(N, X.shape[1])*std
     X -= X.mean(0, keepdims=True)
     X /= X.max(0, keepdims=True)

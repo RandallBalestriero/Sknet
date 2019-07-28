@@ -44,9 +44,7 @@
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
-    <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Base Layer" href="layer/base.html" />
-    <link rel="prev" title="sknet.network" href="network.html" /> 
+    <link rel="search" title="Search" href="../search.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -99,26 +97,15 @@
 <li class="toctree-l1"><a class="reference internal" href="../user/dataset.html">Dataset</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/preprocess.html">Preprocess</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/network.html">Networks</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../user/layer.html">Layer</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/schedule.html">Schedules</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../user/pipeline.html">Pipeline</a></li>
 </ul>
-<ul class="current">
+<ul>
 <li class="toctree-l1"><a class="reference internal" href="base.html"><code class="docutils literal notranslate"><span class="pre">sknet</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="dataset.html"><code class="docutils literal notranslate"><span class="pre">sknet.dataset</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="ops.html"><code class="docutils literal notranslate"><span class="pre">sknet.ops</span></code></a></li>
+<li class="toctree-l1"><a class="reference internal" href="layers.html"><code class="docutils literal notranslate"><span class="pre">sknet.layers</span></code></a></li>
 <li class="toctree-l1"><a class="reference internal" href="network.html"><code class="docutils literal notranslate"><span class="pre">sknet.network</span></code></a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><ul>
-<li class="toctree-l2"><a class="reference internal" href="layer/base.html">Base Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer/io.html">Input Output Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer/dense.html">Dense Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer/conv.html">Convolutional Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer/pool.html">Pool Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer/special.html">Special Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer/normalize.html">Normalization Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer/perturb.html">Perturb Layer</a></li>
-<li class="toctree-l2"><a class="reference internal" href="layer/shape.html">Shape Layer</a></li>
-</ul>
-</li>
 <li class="toctree-l1"><a class="reference internal" href="optimize.html"><code class="docutils literal notranslate"><span class="pre">sknet.optimize</span></code></a></li>
 </ul>
 
@@ -184,11 +171,11 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-sknet.layer">
-<span id="sknet-layer"></span><h1><a class="reference internal" href="layer/base.html#module-sknet.layer" title="sknet.layer"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.layer</span></code></a><a class="headerlink" href="#module-sknet.layer" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="sknet-layer">
+<h1><code class="xref py py-mod docutils literal notranslate"><span class="pre">sknet.layer</span></code><a class="headerlink" href="#sknet-layer" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>All the <a class="reference internal" href="layer/base.html#module-sknet.layer" title="sknet.layer"><code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer</span></code></a> inherit from this base class. Its documentation
+<p>All the <code class="xref py py-class docutils literal notranslate"><span class="pre">sknet.layer</span></code> inherit from this base class. Its documentation
 presents all the details about thegeneral behaviors of the layers.</p>
 <table border="1" class="longtable docutils">
 <colgroup>
@@ -196,8 +183,8 @@ presents all the details about thegeneral behaviors of the layers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/base.html#sknet.layer.Layer" title="sknet.layer.Layer"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Layer</span></code></a></td>
-<td>Layer class used as parent of any implemented layer.</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Layer</span></code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -208,8 +195,8 @@ presents all the details about thegeneral behaviors of the layers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/io.html#sknet.layer.Input" title="sknet.layer.Input"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Input</span></code></a></td>
-<td>Input layer, first of any model.</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Input</span></code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -220,8 +207,8 @@ presents all the details about thegeneral behaviors of the layers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/dense.html#sknet.layer.Dense" title="sknet.layer.Dense"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dense</span></code></a></td>
-<td>Dense or fully connected layer.</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dense</span></code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -232,8 +219,8 @@ presents all the details about thegeneral behaviors of the layers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/conv.html#sknet.layer.Conv2D" title="sknet.layer.Conv2D"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv2D</span></code></a></td>
-<td>2D (spatial) convolutional layer.</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Conv2D</span></code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -244,11 +231,11 @@ presents all the details about thegeneral behaviors of the layers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/pool.html#sknet.layer.Pool" title="sknet.layer.Pool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Pool</span></code></a></td>
-<td>Pooling layer over spatial and/or channel dimensions.</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Pool</span></code></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="layer/pool.html#sknet.layer.GlobalSpatialPool" title="sknet.layer.GlobalSpatialPool"><code class="xref py py-obj docutils literal notranslate"><span class="pre">GlobalSpatialPool</span></code></a></td>
-<td>Pooling over all spatial dimension.</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">GlobalSpatialPool</span></code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -259,14 +246,14 @@ presents all the details about thegeneral behaviors of the layers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/special.html#sknet.layer.Activation" title="sknet.layer.Activation"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Activation</span></code></a></td>
-<td>Apply nonlinearity.</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Activation</span></code></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="layer/special.html#sknet.layer.Spectrogram" title="sknet.layer.Spectrogram"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Spectrogram</span></code></a></td>
-<td>spectrogram layer (time-frequency representation of a time serie) This layer implement a spectrogram computation to allow to include  it as part of a model when dealing with time serie data, it is also  crucial to allow backpropagation through it in case some previous  operation prior to this layer must be differentiated w.r.t.</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Spectrogram</span></code></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="layer/special.html#sknet.layer.LambdaFunction" title="sknet.layer.LambdaFunction"><code class="xref py py-obj docutils literal notranslate"><span class="pre">LambdaFunction</span></code></a></td>
-<td>Apply a lambda function onto the input</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">LambdaFunction</span></code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -277,23 +264,23 @@ presents all the details about thegeneral behaviors of the layers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/perturb.html#sknet.layer.Dropout" title="sknet.layer.Dropout"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dropout</span></code></a></td>
-<td>Randomly mask values of the input</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Dropout</span></code></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="layer/perturb.html#sknet.layer.Gaussian" title="sknet.layer.Gaussian"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Gaussian</span></code></a></td>
-<td>Applies an additive or multiplicative Gaussian noise to the input</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Gaussian</span></code></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="layer/perturb.html#sknet.layer.Uniform" title="sknet.layer.Uniform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Uniform</span></code></a></td>
-<td>Applies an additive or multiplicative Uniform noise to the input</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Uniform</span></code></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="layer/perturb.html#sknet.layer.RandomCrop" title="sknet.layer.RandomCrop"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomCrop</span></code></a></td>
-<td>Random cropping of input images.</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomCrop</span></code></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="layer/perturb.html#sknet.layer.RandomRot90" title="sknet.layer.RandomRot90"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomRot90</span></code></a></td>
-<td>randomly rotate by 90 degrees the input</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomRot90</span></code></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="layer/perturb.html#sknet.layer.RandomAxisReverse" title="sknet.layer.RandomAxisReverse"><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomAxisReverse</span></code></a></td>
-<td>randomly reverse axis of the input</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">RandomAxisReverse</span></code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -304,20 +291,20 @@ presents all the details about thegeneral behaviors of the layers.</p>
 <col width="90%" />
 </colgroup>
 <tbody valign="top">
-<tr class="row-odd"><td><a class="reference internal" href="layer/shape.html#sknet.layer.Reshape" title="sknet.layer.Reshape"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reshape</span></code></a></td>
-<td>reshape of the input accoridng to a given shape.</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Reshape</span></code></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="layer/shape.html#sknet.layer.Stack" title="sknet.layer.Stack"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Stack</span></code></a></td>
-<td>stack multiple inputs into one.</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Stack</span></code></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="layer/shape.html#sknet.layer.Concat" title="sknet.layer.Concat"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Concat</span></code></a></td>
-<td>concatenate multiple inputs into one according to a given axis.</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Concat</span></code></td>
+<td></td>
 </tr>
-<tr class="row-even"><td><a class="reference internal" href="layer/shape.html#sknet.layer.ExpandDim" title="sknet.layer.ExpandDim"><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExpandDim</span></code></a></td>
-<td>add an extra dimension in the input.</td>
+<tr class="row-even"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">ExpandDim</span></code></td>
+<td></td>
 </tr>
-<tr class="row-odd"><td><a class="reference internal" href="layer/shape.html#sknet.layer.Merge" title="sknet.layer.Merge"><code class="xref py py-obj docutils literal notranslate"><span class="pre">Merge</span></code></a></td>
-<td>merge multiple inputs into one according to some function.</td>
+<tr class="row-odd"><td><code class="xref py py-obj docutils literal notranslate"><span class="pre">Merge</span></code></td>
+<td></td>
 </tr>
 </tbody>
 </table>
@@ -328,15 +315,6 @@ presents all the details about thegeneral behaviors of the layers.</p>
            
           </div>
           <footer>
-  
-    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="layer/base.html" class="btn btn-neutral float-right" title="Base Layer" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="network.html" class="btn btn-neutral float-left" title="sknet.network" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
-    </div>
   
 
   <hr/>
