@@ -20,3 +20,4 @@ from .dataset import Dataset
 from .networks import Network
 from .utils import Workplace
 from .layers import Layer
+from .ops import Op

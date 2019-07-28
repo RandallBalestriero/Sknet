@@ -103,7 +103,7 @@ def Resnet(dnn, n_classes=None, D=4, W=1, block=layers.ResBlockV1):
         if bl < 2:
             dnn.append(block(dnn[-1], UNITS[bl+1], stride=2))
             dnn.append(ops.Pool2D(dnn[-1], (2, 2), pool_type='AVG'))
-    dnn.append(ops.BatchNorm(dnn[-1], [0, 2, 3]))
+#    dnn.append(ops.BatchNorm(dnn[-1], [0, 2, 3]))
     dnn.append(ops.Activation(dnn[-1], 0.01))
     dnn.append(ops.GlobalPool2D(dnn[-1], pool_type='AVG'))
     if n_classes is not None:
