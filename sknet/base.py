@@ -43,7 +43,10 @@ def exponential_moving_average(tensor, decay, step, init=tf.zeros_like):
         the updates to apply (execute) to update the value of the moving
         average value
     """
-    ma_value = tf.Variable(init(tensor), trainable=False, name='ma')
+    if callable(init):
+        ma_value = tf.Variable(init(tensor), trainable=False, name='ma')
+    else:
+        ma_value = init
     value = ma_value*decay+tensor*(1-decay)
     value = tf.cond(tf.greater(step, ZERO_INT32), lambda: value,
                     lambda: tensor)

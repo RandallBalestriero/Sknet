@@ -24,24 +24,21 @@ class Network:
         if hasattr(item, '__len__'):
             item = list(item)
             self.layers += item
+            for i in item:
+                if hasattr(i, 'deter_dict'):
+                    self._deter_dict.update(i.deter_dict(True))
         else:
             self.layers.append(item)
-        self.update_deter_dict()
+            if hasattr(item, 'deter_dict'):
+                self._deter_dict.update(item.deter_dict(True))
     def as_list(self):
         """return the layers as a list"""
         return [layer for layer in self]
 
-    def update_deter_dict(self):
-        """gather all the per layer deterministic variables and
-        create a dictionary mapping those variables to value"""
-        for layer in self.layers:
-            if isinstance(layer, Op) or isinstance(layer, Layer):
-                self._deter_dict.update(layer.deter_dict(True))
-
     def deter_dict(self, value):
         for key in self._deter_dict.keys():
             self._deter_dict[key] = value
-        return self._deter_dict
+        return self._deter_dict.copy()
 
     @property
     def shape(self):

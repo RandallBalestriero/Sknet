@@ -49,7 +49,7 @@ class BatchNorm(Op):
         with tf.variable_scope(self._name_) as scope:
             self._name = scope.original_name_scope
             self.epsilon = tf.constant(epsilon)
-            self.decay = tf.constant(decay)
+            self.decay = decay
             self.center = center
             self.scale = scale
             self.axis = [axis] if np.isscalar(axis) else axis
@@ -88,51 +88,36 @@ class BatchNorm(Op):
 
     def forward(self, input, deterministic, *args, **kwargs):
 
-        step = tf.assign_add(self.steps, ONE_INT32)
-        self._updates.append(step)
-
-        # batch statistics
-        if self.use_median:
-            mean_ = tf.contrib.distributions.percentile(input, 50.0,
-                                                        axis=self.axis,
-                                                        keep_dims=True)
-            var_ = tf.contrib.distributions.percentile(tf.abs(input-mean_),
-                                                       50.0, axis=self.axis,
-                                                       keep_dims=True)/0.66
-            var_ = tf.square(var_)
-        else:
-            mean_, var_ = tf.nn.moments(input, axes=self.axis, keep_dims=True)
-
+        mean_, var_ = tf.nn.moments(input, axes=self.axis, keep_dims=True)
         if not self.scale:
-            var_ = np.float32(1.)
+            std_ = np.float32(1.)
+        else:
+            std_ = tf.sqrt(var_)+self.epsilon
         if not self.center:
             mean_ = np.float32(0.)
+        training_output = self.W*(input-mean_)/std_+self.b
 
         # update of the moving averages and updates/params collection
-        if self.decay == 'AVG':
-            decay = tf.cast(step+ONE_INT32, tf.float32)
-            m_ema, m_update = exponential_moving_average(mean_, decay, step)
-            v_ema, v_update = exponential_moving_average(var_, decay, step,
-                                                         init=tf.ones_like)
-        else:
-            m_ema, m_update = exponential_moving_average(mean_, self.decay,
-                                                         step)
-            v_ema, v_update = exponential_moving_average(var_, self.decay, step,
-                                                         init=tf.ones_like)
+        step = tf.assign_add(self.steps, ONE_INT32)
+        m_ema = tf.Variable(tf.zeros_like(mean_), trainable=False)
+        v_ema = tf.Variable(tf.ones_like(var_), trainable=False)
+        with tf.control_dependencies([step]):
+            if self.decay == 'AVG':
+                decay = tf.cast(step+ONE_INT32, tf.float32)
+                _, m_update = exponential_moving_average(mean_, decay, step, init=m_ema)
+                _, v_update = exponential_moving_average(var_, decay, step,
+                                                             init=v_ema)
+            else:
+                _, m_update = exponential_moving_average(mean_, self.decay,
+                                                             step, init=m_ema)
+                _, v_update = exponential_moving_average(var_, self.decay, step,
+                                                             init=v_ema)
         self._updates.append(m_update)
         self._updates.append(v_update)
-
-        # function, context dependent to get stat to use
-        use_mean, use_var = tf.cond(deterministic, lambda: [m_ema, v_ema],
-                                                   lambda: [mean_, var_])
-        use_std = tf.sqrt(use_var)+self.epsilon
-
-        # we also compute those quantities that allow to rewrite the output as
-        # A*input+b, this might be needed for some implementation/models
-        output = self.W*(input-use_mean)/use_std+self.b
-        self.b = -(self.W*use_mean)/use_std+self.b
-        self.A = self.W/use_std
-        return output
+        std_ = tf.sqrt(v_ema)+self.epsilon
+        deterministic_output = self.W*(input-m_ema)/std_+self.b
+        return tf.cond(deterministic, lambda: deterministic_output,
+                       lambda: training_output)
 
     def backward(self, input):
         return input*self.A

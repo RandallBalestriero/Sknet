@@ -136,7 +136,7 @@ class Op(Tensor):
         self._extra_variables = list()
 
         if type(self).deterministic_behavior and deterministic is None:
-            self._deterministic = tf.placeholder(tf.bool,
+            self._deterministic = tf.placeholder(tf.bool, shape=(),
                                                  name='deterministic')
         elif type(self).deterministic_behavior:
             self._deterministic = deterministic
