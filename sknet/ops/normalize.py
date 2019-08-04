@@ -81,6 +81,8 @@ class BatchNorm(Op):
                 self._b = tf.Variable(b, trainable=trainable_b, name='b')
             self.b = b_func(self._b)
 
+            self.m_ema = tf.Variable(tf.zeros(shape_), trainable=False)
+            self.v_ema = tf.Variable(tf.ones(shape_), trainable=False)
             # Steps
             self.steps = tf.Variable(-ONE_INT32, trainable=False, name='step')
 
@@ -89,6 +91,8 @@ class BatchNorm(Op):
     def forward(self, input, deterministic, *args, **kwargs):
 
         mean_, var_ = tf.nn.moments(input, axes=self.axis, keep_dims=True)
+        self.sample_mean = mean_
+        self.sample_var = var_
         if not self.scale:
             std_ = np.float32(1.)
         else:
@@ -99,23 +103,21 @@ class BatchNorm(Op):
 
         # update of the moving averages and updates/params collection
         step = tf.assign_add(self.steps, ONE_INT32)
-        m_ema = tf.Variable(tf.zeros_like(mean_), trainable=False)
-        v_ema = tf.Variable(tf.ones_like(var_), trainable=False)
         with tf.control_dependencies([step]):
             if self.decay == 'AVG':
                 decay = tf.cast(step+ONE_INT32, tf.float32)
-                _, m_update = exponential_moving_average(mean_, decay, step, init=m_ema)
+                _, m_update = exponential_moving_average(mean_, decay, step, init=self.m_ema)
                 _, v_update = exponential_moving_average(var_, decay, step,
-                                                             init=v_ema)
+                                                             init=self.v_ema)
             else:
                 _, m_update = exponential_moving_average(mean_, self.decay,
-                                                             step, init=m_ema)
+                                                             step, init=self.m_ema)
                 _, v_update = exponential_moving_average(var_, self.decay, step,
-                                                             init=v_ema)
+                                                             init=self.v_ema)
         self._updates.append(m_update)
         self._updates.append(v_update)
-        std_ = tf.sqrt(v_ema)+self.epsilon
-        deterministic_output = self.W*(input-m_ema)/std_+self.b
+        std_ = tf.sqrt(self.v_ema)+self.epsilon
+        deterministic_output = self.W*(input-self.m_ema)/std_+self.b
         return tf.cond(deterministic, lambda: deterministic_output,
                        lambda: training_output)
 
