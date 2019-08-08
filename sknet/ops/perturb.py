@@ -210,7 +210,7 @@ class RandomCrop(Op):
     
             super().__init__(input, deterministic=deterministic)
 
-    def forward(self, input, deterministic, *args, **kwargs):
+    def forward(self, input, deterministic):
 
         # Patches form the input:
         # need to transpose to extract patches
@@ -291,7 +291,7 @@ class RandomAxisReverse(Op):
             self.seed  = seed
             super().__init__(input, deterministic=deterministic)
 
-    def forward(self, input, deterministic, *args, **kwargs):
+    def forward(self, input, deterministic):
         N          = input.shape.as_list()[0]
         prob       = tf.random_uniform((N,), seed=self.seed)
         to_reverse = tf.less(prob,0.5)

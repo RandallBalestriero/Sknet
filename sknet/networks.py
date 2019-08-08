@@ -9,7 +9,6 @@ class Network:
     def __init__(self, layers=[], name='model'):
         self.name = name
         self.layers = layers
-        self._deter_dict = dict()
 
     def __getitem__(self, key):
         if isinstance(key, slice):
@@ -24,21 +23,23 @@ class Network:
         if hasattr(item, '__len__'):
             item = list(item)
             self.layers += item
-            for i in item:
-                if hasattr(i, 'deter_dict'):
-                    self._deter_dict.update(i.deter_dict(True))
         else:
             self.layers.append(item)
-            if hasattr(item, 'deter_dict'):
-                self._deter_dict.update(item.deter_dict(True))
     def as_list(self):
         """return the layers as a list"""
         return [layer for layer in self]
 
     def deter_dict(self, value):
-        for key in self._deter_dict.keys():
-            self._deter_dict[key] = value
-        return self._deter_dict.copy()
+        deter_dict = dict()
+        for item in self:
+            if isinstance(item, Layer):
+                for i in item.internal_ops:
+                    if hasattr(i, 'deter_dict'):
+                        deter_dict.update(i.deter_dict(value))
+            else:
+                if hasattr(item, 'deter_dict'):
+                    deter_dict.update(item.deter_dict(value))
+        return deter_dict
 
     @property
     def shape(self):
