@@ -99,7 +99,10 @@ class BatchNorm(Op):
             std_ = tf.sqrt(var_)+self.epsilon
         if not self.center:
             mean_ = np.float32(0.)
-        training_output = self.W*(input-mean_)/std_+self.b
+        training_output = tf.nn.batch_normalization(input, mean_,
+                                                    var_, self.b, self.W,
+                                                    self.epsilon)
+
 
         # update of the moving averages and updates/params collection
         step = tf.assign_add(self.steps, ONE_INT32)
@@ -117,7 +120,10 @@ class BatchNorm(Op):
         self._updates.append(m_update)
         self._updates.append(v_update)
         std_ = tf.sqrt(self.v_ema)+self.epsilon
-        deterministic_output = self.W*(input-self.m_ema)/std_+self.b
+        deterministic_output = tf.nn.batch_normalization(input, self.m_ema,
+                                                    self.v_ema, self.b, self.W,
+                                                    self.epsilon)
+
         return tf.cond(deterministic, lambda: deterministic_output,
                        lambda: training_output)
 
