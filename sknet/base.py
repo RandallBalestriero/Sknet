@@ -254,8 +254,9 @@ class Worker(object):
     """
 
     def __init__(self, *args, context, to_print=list(), feed_dict={},
-                 name=None, **kwargs):
+                 name=None, permanent=False, **kwargs):
         self.context = context
+        self.permanent = permanent
         if not hasattr(to_print, '__len__'):
             self.to_print = [to_print]
         else:
@@ -290,11 +291,13 @@ class Worker(object):
         allops = [op[0] for op in self.named_ops.values()]
         allops += [op[0] for op in self.ops]
         self._dependencies = get_tensor_dependencies(allops)
-        self.empty()
-
-    def empty(self):
         self.batch_data = dict([(name, []) for name in self.named_ops.keys()])
         self.epoch_data = dict([(name, []) for name in self.named_ops.keys()])
+
+    def empty(self):
+        if not self.permanent:
+            self.batch_data = dict([(name, []) for name in self.named_ops.keys()])
+            self.epoch_data = dict([(name, []) for name in self.named_ops.keys()])
 
     @property
     def dependencies(self):

@@ -57,6 +57,7 @@ class BatchIterator(dict):
         self.sets = list(options.keys())
         self.dataset = dataset
         self.options = options
+        self.p = dict()
         # extract the sets and then check for joint ones and separate them
         print('BatchIterator initialized with ')
         with tf.variable_scope("iterator"):
@@ -80,11 +81,14 @@ class BatchIterator(dict):
         """
         self.batch_counter[s] = -1
         N = self.dataset.N(s)
+        p = self.p[s] if s in self.p.keys() else None
         if self.options[s] == "continuous":
             indices = np.asarray(range(N)).astype('int64')
         elif self.options[s] == "random":
-            indices = np.random.choice(N, (N,))
-        else:
+            indices = np.random.choice(N, (N,), replace=True, p=p)
+        elif self.options[s] == "random_no_replace":
+            indices = np.random.choice(N, (N,), replace=False, p=p)
+        elif self.options[s] == "random_see_all":
             indices = np.random.permutation(N)
         self[s] = indices
 

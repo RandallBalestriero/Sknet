@@ -41,22 +41,24 @@ class Layer(Tensor):
             updates.append(op.updates)
         return updates
 
-def Dense(input, filters, nonlinearity=0):
-    dense = ops.Dense(input, filters, b=None)
+def Dense(input, filters, nonlinearity=0, W_func=tf.identity):
+    dense = ops.Dense(input, filters, b=None, W_func=tf.identity)
     bn = ops.BatchNorm(dense, [0])
     nonlinearity = ops.Activation(bn, nonlinearity)
     return Layer([dense, bn, nonlinearity])
 
 def Conv2D(input, filters, nonlinearity=0, strides=1, pad='valid',
-           W_bn=tf.ones, b_bn=tf.zeros):
-    conv = ops.Conv2D(input, filters=filters, strides=strides, b=None, pad=pad)
+           W_bn=tf.ones, b_bn=tf.zeros, W_func=tf.identity):
+    conv = ops.Conv2D(input, filters=filters, strides=strides, b=None, pad=pad,
+                      W_func=tf.identity)
     bn = ops.BatchNorm(conv, [0, 2, 3], W=W_bn, b=b_bn)
     nonlinearity = ops.Activation(bn, nonlinearity)
     return Layer([conv, bn, nonlinearity])
 
 def Conv2DPool(input, filters, nonlinearity=0, pad='valid', pool_shape=(2, 2),
-               strides=1, W_bn=tf.ones, b_bn=tf.zeros):
-    conv = ops.Conv2D(input, filters=filters, strides=strides, b=None, pad=pad)
+               strides=1, W_bn=tf.ones, b_bn=tf.zeros, W_func=tf.identity):
+    conv = ops.Conv2D(input, filters=filters, strides=strides, b=None, pad=pad,
+                      W_func=W_func)
     bn = ops.BatchNorm(conv, [0, 2, 3], W=W_bn, b=b_bn)
     nonlinearity = ops.Activation(bn, nonlinearity)
     pool = ops.Pool2D(nonlinearity, pool_shape)
