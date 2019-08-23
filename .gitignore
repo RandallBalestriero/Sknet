@@ -2,6 +2,10 @@ __pycache__/
 *.npz
 *.png
 *.h5
-
+__pycache__/
+sknet/__pycache__/
+sknet/ops/__pychache__/
+sknet/utils/__pycache__/
+sknet/dataset/__pycache__/
 
 

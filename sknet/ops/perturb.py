@@ -165,7 +165,7 @@ class RandomContrast(Op):
 
     def forward(self, input, deterministic):
         alpha = tf.random_uniform((input.shape.as_list()[0], 1, 1, 1),
-                                  lower=self.vmin, upper=self.vmax)
+                                  minval=self.vmin, maxval=self.vmax)
         adjusted = alpha*(input-tf.reduce_mean(input, [1, 2, 3],
                                                  keepdims=True))
         adjusted += tf.reduce_mean(input, [1, 2, 3], keepdims=True)
@@ -191,7 +191,7 @@ class RandomBrightness(Op):
 
     def forward(self, input, deterministic):
         alpha = tf.random_uniform((input.shape.as_list()[0], 1, 1, 1),
-                                  lower=self.vmin, upper=self.vmax)
+                                  minval=self.vmin, maxval=self.vmax)
         adjusted = alpha + input
         adjusted = tf.clip_by_value(adjusted, tf.reduce_min(input),
                                     tf.reduce_max(input))
@@ -215,7 +215,8 @@ class RandomHue(Op):
 
     def forward(self, input, deterministic):
 
-        radians = tf.random_uniform((input.shape.as_list()[0], 1))
+        radians = tf.random_uniform((input.shape.as_list()[0], 1),
+                                    minval=self.vmin, maxval=self.vmax)
         cosA = tf.cos(radians)
         sinA = tf.sin(radians)
         aa = cosA + (1.0 - cosA) / 3.0
