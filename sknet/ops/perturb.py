@@ -148,6 +148,94 @@ class GaussianNoise(Op):
         return output
 
 
+class RandomContrast(Op):
+    """randomly contrast on the input
+    """
+
+    _name_ = 'RandomContrastOp'
+    deterministic_behavior = True
+
+    def __init__(self, input, vmin, vmax, deterministic=None, seed=None, **kwargs):
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
+            self.vmin = vmin
+            self.vmax = vmax
+            self.seed = seed
+            super().__init__(input, deterministic=deterministic)
+
+    def forward(self, input, deterministic):
+        alpha = tf.random_uniform((input.shape.as_list()[0], 1, 1, 1),
+                                  lower=self.vmin, upper=self.vmax)
+        adjusted = alpha*(input-tf.reduce_mean(input, [1, 2, 3],
+                                                 keepdims=True))
+        adjusted += tf.reduce_mean(input, [1, 2, 3], keepdims=True)
+        adjusted = tf.clip_by_value(adjusted, tf.reduce_min(input),
+                                    tf.reduce_max(input))
+        return adjusted
+
+
+class RandomBrightness(Op):
+    """randomly contrast on the input
+    """
+
+    _name_ = 'RandomBrightnessOp'
+    deterministic_behavior = True
+
+    def __init__(self, input, vmin, vmax, deterministic=None, seed=None, **kwargs):
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
+            self.vmin = vmin
+            self.vmax = vmax
+            self.seed = seed
+            super().__init__(input, deterministic=deterministic)
+
+    def forward(self, input, deterministic):
+        alpha = tf.random_uniform((input.shape.as_list()[0], 1, 1, 1),
+                                  lower=self.vmin, upper=self.vmax)
+        adjusted = alpha + input
+        adjusted = tf.clip_by_value(adjusted, tf.reduce_min(input),
+                                    tf.reduce_max(input))
+        return adjusted
+
+
+class RandomHue(Op):
+    """randomly contrast on the input
+    """
+
+    _name_ = 'RandomHueOp'
+    deterministic_behavior = True
+
+    def __init__(self, input, vmin, vmax, deterministic=None, seed=None, **kwargs):
+        with tf.variable_scope(self._name_) as scope:
+            self._name = scope.original_name_scope
+            self.vmin = vmin
+            self.vmax = vmax
+            self.seed = seed
+            super().__init__(input, deterministic=deterministic)
+
+    def forward(self, input, deterministic):
+
+        radians = tf.random_uniform((input.shape.as_list()[0], 1))
+        cosA = tf.cos(radians)
+        sinA = tf.sin(radians)
+        aa = cosA + (1.0 - cosA) / 3.0
+        ab = 1./3. * (1.0 - cosA) - np.sqrt(1./3.) * sinA
+        ac = 1./3. * (1.0 - cosA) + np.sqrt(1./3.) * sinA
+        ba = 1./3. * (1.0 - cosA) + np.sqrt(1./3.) * sinA
+        bb = cosA + 1./3.*(1.0 - cosA)
+        bc = 1./3. * (1.0 - cosA) - np.sqrt(1./3.) * sinA
+        ca = 1./3. * (1.0 - cosA) - np.sqrt(1./3.) * sinA
+        cb = 1./3. * (1.0 - cosA) + np.sqrt(1./3.) * sinA
+        cc = cosA + 1./3. * (1.0 - cosA)
+
+        mat_shape = (input.shape.as_list()[0], 3, 3)
+        rot = tf.reshape(tf.stack([aa, ab, ac, ba, bb, bc, ca, cb, cc], 1),
+                         mat_shape)
+        adjusted = tf.einsum('ncij,nkc->nkij', input, rot)
+        adjusted = tf.clip_by_value(adjusted, tf.reduce_min(input),
+                                    tf.reduce_max(input))
+        return adjusted
+
 
 class RandomCrop(Op):
     """Random cropping of input images.
