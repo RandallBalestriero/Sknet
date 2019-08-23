@@ -111,7 +111,6 @@ class PiecewiseConstant:
         keys = list(steps.keys())
         values = list(steps.values())
         argsort = np.argsort(keys)
-        print(keys, argsort)
         self.boundaries = [np.int32(keys[i]) for i in argsort]
         self.values = [np.float32(values[i]) for i in argsort]
         self.values.insert(0, np.float32(self.initial))
