@@ -28,17 +28,17 @@ def load(data_format='NCHW'):
         if 'train' in name:
             classe = name.split('/')[-1].split('_')[0]
             x_train.append(scipy.misc.imread(f.open(name), flatten=False,
-                           mode='RGB'))
+                           mode='RGB').transpose((2, 0, 1)))
             y_train.append(classe)
         if 'val' in name:
             x_valid.append(scipy.misc.imread(f.open(name), flatten=False,
-                           mode='RGB'))
+                           mode='RGB').transpose((2, 0, 1)))
             arg =  name.split('/')[-1]
             print(val_classes[arg])
             y_valid.append(val_classes[arg])
         if 'test' in name:
             x_test.append(scipy.misc.imread(f.open(name), flatten=False,
-                           mode='RGB'))
+                           mode='RGB').transpose((2, 0, 1)))
 
     dataset = Dataset()
     dataset['images/train_set'], dataset['labels/train_set'] = x_train, y_train
