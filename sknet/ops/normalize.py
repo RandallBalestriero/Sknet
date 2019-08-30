@@ -117,8 +117,10 @@ class BatchNorm(Op):
                                                              step, init=self.m_ema)
                 _, v_update = exponential_moving_average(var_, self.decay, step,
                                                              init=self.v_ema)
-        self._updates.append(m_update)
-        self._updates.append(v_update)
+        if self.center:
+            self._updates.append(m_update)
+        if self.scale:
+            self._updates.append(v_update)
         std_ = tf.sqrt(self.v_ema)+self.epsilon
         deterministic_output = tf.nn.batch_normalization(input, self.m_ema,
                                                     self.v_ema, self.b, self.W,

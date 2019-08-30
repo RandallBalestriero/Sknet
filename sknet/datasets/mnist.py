@@ -8,7 +8,7 @@ from . import Dataset
 from ..utils import to_one_hot, DownloadProgressBar
 
 
-def load_mnist(PATH=None):
+def load(PATH=None, classes=range(10)):
     """Grayscale digit classification.
     The `MNIST <http://yann.lecun.com/exdb/mnist/>`_ database of handwritten 
     digits, available from this page, has a training set of 60,000 examples, 
@@ -30,8 +30,8 @@ def load_mnist(PATH=None):
     if PATH is None:
         PATH = os.environ['DATASET_PATH']
     datum_shape = (1,28,28)
-    dict_init = [("n_classes",10),("name","mnist"),
-                    ('classes',[str(u) for u in range(10)])]
+    dict_init = [("n_classes", len(classes)),("name", "mnist"),
+                    ('classes', [str(u) for u in range(10)])]
 
     dataset = Dataset(**dict(dict_init))
     print('Loading mnist')
@@ -56,13 +56,17 @@ def load_mnist(PATH=None):
     train_set, valid_set, test_set = pickle.load(f,encoding='latin1')
     f.close()
 
-    dataset['images/train_set'] = train_set[0].reshape((-1,1,28,28))
-    dataset['images/test_set']  = test_set[0].reshape((-1,1,28,28))
-    dataset['images/valid_set'] = valid_set[0].reshape((-1,1,28,28))
+    itrain = np.isin(train_set[1], classes)
+    itest = np.isin(test_set[1], classes)
+    ivalid = np.isin(valid_set[1], classes)
 
-    dataset['labels/train_set'] = train_set[1]
-    dataset['labels/test_set']  = test_set[1]
-    dataset['labels/valid_set'] = valid_set[1]
+    dataset['images/train_set'] = train_set[0][itrain].reshape((-1,1,28,28))
+    dataset['images/test_set']  = test_set[0][itest].reshape((-1,1,28,28))
+    dataset['images/valid_set'] = valid_set[0][ivalid].reshape((-1,1,28,28))
+
+    dataset['labels/train_set'] = train_set[1][itrain]
+    dataset['labels/test_set']  = test_set[1][itest]
+    dataset['labels/valid_set'] = valid_set[1][ivalid]
 
     dataset.cast('images','float32')
     dataset.cast('labels','int32')

@@ -69,6 +69,8 @@ class Adam:
             self.updates = [step]
 
             for param, grad in zip(params, gradients):
+                if grad is None:
+                    continue
                 _, m_op = exponential_moving_average(grad, beta1, step)
                 _, v_op = exponential_moving_average(tf.square(grad), beta2, step)
                 update = learning_rate*m_op/(tf.sqrt(v_op)+eps)

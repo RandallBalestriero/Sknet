@@ -171,7 +171,7 @@ class RandomContrast(Op):
         adjusted += tf.reduce_mean(input, [1, 2, 3], keepdims=True)
         adjusted = tf.clip_by_value(adjusted, tf.reduce_min(input),
                                     tf.reduce_max(input))
-        return adjusted
+        return tf.cond(deterministic, lambda: input, lambda: adjusted)
 
 
 class RandomBrightness(Op):
@@ -195,7 +195,7 @@ class RandomBrightness(Op):
         adjusted = alpha + input
         adjusted = tf.clip_by_value(adjusted, tf.reduce_min(input),
                                     tf.reduce_max(input))
-        return adjusted
+        return tf.cond(deterministic, lambda: input, lambda: adjusted)
 
 
 class RandomHue(Op):
@@ -235,7 +235,7 @@ class RandomHue(Op):
         adjusted = tf.einsum('ncij,nkc->nkij', input, rot)
         adjusted = tf.clip_by_value(adjusted, tf.reduce_min(input),
                                     tf.reduce_max(input))
-        return adjusted
+        return tf.cond(deterministic, lambda: input, lambda: adjusted)
 
 
 class RandomCrop(Op):

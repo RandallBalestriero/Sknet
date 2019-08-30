@@ -31,7 +31,7 @@ def load_fashionmnist(PATH=None):
         PATH = os.environ['DATASET_PATH']
     dict_init = [("n_classes",10),("path",PATH),("name","fashionmnist"),
                 ("classes",["T-shirt/top", "Trouser", "Pullover",
-                    "Dress", "Coat", "Sandal", "Shirt", 
+                    "Dress", "Coat", "Sandal", "Shirt",
                     "Sneaker", "Bag", "Ankle boot"])]
 
     dataset = Dataset(**dict(dict_init))

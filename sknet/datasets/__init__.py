@@ -14,5 +14,5 @@ from .warblr import *
 from .stl10 import *
 from .mini import *
 from .DCLDE import *
-
+from .tinyimagenet import *
 

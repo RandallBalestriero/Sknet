@@ -91,7 +91,7 @@ class Network:
         return updates
 
 
-def Resnet(dnn, n_classes=None, D=4, W=1, block=layers.ResBlockV1):
+def Resnet(dnn, n_classes=None, D=4, W=1, block=layers.ResBlockV1, global_pool=True):
     UNITS = [16*W, 32*W, 64*W]
     dnn.append(ops.Conv2D(dnn[-1], filters=(UNITS[0], 3, 3), pad='same'))
     dnn.append(ops.BatchNorm(dnn[-1], [0, 2, 3]))
@@ -103,7 +103,8 @@ def Resnet(dnn, n_classes=None, D=4, W=1, block=layers.ResBlockV1):
             dnn.append(ops.Pool2D(dnn[-1], (2, 2), pool_type='AVG'))
 #    dnn.append(ops.BatchNorm(dnn[-1], [0, 2, 3]))
     dnn.append(ops.Activation(dnn[-1], 0.01))
-    dnn.append(ops.GlobalPool2D(dnn[-1], pool_type='AVG'))
+    if global_pool:
+        dnn.append(ops.GlobalPool2D(dnn[-1], pool_type='AVG'))
     if n_classes is not None:
         dnn.append(ops.Dense(dnn[-1], n_classes))
 
