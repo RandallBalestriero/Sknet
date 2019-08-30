@@ -34,16 +34,33 @@ def load_tinyimagenet(data_format='NCHW'):
             x_valid.append(scipy.misc.imread(f.open(name), flatten=False,
                            mode='RGB').transpose((2, 0, 1)))
             arg =  name.split('/')[-1]
-            print(val_classes[arg])
             y_valid.append(val_classes[arg])
         if 'test' in name:
             x_test.append(scipy.misc.imread(f.open(name), flatten=False,
                            mode='RGB').transpose((2, 0, 1)))
 
+    # as per loading, the classes are of the form 'n023552' and thus need to be
+    # converted to an integer. The mapping dictionnary will do the one to one
+    # correspondance.
+    mapping = dict()
+    counter = 0
+    for classes in np.unique(y_train):
+        if classes not in mapping:
+            mapping[classes] = counter
+            counter += 1
+
+    y_train = np.asarray([mapping[y] for y in y_train]).astype('int32')
+    y_valid = np.asarray([mapping[y] for y in y_valid]).astype('int32')
+    x_train = np.asarray(x_train).astype('float32')
+    x_test = np.asarray(x_test).astype('float32')
+    x_valid = np.asarray(x_valid).astype('float32')
+
     dataset = Dataset()
     dataset['images/train_set'], dataset['labels/train_set'] = x_train, y_train
-    dataset['images/test_set'], dataset['labels/test_set'] = x_test, np.zeros(100)
+    dataset['images/test_set'], dataset['labels/test_set'] = x_test, np.zeros(100, dtype='int32')
     dataset['images/valid_set'], dataset['labels/valid_set'] = x_valid, y_valid
+
+    dataset.n_classes = 200
 
     return dataset
 
