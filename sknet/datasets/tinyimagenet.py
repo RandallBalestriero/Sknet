@@ -7,7 +7,7 @@ from PIL import Image
 from . import Dataset
 
 
-def load(data_format='NCHW'):
+def load_tinyimagenet(data_format='NCHW'):
 
     PATH = os.environ['DATASET_PATH']
 
