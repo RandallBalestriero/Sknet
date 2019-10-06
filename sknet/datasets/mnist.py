@@ -8,7 +8,7 @@ from . import Dataset
 from ..utils import to_one_hot, DownloadProgressBar
 
 
-def load(PATH=None, classes=range(10)):
+def load_mnist(PATH=None, classes=range(10)):
     """Grayscale digit classification.
     The `MNIST <http://yann.lecun.com/exdb/mnist/>`_ database of handwritten 
     digits, available from this page, has a training set of 60,000 examples, 

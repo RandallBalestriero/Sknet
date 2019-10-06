@@ -87,7 +87,7 @@ def ResBlockV1(input, filters, stride=1):
                   merge, output])
 
 
-def ResBlockV2(input, filters, stride=1):
+def ResBlockV2(input, filters, stride=1, decay=0.9):
     if stride > 1:
         conv_linear = ops.Conv2D(input, filters=(filters, 3, 3),
                                  b=None, pad='same')
@@ -95,11 +95,11 @@ def ResBlockV2(input, filters, stride=1):
         conv_linear = ops.Identity(input)
     conv = ops.Conv2D(input, filters=(filters, 3, 3), b=None,
                       pad='same')
-    bn = ops.BatchNorm(conv, [0, 2, 3])
+    bn = ops.BatchNorm(conv, [0, 2, 3], decay=decay)
     nonlinearity = ops.Activation(bn, 0.)
     out_conv = ops.Conv2D(nonlinearity, filters=(filters, 3, 3), b=None,
                           pad='same')
-    bn2 = ops.BatchNorm(out_conv, [0, 2, 3])
+    bn2 = ops.BatchNorm(out_conv, [0, 2, 3], decay=decay)
     merge = ops.Merge([bn2, conv_linear], tf.add_n)
     return Layer([conv_linear, conv, bn, nonlinearity, out_conv, bn2,
                   merge])

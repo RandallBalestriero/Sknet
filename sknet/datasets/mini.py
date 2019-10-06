@@ -77,6 +77,74 @@ def load_mini(N=1000):
 
     return dataset
 
+def load_onesine(N):
+    time = np.linspace(-1.5, 5.5, N//2)
+    train_set = np.stack([time, np.cos(time)], 1)
+    train_set = np.concatenate([train_set, train_set], 0)
+    train_set = train_set.astype('float32')
+    labels = np.zeros(N, dtype='int32')
+    return train_set, labels
+
+def load_onecircle(N):
+    X = np.random.randn(N, 2)
+    X /= np.sqrt((X**2).sum(1, keepdims=True))
+    labels = np.zeros(N)
+    X = X.astype('float32')
+    labels = labels.astype('int32')
+    return X, labels
+
+def load_onesquare(N):
+    time = np.linspace(0, 1, N//4).reshape((-1, 1))
+    print(time.shape, np.ones(N//4).shape)
+    np.hstack([time, np.ones((N//4, 1))])
+    X = np.vstack([np.hstack([time, np.ones((N//4, 1))]),
+                        np.hstack([time, np.zeros((N//4, 1))]),
+                        np.hstack([np.zeros((N//4, 1)), time]),
+                        np.hstack([np.ones((N//4, 1)), time])])
+    X -= X.mean(0)
+    labels = np.zeros(N)
+    labels = labels.astype('int32')
+    X = X.astype('float32')
+    return X, labels
+
+
+
+def load_twosine(N, factor=0.3):
+    time = np.linspace(-1.5, 5.5, N//2)
+    train_set = np.stack([time, np.cos(time)], 1)
+    train_set = np.concatenate([train_set, train_set], 0)
+    train_set[N//2:, 1] += factor
+    train_set = train_set.astype('float32')
+    labels = np.zeros(N, dtype='int32')
+    labels[N//2:] += 1
+    return train_set, labels
+
+def load_twocircles(N, factor=0.3):
+    X = np.random.randn(N, 2)
+    X /= np.sqrt((X**2).sum(1, keepdims=True))
+    X[:N//2] *= (1+factor)
+    labels = np.concatenate([np.ones(N//2), np.zeros(N//2)])
+    X = X.astype('float32')
+    labels = labels.astype('int32')
+    return X, labels
+
+def load_twosquares(N, factor=0.3):
+    time = np.linspace(0, 1, N//4).reshape((-1, 1))
+    print(time.shape, np.ones(N//4).shape)
+    np.hstack([time, np.ones((N//4, 1))])
+    X = np.vstack([np.hstack([time, np.ones((N//4, 1))]),
+                        np.hstack([time, np.zeros((N//4, 1))]),
+                        np.hstack([np.zeros((N//4, 1)), time]),
+                        np.hstack([np.ones((N//4, 1)), time])])
+    X -= X.mean(0)
+    X[::2] *= (1+factor)
+    labels = np.ones(N)
+    labels[::2] = 0
+    labels = labels.astype('int32')
+    X = X.astype('float32')
+    return X, labels
+
+
 def load_chirp2D(N,seed=0):
     X1,X2 = np.meshgrid(np.linspace(0,4,N),np.linspace(0,4,N))
     np.random.seed(seed)

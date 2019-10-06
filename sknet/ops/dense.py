@@ -89,6 +89,7 @@ class Dense(Op):
                 self.b  = None
             else:
                 if callable(b):
+                    print(b((1,units)))
                     self._b = tf.Variable(b((1,units)),name=name+'b')
                 else:
                     self._b = b
